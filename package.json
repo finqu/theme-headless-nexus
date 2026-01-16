@@ -10,18 +10,18 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@finqu/storefront-lib": "*",
-    "@finqu/storefront-sdk": "*",
-    "@finqu/storefront-cli": "*",
+    "@finqu/storefront-cli": "0.1.0-alpha.11",
+    "@finqu/storefront-lib": "^1.0.7",
+    "@finqu/storefront-sdk": "0.1.0-alpha.11",
     "@puckeditor/core": "^0.21.0",
-    "next": "^15.0.0",
-    "react": "^19.0.0",
-    "react-dom": "^19.0.0"
+    "next": "^16.1.2",
+    "react": "^19.2.3",
+    "react-dom": "^19.2.3"
   },
   "devDependencies": {
-    "@types/node": "^22.10.0",
-    "@types/react": "^19.0.0",
-    "@types/react-dom": "^19.0.0",
-    "typescript": "^5.7.0"
+    "@types/node": "^25.0.9",
+    "@types/react": "^19.2.8",
+    "@types/react-dom": "^19.2.3",
+    "typescript": "^5.9.3"
   }
 }

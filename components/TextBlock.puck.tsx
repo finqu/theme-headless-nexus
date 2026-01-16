@@ -1,4 +1,4 @@
-import { type PuckComponentConfig } from '@finqu/storefront-sdk';
+import { type ComponentConfig } from '@finqu/storefront-sdk';
 
 interface TextBlockProps {
     content: string;
@@ -7,7 +7,7 @@ interface TextBlockProps {
 
 export const category = 'Content';
 
-export const config: PuckComponentConfig<TextBlockProps> = {
+export const config: ComponentConfig<TextBlockProps> = {
     label: 'Text Block',
     fields: {
         content: {

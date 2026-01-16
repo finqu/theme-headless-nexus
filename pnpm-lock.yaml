@@ -9,77 +9,56 @@ importers:
   .:
     dependencies:
       '@finqu/storefront-cli':
-        specifier: '*'
-        version: 0.1.0-alpha.10
+        specifier: 0.1.0-alpha.11
+        version: 0.1.0-alpha.11
       '@finqu/storefront-lib':
-        specifier: '*'
+        specifier: ^1.0.7
         version: 1.0.7(@tanstack/react-query@5.90.17(react@19.2.3))(react@19.2.3)
       '@finqu/storefront-sdk':
-        specifier: '*'
-        version: 0.1.0-alpha.10(@finqu/storefront-lib@1.0.7(@tanstack/react-query@5.90.17(react@19.2.3))(react@19.2.3))(@measured/puck@0.18.3(@types/react@19.2.8)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)(use-sync-external-store@1.6.0(react@19.2.3)))(react@19.2.3)
+        specifier: 0.1.0-alpha.11
+        version: 0.1.0-alpha.11(@finqu/storefront-lib@1.0.7(@tanstack/react-query@5.90.17(react@19.2.3))(react@19.2.3))(@puckeditor/core@0.21.0(@floating-ui/dom@1.7.4)(@types/react-dom@19.2.3(@types/react@19.2.8))(@types/react@19.2.8)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)(use-sync-external-store@1.6.0(react@19.2.3)))(react@19.2.3)
       '@puckeditor/core':
         specifier: ^0.21.0
         version: 0.21.0(@floating-ui/dom@1.7.4)(@types/react-dom@19.2.3(@types/react@19.2.8))(@types/react@19.2.8)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)(use-sync-external-store@1.6.0(react@19.2.3))
       next:
-        specifier: ^15.0.0
-        version: 15.5.9(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
+        specifier: ^16.1.2
+        version: 16.1.2(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
       react:
-        specifier: ^19.0.0
+        specifier: ^19.2.3
         version: 19.2.3
       react-dom:
-        specifier: ^19.0.0
+        specifier: ^19.2.3
         version: 19.2.3(react@19.2.3)
     devDependencies:
       '@types/node':
-        specifier: ^22.10.0
-        version: 22.19.7
+        specifier: ^25.0.9
+        version: 25.0.9
       '@types/react':
-        specifier: ^19.0.0
+        specifier: ^19.2.8
         version: 19.2.8
       '@types/react-dom':
-        specifier: ^19.0.0
+        specifier: ^19.2.3
         version: 19.2.3(@types/react@19.2.8)
       typescript:
-        specifier: ^5.7.0
+        specifier: ^5.9.3
         version: 5.9.3
 
 packages:
 
-  '@dnd-kit/abstract@0.0.7-beta-20250130032138':
-    resolution: {integrity: sha512-CFprqfJTtvSqq6ST7AEu41M1CIMk3lko5JNggTsx9seuqodJ0kCqBDul92BBWoAxPiRuQPm+TrK5vijj1tO7rg==}
-
   '@dnd-kit/abstract@0.1.21':
     resolution: {integrity: sha512-6sJut6/D21xPIK8EFMu+JJeF+fBCOmQKN1BRpeUYFi5m9P1CJpTYbBwfI107h7PHObI6a5bsckiKkRpF2orHpw==}
-
-  '@dnd-kit/collision@0.0.7-beta-20250130032138':
-    resolution: {integrity: sha512-IlR3Qi1Fwc+DFDIdxHCcuolv7+l+M/0KAXdW5gd8m4y5sfW1do1pogAcRA6qNHcUvlUtbsdINf/CzFoztMJ5Bw==}
 
   '@dnd-kit/collision@0.1.21':
     resolution: {integrity: sha512-9AJ4NbuwGDexxMCZXZyKdNQhbAe93p6C6IezQaDaWmdCqZHMHmC3+ul7pGefBQfOooSarGwIf8Bn182o9SMa1A==}
 
-  '@dnd-kit/dom@0.0.7-beta-20250130032138':
-    resolution: {integrity: sha512-LuySH+UkuvlNgMGDfRPe00cSbRMxyE9PbVNfUEmsnXUmltSW9ht5jVZrkQYAI8kZB3y7ry8h1fZtK/dOI3QFBg==}
-
   '@dnd-kit/dom@0.1.21':
     resolution: {integrity: sha512-6UDc1y2Y3oLQKArGlgCrZxz5pdEjRSiQujXOn5JdbuWvKqTdUR5RTYDeicr+y2sVm3liXjTqs3WlUoV+eqhqUQ==}
-
-  '@dnd-kit/geometry@0.0.7-beta-20250130032138':
-    resolution: {integrity: sha512-XfXqVq+LdMt5VKTjiyhvCcc68xRvD9xZilA52mdODN1qM3wh5ezpe17MyjlqefqH+sratpjmZwifHk2CONRWeg==}
 
   '@dnd-kit/geometry@0.1.21':
     resolution: {integrity: sha512-Tir97wNJbopN2HgkD7AjAcoB3vvrVuUHvwdPALmNDUH0fWR637c4MKQ66YjjZAbUEAR8KL6mlDiHH4MzTLd7CQ==}
 
-  '@dnd-kit/helpers@0.0.7-beta-20250130032138':
-    resolution: {integrity: sha512-KzZhgi3zoSJMSEwSL+6d/8GS2FfvY1s5wpIUPxEAgJM9ati+iU8uFL4T5qgxeTt8LVxobyFRzI5rVisUGgSICA==}
-
   '@dnd-kit/helpers@0.1.18':
     resolution: {integrity: sha512-k4hVXIb8ysPt+J0KOxbBTc6rG0JSlsrNevI/fCHLbyXvEyj1imxl7yOaAQX13cAZnte88db6JvbgsSWlVjtxbw==}
-
-  '@dnd-kit/react@0.0.7-beta-20250130032138':
-    resolution: {integrity: sha512-JsBHxVGoJlmFMt0mo6/7mwasrvq09Iz/uFUXcX/M7ob8UjdthNjL5y9vk8VGnJlka7yMHQxEGHJvQs6yh+FWow==}
-    peerDependencies:
-      react: ^18.0.0 || ^19.0.0
-      react-dom: ^18.0.0 || ^19.0.0
 
   '@dnd-kit/react@0.1.18':
     resolution: {integrity: sha512-OCeCO9WbKnN4rVlEOEe9QWxSIFzP0m/fBFmVYfu2pDSb4pemRkfrvCsI/FH3jonuESYS8qYnN9vc8Vp3EiCWCA==}
@@ -87,17 +66,14 @@ packages:
       react: ^18.0.0 || ^19.0.0
       react-dom: ^18.0.0 || ^19.0.0
 
-  '@dnd-kit/state@0.0.7-beta-20250130032138':
-    resolution: {integrity: sha512-xBW0LTG+jzXbdeha35uAlvZhO4M6F81fq7vpA54nodIu/RkBIB38NhnReMv/UrVRHxaZlwILDpW/3oHGu5h2jg==}
-
   '@dnd-kit/state@0.1.21':
     resolution: {integrity: sha512-pdhntEPvn/QttcF295bOJpWiLsRqA/Iczh1ODOJUxGiR+E4GkYVz9VapNNm9gDq6ST0tr/e1Q2xBztUHlJqQgA==}
 
   '@emnapi/runtime@1.8.1':
     resolution: {integrity: sha512-mehfKSMWjjNol8659Z8KxEMrdSJDDot5SXMq00dM8BN4o+CLNXQ0xH2V7EchNHV4RmbZLmmPdEaXZc5H2FXmDg==}
 
-  '@finqu/storefront-cli@0.1.0-alpha.10':
-    resolution: {integrity: sha512-YYl2y98G58+TwZ3U+9xR/TyXp8BDWvExQ9tAcQIP5W7PW1q5r5aCrYgEbQUPk13T1IntPzrSfMkXC+p1XHo3tA==, tarball: https://npm.pkg.github.com/download/@finqu/storefront-cli/0.1.0-alpha.10/049ba09336d8906774a47ae1a435f6516f90aefc}
+  '@finqu/storefront-cli@0.1.0-alpha.11':
+    resolution: {integrity: sha512-V3cPPV78gDlJwEnN6Uzh8znF3/1jraVJh8UJ8AStTyY6DlCST7YQ2U9bsmx1WhERjdyK5TDoE/zMGSPw/0iVHQ==, tarball: https://npm.pkg.github.com/download/@finqu/storefront-cli/0.1.0-alpha.11/dedfd6e4f974037f0cb01d563cc32fdd8bc3f798}
     hasBin: true
 
   '@finqu/storefront-lib@1.0.7':
@@ -112,11 +88,11 @@ packages:
       react:
         optional: true
 
-  '@finqu/storefront-sdk@0.1.0-alpha.10':
-    resolution: {integrity: sha512-FTTe3YPFq0e82H47E9Xfky01Kvqy3GB4OfMtFU+x9iZMk+8jpI62OlpgA664zlwT3sf0VI9yWE+QnSysKpU1tA==, tarball: https://npm.pkg.github.com/download/@finqu/storefront-sdk/0.1.0-alpha.10/eac4fa9056f177e09fd390549eebc86198954601}
+  '@finqu/storefront-sdk@0.1.0-alpha.11':
+    resolution: {integrity: sha512-7LPz0qEneYj4sYF5lnCVNBECra5/ypj9685VVxeu7r4UJDCGGK/VS7ZTEfFb2nO/B4jeUqJr1FJ7AOjvUj6VBQ==, tarball: https://npm.pkg.github.com/download/@finqu/storefront-sdk/0.1.0-alpha.11/e5bb5371f80302917cc7f3e521a20aacc69c1298}
     peerDependencies:
       '@finqu/storefront-lib': '*'
-      '@measured/puck': ^0.18.0
+      '@puckeditor/core': ^0.21.0
       react: ^18.0.0 || ^19.0.0
 
   '@floating-ui/core@1.7.3':
@@ -271,59 +247,53 @@ packages:
     cpu: [x64]
     os: [win32]
 
-  '@measured/puck@0.18.3':
-    resolution: {integrity: sha512-mw78Z7Ykk4LbyM+8n3CPsjI41SyMg1dOfYoV3VSWJiZWkMj47x6DJS6SdwfaNSyseyPpcSx6sEbL6BaOBAVoHQ==}
-    deprecated: 'Puck has moved. Please use @puckeditor/core instead: https://www.npmjs.com/package/@puckeditor/core'
-    peerDependencies:
-      react: ^18.0.0 || ^19.0.0
+  '@next/env@16.1.2':
+    resolution: {integrity: sha512-r6TpLovDTvWtzw11UubUQxEK6IduT8rSAHbGX68yeFpA/1Oq9R4ovi5nqMUMgPN0jr2SpfeyFRbTZg3Inuuv3g==}
 
-  '@next/env@15.5.9':
-    resolution: {integrity: sha512-4GlTZ+EJM7WaW2HEZcyU317tIQDjkQIyENDLxYJfSWlfqguN+dHkZgyQTV/7ykvobU7yEH5gKvreNrH4B6QgIg==}
-
-  '@next/swc-darwin-arm64@15.5.7':
-    resolution: {integrity: sha512-IZwtxCEpI91HVU/rAUOOobWSZv4P2DeTtNaCdHqLcTJU4wdNXgAySvKa/qJCgR5m6KI8UsKDXtO2B31jcaw1Yw==}
+  '@next/swc-darwin-arm64@16.1.2':
+    resolution: {integrity: sha512-0N2baysDpTXASTVxTV+DkBnD97bo9PatUj8sHlKA+oR9CyvReaPQchQyhCbH0Jm0mC/Oka5F52intN+lNOhSlA==}
     engines: {node: '>= 10'}
     cpu: [arm64]
     os: [darwin]
 
-  '@next/swc-darwin-x64@15.5.7':
-    resolution: {integrity: sha512-UP6CaDBcqaCBuiq/gfCEJw7sPEoX1aIjZHnBWN9v9qYHQdMKvCKcAVs4OX1vIjeE+tC5EIuwDTVIoXpUes29lg==}
+  '@next/swc-darwin-x64@16.1.2':
+    resolution: {integrity: sha512-Q0wnSK0lmeC9ps+/w/bDsMSF3iWS45WEwF1bg8dvMH3CmKB2BV4346tVrjWxAkrZq20Ro6Of3R19IgrEJkXKyw==}
     engines: {node: '>= 10'}
     cpu: [x64]
     os: [darwin]
 
-  '@next/swc-linux-arm64-gnu@15.5.7':
-    resolution: {integrity: sha512-NCslw3GrNIw7OgmRBxHtdWFQYhexoUCq+0oS2ccjyYLtcn1SzGzeM54jpTFonIMUjNbHmpKpziXnpxhSWLcmBA==}
+  '@next/swc-linux-arm64-gnu@16.1.2':
+    resolution: {integrity: sha512-4twW+h7ZatGKWq+2pUQ9SDiin6kfZE/mY+D8jOhSZ0NDzKhQfAPReXqwTDWVrNjvLzHzOcDL5kYjADHfXL/b/Q==}
     engines: {node: '>= 10'}
     cpu: [arm64]
     os: [linux]
 
-  '@next/swc-linux-arm64-musl@15.5.7':
-    resolution: {integrity: sha512-nfymt+SE5cvtTrG9u1wdoxBr9bVB7mtKTcj0ltRn6gkP/2Nu1zM5ei8rwP9qKQP0Y//umK+TtkKgNtfboBxRrw==}
+  '@next/swc-linux-arm64-musl@16.1.2':
+    resolution: {integrity: sha512-Sn6LxPIZcADe5AnqqMCfwBv6vRtDikhtrjwhu+19WM6jHZe31JDRcGuPZAlJrDk6aEbNBPUUAKmySJELkBOesg==}
     engines: {node: '>= 10'}
     cpu: [arm64]
     os: [linux]
 
-  '@next/swc-linux-x64-gnu@15.5.7':
-    resolution: {integrity: sha512-hvXcZvCaaEbCZcVzcY7E1uXN9xWZfFvkNHwbe/n4OkRhFWrs1J1QV+4U1BN06tXLdaS4DazEGXwgqnu/VMcmqw==}
+  '@next/swc-linux-x64-gnu@16.1.2':
+    resolution: {integrity: sha512-nwzesEQBfQIOOnQ7JArzB08w9qwvBQ7nC1i8gb0tiEFH94apzQM3IRpY19MlE8RBHxc9ArG26t1DEg2aaLaqVQ==}
     engines: {node: '>= 10'}
     cpu: [x64]
     os: [linux]
 
-  '@next/swc-linux-x64-musl@15.5.7':
-    resolution: {integrity: sha512-4IUO539b8FmF0odY6/SqANJdgwn1xs1GkPO5doZugwZ3ETF6JUdckk7RGmsfSf7ws8Qb2YB5It33mvNL/0acqA==}
+  '@next/swc-linux-x64-musl@16.1.2':
+    resolution: {integrity: sha512-s60bLf16BDoICQHeKEm0lDgUNMsL1UpQCkRNZk08ZNnRpK0QUV+6TvVHuBcIA7oItzU0m7kVmXe8QjXngYxJVA==}
     engines: {node: '>= 10'}
     cpu: [x64]
     os: [linux]
 
-  '@next/swc-win32-arm64-msvc@15.5.7':
-    resolution: {integrity: sha512-CpJVTkYI3ZajQkC5vajM7/ApKJUOlm6uP4BknM3XKvJ7VXAvCqSjSLmM0LKdYzn6nBJVSjdclx8nYJSa3xlTgQ==}
+  '@next/swc-win32-arm64-msvc@16.1.2':
+    resolution: {integrity: sha512-Sq8k4SZd8Y8EokKdz304TvMO9HoiwGzo0CTacaiN1bBtbJSQ1BIwKzNFeFdxOe93SHn1YGnKXG6Mq3N+tVooyQ==}
     engines: {node: '>= 10'}
     cpu: [arm64]
     os: [win32]
 
-  '@next/swc-win32-x64-msvc@15.5.7':
-    resolution: {integrity: sha512-gMzgBX164I6DN+9/PGA+9dQiwmTkE4TloBNx8Kv9UiGARsr9Nba7IpcBRA1iTV9vwlYnrE3Uy6I7Aj6qLjQuqw==}
+  '@next/swc-win32-x64-msvc@16.1.2':
+    resolution: {integrity: sha512-KQDBwspSaNX5/wwt6p7ed5oINJWIxcgpuqJdDNubAyq7dD+ZM76NuEjg8yUxNOl5R4NNgbMfqE/RyNrsbYmOKg==}
     engines: {node: '>= 10'}
     cpu: [x64]
     os: [win32]
@@ -714,8 +684,8 @@ packages:
   '@types/node@20.19.30':
     resolution: {integrity: sha512-WJtwWJu7UdlvzEAUm484QNg5eAoq5QR08KDNx7g45Usrs2NtOPiX8ugDqmKdXkyL03rBqU5dYNYVQetEpBHq2g==}
 
-  '@types/node@22.19.7':
-    resolution: {integrity: sha512-MciR4AKGHWl7xwxkBa6xUGxQJ4VBOmPTF7sL+iGzuahOFaO0jHCsuEfS80pan1ef4gWId1oWOweIhrDEYLuaOw==}
+  '@types/node@25.0.9':
+    resolution: {integrity: sha512-/rpCXHlCWeqClNBwUhDcusJxXYDjZTyE8v5oTO7WbL8eij2nKhUeU89/6xgjU7N4/Vh3He0BtyhJdQbDyhiXAw==}
 
   '@types/react-dom@19.2.3':
     resolution: {integrity: sha512-jp2L/eY6fn+KgVVQAOqYItbF0VY/YApe5Mz2F0aykSO8gx31bYCZyvSeYxCHKvzHG5eZjc+zyaS5BrBWya2+kQ==}
@@ -740,6 +710,10 @@ packages:
   aria-hidden@1.2.6:
     resolution: {integrity: sha512-ik3ZgC9dY/lYVVM++OISsaYDeg1tb0VtP5uL3ouh1koGOaUMDPpbFIei4JkFimWUFPn90sbMNMXQAIVOlnYKJA==}
     engines: {node: '>=10'}
+
+  baseline-browser-mapping@2.9.14:
+    resolution: {integrity: sha512-B0xUquLkiGLgHhpPBqvl7GWegWBUNuujQ6kXd/r1U38ElPT6Ok8KZ8e+FpUGEc2ZoRQUzq/aUnaKFc/svWUGSg==}
+    hasBin: true
 
   braces@3.0.3:
     resolution: {integrity: sha512-yQbXgO/OSZVD2IsiLlro+7Hf6Q18EJrKSEsdoMzKePKXct3gvD8oLcOQdIzGupr5Fj+EDe8gO/lxc1BzfMpxvA==}
@@ -857,9 +831,9 @@ packages:
     engines: {node: ^10 || ^12 || ^13.7 || ^14 || >=15.0.1}
     hasBin: true
 
-  next@15.5.9:
-    resolution: {integrity: sha512-agNLK89seZEtC5zUHwtut0+tNrc0Xw4FT/Dg+B/VLEo9pAcS9rtTKpek3V6kVcVwsB2YlqMaHdfZL4eLEVYuCg==}
-    engines: {node: ^18.18.0 || ^19.8.0 || >= 20.0.0}
+  next@16.1.2:
+    resolution: {integrity: sha512-SVSWX7wjUUDrIDVqhl4xm/jiOrvYGMG7NzVE/dGzzgs7r3dFGm4V19ia0xn3GDNtHCKM7C9h+5BoimnJBhmt9A==}
+    engines: {node: '>=20.9.0'}
     hasBin: true
     peerDependencies:
       '@opentelemetry/api': ^1.1.0
@@ -1067,6 +1041,9 @@ packages:
   undici-types@6.21.0:
     resolution: {integrity: sha512-iwDZqg0QAGrg9Rav5H4n0M64c3mkR59cJ6wQp+7C4nI0gsmExaedaYLNO44eT4AtBBwjbTiGPMlt2Md0T9H9JQ==}
 
+  undici-types@7.16.0:
+    resolution: {integrity: sha512-Zz+aZWSj8LE6zoxD+xrjh4VfkIG8Ya6LvYkZqtUQGJPZjYl53ypCaUwWqo7eI0x66KBGeRo+mlBEkMSeSZ38Nw==}
+
   use-callback-ref@1.3.3:
     resolution: {integrity: sha512-jQL3lRnocaFtu3V00JToYz/4QkNWswxijDaCVNZRiRTO3HQDLsdu1ZtmIUvV4yPp+rvWm5j0y0TG/S61cuijTg==}
     engines: {node: '>=10'}
@@ -1141,36 +1118,16 @@ packages:
 
 snapshots:
 
-  '@dnd-kit/abstract@0.0.7-beta-20250130032138':
-    dependencies:
-      '@dnd-kit/geometry': 0.0.7-beta-20250130032138
-      '@dnd-kit/state': 0.0.7-beta-20250130032138
-      tslib: 2.8.1
-
   '@dnd-kit/abstract@0.1.21':
     dependencies:
       '@dnd-kit/geometry': 0.1.21
       '@dnd-kit/state': 0.1.21
       tslib: 2.8.1
 
-  '@dnd-kit/collision@0.0.7-beta-20250130032138':
-    dependencies:
-      '@dnd-kit/abstract': 0.0.7-beta-20250130032138
-      '@dnd-kit/geometry': 0.0.7-beta-20250130032138
-      tslib: 2.8.1
-
   '@dnd-kit/collision@0.1.21':
     dependencies:
       '@dnd-kit/abstract': 0.1.21
       '@dnd-kit/geometry': 0.1.21
-      tslib: 2.8.1
-
-  '@dnd-kit/dom@0.0.7-beta-20250130032138':
-    dependencies:
-      '@dnd-kit/abstract': 0.0.7-beta-20250130032138
-      '@dnd-kit/collision': 0.0.7-beta-20250130032138
-      '@dnd-kit/geometry': 0.0.7-beta-20250130032138
-      '@dnd-kit/state': 0.0.7-beta-20250130032138
       tslib: 2.8.1
 
   '@dnd-kit/dom@0.1.21':
@@ -1181,33 +1138,14 @@ snapshots:
       '@dnd-kit/state': 0.1.21
       tslib: 2.8.1
 
-  '@dnd-kit/geometry@0.0.7-beta-20250130032138':
-    dependencies:
-      '@dnd-kit/state': 0.0.7-beta-20250130032138
-      tslib: 2.8.1
-
   '@dnd-kit/geometry@0.1.21':
     dependencies:
       '@dnd-kit/state': 0.1.21
       tslib: 2.8.1
 
-  '@dnd-kit/helpers@0.0.7-beta-20250130032138':
-    dependencies:
-      '@dnd-kit/abstract': 0.0.7-beta-20250130032138
-      tslib: 2.8.1
-
   '@dnd-kit/helpers@0.1.18':
     dependencies:
       '@dnd-kit/abstract': 0.1.21
-      tslib: 2.8.1
-
-  '@dnd-kit/react@0.0.7-beta-20250130032138(react-dom@19.2.3(react@19.2.3))(react@19.2.3)':
-    dependencies:
-      '@dnd-kit/abstract': 0.0.7-beta-20250130032138
-      '@dnd-kit/dom': 0.0.7-beta-20250130032138
-      '@dnd-kit/state': 0.0.7-beta-20250130032138
-      react: 19.2.3
-      react-dom: 19.2.3(react@19.2.3)
       tslib: 2.8.1
 
   '@dnd-kit/react@0.1.18(react-dom@19.2.3(react@19.2.3))(react@19.2.3)':
@@ -1217,11 +1155,6 @@ snapshots:
       '@dnd-kit/state': 0.1.21
       react: 19.2.3
       react-dom: 19.2.3(react@19.2.3)
-      tslib: 2.8.1
-
-  '@dnd-kit/state@0.0.7-beta-20250130032138':
-    dependencies:
-      '@preact/signals-core': 1.12.1
       tslib: 2.8.1
 
   '@dnd-kit/state@0.1.21':
@@ -1234,7 +1167,7 @@ snapshots:
       tslib: 2.8.1
     optional: true
 
-  '@finqu/storefront-cli@0.1.0-alpha.10':
+  '@finqu/storefront-cli@0.1.0-alpha.11':
     dependencies:
       chokidar: 4.0.3
       commander: 13.1.0
@@ -1246,10 +1179,10 @@ snapshots:
       '@tanstack/react-query': 5.90.17(react@19.2.3)
       react: 19.2.3
 
-  '@finqu/storefront-sdk@0.1.0-alpha.10(@finqu/storefront-lib@1.0.7(@tanstack/react-query@5.90.17(react@19.2.3))(react@19.2.3))(@measured/puck@0.18.3(@types/react@19.2.8)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)(use-sync-external-store@1.6.0(react@19.2.3)))(react@19.2.3)':
+  '@finqu/storefront-sdk@0.1.0-alpha.11(@finqu/storefront-lib@1.0.7(@tanstack/react-query@5.90.17(react@19.2.3))(react@19.2.3))(@puckeditor/core@0.21.0(@floating-ui/dom@1.7.4)(@types/react-dom@19.2.3(@types/react@19.2.8))(@types/react@19.2.8)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)(use-sync-external-store@1.6.0(react@19.2.3)))(react@19.2.3)':
     dependencies:
       '@finqu/storefront-lib': 1.0.7(@tanstack/react-query@5.90.17(react@19.2.3))(react@19.2.3)
-      '@measured/puck': 0.18.3(@types/react@19.2.8)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)(use-sync-external-store@1.6.0(react@19.2.3))
+      '@puckeditor/core': 0.21.0(@floating-ui/dom@1.7.4)(@types/react-dom@19.2.3(@types/react@19.2.8))(@types/react@19.2.8)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)(use-sync-external-store@1.6.0(react@19.2.3))
       react: 19.2.3
 
   '@floating-ui/core@1.7.3':
@@ -1366,47 +1299,30 @@ snapshots:
   '@img/sharp-win32-x64@0.34.5':
     optional: true
 
-  '@measured/puck@0.18.3(@types/react@19.2.8)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)(use-sync-external-store@1.6.0(react@19.2.3))':
-    dependencies:
-      '@dnd-kit/helpers': 0.0.7-beta-20250130032138
-      '@dnd-kit/react': 0.0.7-beta-20250130032138(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
-      deep-diff: 1.0.2
-      object-hash: 3.0.0
-      react: 19.2.3
-      react-hotkeys-hook: 4.6.2(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
-      use-debounce: 9.0.4(react@19.2.3)
-      uuid: 9.0.1
-      zustand: 5.0.10(@types/react@19.2.8)(react@19.2.3)(use-sync-external-store@1.6.0(react@19.2.3))
-    transitivePeerDependencies:
-      - '@types/react'
-      - immer
-      - react-dom
-      - use-sync-external-store
+  '@next/env@16.1.2': {}
 
-  '@next/env@15.5.9': {}
-
-  '@next/swc-darwin-arm64@15.5.7':
+  '@next/swc-darwin-arm64@16.1.2':
     optional: true
 
-  '@next/swc-darwin-x64@15.5.7':
+  '@next/swc-darwin-x64@16.1.2':
     optional: true
 
-  '@next/swc-linux-arm64-gnu@15.5.7':
+  '@next/swc-linux-arm64-gnu@16.1.2':
     optional: true
 
-  '@next/swc-linux-arm64-musl@15.5.7':
+  '@next/swc-linux-arm64-musl@16.1.2':
     optional: true
 
-  '@next/swc-linux-x64-gnu@15.5.7':
+  '@next/swc-linux-x64-gnu@16.1.2':
     optional: true
 
-  '@next/swc-linux-x64-musl@15.5.7':
+  '@next/swc-linux-x64-musl@16.1.2':
     optional: true
 
-  '@next/swc-win32-arm64-msvc@15.5.7':
+  '@next/swc-win32-arm64-msvc@16.1.2':
     optional: true
 
-  '@next/swc-win32-x64-msvc@15.5.7':
+  '@next/swc-win32-x64-msvc@16.1.2':
     optional: true
 
   '@nodelib/fs.scandir@2.1.5':
@@ -1814,9 +1730,9 @@ snapshots:
     dependencies:
       undici-types: 6.21.0
 
-  '@types/node@22.19.7':
+  '@types/node@25.0.9':
     dependencies:
-      undici-types: 6.21.0
+      undici-types: 7.16.0
 
   '@types/react-dom@19.2.3(@types/react@19.2.8)':
     dependencies:
@@ -1832,13 +1748,15 @@ snapshots:
 
   '@types/ws@8.18.1':
     dependencies:
-      '@types/node': 22.19.7
+      '@types/node': 25.0.9
 
   argparse@2.0.1: {}
 
   aria-hidden@1.2.6:
     dependencies:
       tslib: 2.8.1
+
+  baseline-browser-mapping@2.9.14: {}
 
   braces@3.0.3:
     dependencies:
@@ -1942,24 +1860,25 @@ snapshots:
 
   nanoid@3.3.11: {}
 
-  next@15.5.9(react-dom@19.2.3(react@19.2.3))(react@19.2.3):
+  next@16.1.2(react-dom@19.2.3(react@19.2.3))(react@19.2.3):
     dependencies:
-      '@next/env': 15.5.9
+      '@next/env': 16.1.2
       '@swc/helpers': 0.5.15
+      baseline-browser-mapping: 2.9.14
       caniuse-lite: 1.0.30001764
       postcss: 8.4.31
       react: 19.2.3
       react-dom: 19.2.3(react@19.2.3)
       styled-jsx: 5.1.6(react@19.2.3)
     optionalDependencies:
-      '@next/swc-darwin-arm64': 15.5.7
-      '@next/swc-darwin-x64': 15.5.7
-      '@next/swc-linux-arm64-gnu': 15.5.7
-      '@next/swc-linux-arm64-musl': 15.5.7
-      '@next/swc-linux-x64-gnu': 15.5.7
-      '@next/swc-linux-x64-musl': 15.5.7
-      '@next/swc-win32-arm64-msvc': 15.5.7
-      '@next/swc-win32-x64-msvc': 15.5.7
+      '@next/swc-darwin-arm64': 16.1.2
+      '@next/swc-darwin-x64': 16.1.2
+      '@next/swc-linux-arm64-gnu': 16.1.2
+      '@next/swc-linux-arm64-musl': 16.1.2
+      '@next/swc-linux-x64-gnu': 16.1.2
+      '@next/swc-linux-x64-musl': 16.1.2
+      '@next/swc-win32-arm64-msvc': 16.1.2
+      '@next/swc-win32-x64-msvc': 16.1.2
       sharp: 0.34.5
     transitivePeerDependencies:
       - '@babel/core'
@@ -2190,6 +2109,8 @@ snapshots:
   uc.micro@2.1.0: {}
 
   undici-types@6.21.0: {}
+
+  undici-types@7.16.0: {}
 
   use-callback-ref@1.3.3(@types/react@19.2.8)(react@19.2.3):
     dependencies:

@@ -1,4 +1,4 @@
-import { type PuckComponentConfig } from '@finqu/storefront-sdk';
+import { type ComponentConfig } from '@finqu/storefront-sdk';
 
 interface HeroProps {
     title: string;
@@ -7,7 +7,7 @@ interface HeroProps {
 
 export const category = 'Marketing';
 
-export const config: PuckComponentConfig<HeroProps> = {
+export const config: ComponentConfig<HeroProps> = {
     label: 'Hero Banner',
     fields: {
         title: {

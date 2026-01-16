@@ -2,7 +2,7 @@
 
 import { Puck, type Data } from '@puckeditor/core';
 import { config } from '@/.storefront/puck.config';
-import '@puckeditor/puck/puck.css';
+import '@puckeditor/core/puck.css';
 
 const initialData: Data = {
     root: {},

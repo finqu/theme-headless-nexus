@@ -1,41 +1,41 @@
 import { type ComponentConfig } from '@finqu/storefront-sdk';
 
 interface TextBlockProps {
-    content: string;
-    alignment: 'left' | 'center' | 'right';
+  content: string;
+  alignment: 'left' | 'center' | 'right';
 }
 
 export const category = 'Content';
 
 export const config: ComponentConfig<TextBlockProps> = {
-    label: 'Text Block',
-    fields: {
-        content: {
-            type: 'textarea',
-            label: 'Content',
-        },
-        alignment: {
-            type: 'radio',
-            label: 'Alignment',
-            options: [
-                { label: 'Left', value: 'left' },
-                { label: 'Center', value: 'center' },
-                { label: 'Right', value: 'right' },
-            ],
-        },
+  label: 'Text Block',
+  fields: {
+    content: {
+      type: 'textarea',
+      label: 'Content',
     },
-    defaultProps: {
-        content: 'Add your text here...',
-        alignment: 'left',
+    alignment: {
+      type: 'radio',
+      label: 'Alignment',
+      options: [
+        { label: 'Left', value: 'left' },
+        { label: 'Center', value: 'center' },
+        { label: 'Right', value: 'right' },
+      ],
     },
-    render: ({ content, alignment }) => (
-        <div
-            style={{
-                padding: '2rem',
-                textAlign: alignment,
-            }}
-        >
-            <p>{content}</p>
-        </div>
-    ),
+  },
+  defaultProps: {
+    content: 'Add your text here...',
+    alignment: 'left',
+  },
+  render: ({ content, alignment }) => (
+    <div
+      style={{
+        padding: '2rem',
+        textAlign: alignment,
+      }}
+    >
+      <p>{content}</p>
+    </div>
+  ),
 };

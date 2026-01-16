@@ -1,0 +1,27 @@
+{
+  "name": "theme-headless-horizon",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "storefront dev",
+    "build": "storefront build && next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "@finqu/storefront-lib": "*",
+    "@finqu/storefront-sdk": "*",
+    "@finqu/storefront-cli": "*",
+    "@puckeditor/core": "^0.21.0",
+    "next": "^15.0.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.0",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "typescript": "^5.7.0"
+  }
+}

@@ -1,15 +1,21 @@
 import type { ComponentConfig } from '@puckeditor/core';
 import type { Product } from '@finqu/storefront-lib/types';
+import {
+  ProductGrid,
+  productGridDefaultProps,
+  type ProductGridViewProps,
+} from '../ui/product-grid';
+import { fetchProductsByIds } from './shared';
 
 /**
- * Props for the ProductGrid component
+ * Props for the ProductGrid Puck component.
+ * Stores product IDs for persistence; full products are resolved at render time.
  */
-interface ProductGridProps {
-  title?: string;
+interface ProductGridProps extends Omit<ProductGridViewProps, 'products'> {
+  /** Product IDs stored in Puck data (lightweight) */
+  selectedProductIds?: number[];
+  /** Full product objects resolved from IDs (populated by resolveData) */
   selectedProducts?: Product[];
-  columns?: 2 | 3 | 4;
-  showPrice?: boolean;
-  showDescription?: boolean;
 }
 
 /**
@@ -18,101 +24,47 @@ interface ProductGridProps {
 export const category = 'E-commerce';
 
 /**
- * Puck component configuration (render-only version)
+ * Puck component configuration (render-only version).
+ * Uses resolveData to fetch fresh product data from the API at render time.
  */
 export const config: ComponentConfig<ProductGridProps> = {
   label: 'Product Grid',
   defaultProps: {
-    title: 'Featured Products',
-    columns: 3,
-    showPrice: true,
-    showDescription: false,
+    ...productGridDefaultProps,
+    selectedProductIds: [],
   },
-  render: ({ title, selectedProducts, columns = 3, showPrice = true, showDescription = false }) => {
-    // Grid column classes based on selection
-    const gridCols = {
-      2: 'grid-cols-1 sm:grid-cols-2',
-      3: 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3',
-      4: 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-4',
-    };
+  resolveData: async ({ props }) => {
+    const { selectedProductIds, selectedProducts, ...rest } = props;
 
-    // Handle no products selected state
-    if (!selectedProducts || !Array.isArray(selectedProducts) || selectedProducts.length === 0) {
-      return (
-        <section className="py-12">
-          <div className="container mx-auto px-4">
-            {title && <h2 className="mb-8 text-2xl font-bold">{title}</h2>}
-            <div className="rounded-lg border-2 border-dashed border-gray-300 p-12 text-center">
-              <p className="text-gray-500">
-                No products selected. Click to select products from your store.
-              </p>
-            </div>
-          </div>
-        </section>
-      );
+    // If we already have products (e.g., from edit mode), extract IDs and re-fetch fresh data
+    const ids =
+      selectedProductIds && selectedProductIds.length > 0
+        ? selectedProductIds
+        : selectedProducts?.map((p) => p.id).filter((id): id is number => id != null) || [];
+
+    if (ids.length === 0) {
+      return { props: { ...rest, selectedProductIds: [], selectedProducts: [] } };
     }
 
-    return (
-      <section className="py-12">
-        <div className="container mx-auto px-4">
-          {title && <h2 className="mb-8 text-2xl font-bold">{title}</h2>}
-          <div className={`grid gap-6 ${gridCols[columns]}`}>
-            {selectedProducts.map((product: Product) => {
-              const variant = product.firstAvailableVariant;
-              const image = variant?.featuredImage || variant?.image;
+    // Fetch fresh product data from the API
+    const freshProducts = await fetchProductsByIds(ids);
 
-              return (
-                <article key={product.id} className="group overflow-hidden">
-                  {/* Product Image */}
-                  <div className="aspect-square overflow-hidden rounded-md bg-gray-100">
-                    {image?.url ? (
-                      <img
-                        src={image.url}
-                        alt={image.alt || product.title || ''}
-                        className="h-full w-full object-cover transition-transform group-hover:scale-105"
-                      />
-                    ) : (
-                      <div className="flex h-full w-full items-center justify-center bg-gray-200">
-                        <span className="text-gray-400">No image</span>
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Product Info */}
-                  <div className="py-4">
-                    <h3 className="font-medium text-gray-900">{product.title}</h3>
-
-                    {showDescription && product.shortDescription && (
-                      <p className="mt-1 line-clamp-2 text-sm text-gray-500">
-                        {product.shortDescription}
-                      </p>
-                    )}
-
-                    {showPrice && variant?.price != null && (
-                      <div className="mt-2">
-                        {variant.originalPrice && variant.originalPrice > variant.price ? (
-                          <div className="flex items-center gap-2">
-                            <span className="font-semibold text-red-600">
-                              {variant.price.toFixed(2)} €
-                            </span>
-                            <span className="text-sm text-gray-400 line-through">
-                              {variant.originalPrice.toFixed(2)} €
-                            </span>
-                          </div>
-                        ) : (
-                          <span className="font-semibold text-gray-900">
-                            {variant.price.toFixed(2)} €
-                          </span>
-                        )}
-                      </div>
-                    )}
-                  </div>
-                </article>
-              );
-            })}
-          </div>
-        </div>
-      </section>
-    );
+    return {
+      props: {
+        ...rest,
+        selectedProductIds: ids,
+        selectedProducts: freshProducts,
+      },
+    };
   },
+  render: ({ title, selectedProducts, columns, showPrice, showDescription }) => (
+    <ProductGrid
+      title={title}
+      products={selectedProducts}
+      columns={columns}
+      showPrice={showPrice}
+      showDescription={showDescription}
+      hrefForProduct={(product) => (product.handle ? `/product/${product.handle}` : undefined)}
+    />
+  ),
 };

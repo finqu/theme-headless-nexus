@@ -3,18 +3,22 @@
 import { useState, useEffect } from 'react';
 import type { ComponentConfig } from '@puckeditor/core';
 import type { Product } from '@finqu/storefront-lib/types';
-import { storefrontServer } from '@/lib/storefront';
-import { products } from '@finqu/storefront-lib/server';
+import {
+  ProductGrid,
+  productGridDefaultProps,
+  type ProductGridViewProps,
+} from '../ui/product-grid';
+import { fetchProducts, getProductImageUrl } from './shared';
 
 /**
- * Props for the ProductGrid component
+ * Props for the ProductGrid Puck component.
+ * Stores product IDs for persistence; full products are kept for preview in editor.
  */
-interface ProductGridProps {
-  title?: string;
+interface ProductGridProps extends Omit<ProductGridViewProps, 'products'> {
+  /** Product IDs stored in Puck data (lightweight) */
+  selectedProductIds?: number[];
+  /** Full product objects for editor preview (populated by field) */
   selectedProducts?: Product[];
-  columns?: 2 | 3 | 4;
-  showPrice?: boolean;
-  showDescription?: boolean;
 }
 
 /**
@@ -44,74 +48,14 @@ function ProductPickerField({
   // Fetch products when dialog opens
   useEffect(() => {
     if (isOpen) {
-      fetchProducts();
+      loadProducts();
     }
   }, [isOpen, searchQuery]);
 
-  const fetchProducts = async () => {
+  const loadProducts = async () => {
     setIsLoading(true);
-    try {
-      const result = await products(
-        storefrontServer,
-        {
-          query: searchQuery || undefined,
-          first: 20,
-        },
-        {
-          query: `
-            query Products($query: String, $limit: Int, $offset: Int, $sort: String, $productGroup: String, $priceMin: Float, $priceMax: Float, $onlyDiscounted: Boolean, $onlyNew: Boolean, $first: Int, $after: String, $last: Int, $before: String, $sortKey: String, $reverse: Boolean) {
-                products(query: $query, limit: $limit, offset: $offset, sort: $sort, productGroup: $productGroup, priceMin: $priceMin, priceMax: $priceMax, onlyDiscounted: $onlyDiscounted, onlyNew: $onlyNew, first: $first, after: $after, last: $last, before: $before, sortKey: $sortKey, reverse: $reverse) {
-                  edges {
-                    node {
-                      handle
-                      seoDescription
-                      seoTitle
-                      seoKeywords
-                      id
-                      hasOnlyDefaultVariant
-                      inPreview
-                      isAvailable
-                      isDirectlyBuyable
-                      title
-                      shortDescription
-                      description
-                      returnPolicyTimeLimit
-                      rating
-                      reviewCount
-                      maxRating
-                      reviewsAreEnabled
-                      rate
-                      firstAvailableVariant {
-                        id
-                        title
-                        sku
-                        price
-                        featuredImage {
-                          url
-                          alt
-                        }
-                      }
-                    }
-                    cursor
-                  }
-                  pageInfo {
-                    hasNextPage
-                    hasPreviousPage
-                    startCursor
-                    endCursor
-                  }
-                  totalCount
-                }
-              }
-          `,
-        }
-      );
-      const productList = result.edges?.map((edge) => edge.node).filter(Boolean) || [];
-      setAvailableProducts(productList as Product[]);
-    } catch (error) {
-      console.error('Failed to fetch products:', error);
-      setAvailableProducts([]);
-    }
+    const products = await fetchProducts({ query: searchQuery, first: 20 });
+    setAvailableProducts(products);
     setIsLoading(false);
   };
 
@@ -125,11 +69,6 @@ function ProductPickerField({
     onChange(selectedProducts.filter((p) => p.id !== productId));
   };
 
-  const getProductImage = (product: Product) => {
-    const variant = product.firstAvailableVariant;
-    return variant?.featuredImage?.url || variant?.image?.url;
-  };
-
   return (
     <div className="space-y-3">
       {/* Selected Products */}
@@ -139,42 +78,45 @@ function ProductPickerField({
             {selectedProducts.length} product{selectedProducts.length !== 1 ? 's' : ''} selected
           </p>
           <div className="grid grid-cols-2 gap-2">
-            {selectedProducts.map((product) => (
-              <div
-                key={product.id}
-                className="flex items-center gap-2 rounded-md border bg-white p-2"
-              >
-                {getProductImage(product) ? (
-                  <img
-                    src={getProductImage(product) || undefined}
-                    alt={product.title || ''}
-                    className="h-10 w-10 rounded object-cover"
-                  />
-                ) : (
-                  <div className="flex h-10 w-10 items-center justify-center rounded bg-gray-100">
-                    <span className="text-xs text-gray-400">No img</span>
-                  </div>
-                )}
-                <div className="min-w-0 flex-1">
-                  <p className="truncate text-xs font-medium">{product.title}</p>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => removeProduct(product.id)}
-                  className="rounded p-1 text-gray-400 hover:bg-red-50 hover:text-red-500"
-                  title="Remove"
+            {selectedProducts.map((product) => {
+              const imageUrl = getProductImageUrl(product);
+              return (
+                <div
+                  key={product.id}
+                  className="flex items-center gap-2 rounded-md border bg-white p-2"
                 >
-                  <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M6 18L18 6M6 6l12 12"
+                  {imageUrl ? (
+                    <img
+                      src={imageUrl}
+                      alt={product.title || ''}
+                      className="h-10 w-10 rounded object-cover"
                     />
-                  </svg>
-                </button>
-              </div>
-            ))}
+                  ) : (
+                    <div className="flex h-10 w-10 items-center justify-center rounded bg-gray-100">
+                      <span className="text-xs text-gray-400">No img</span>
+                    </div>
+                  )}
+                  <div className="min-w-0 flex-1">
+                    <p className="truncate text-xs font-medium">{product.title}</p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => removeProduct(product.id)}
+                    className="rounded p-1 text-gray-400 hover:bg-red-50 hover:text-red-500"
+                    title="Remove"
+                  >
+                    <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M6 18L18 6M6 6l12 12"
+                      />
+                    </svg>
+                  </button>
+                </div>
+              );
+            })}
           </div>
         </div>
       )}
@@ -243,7 +185,7 @@ function ProductPickerField({
                 <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
                   {availableProducts.map((product) => {
                     const isSelected = selectedIds.has(product.id);
-                    const imageUrl = getProductImage(product);
+                    const imageUrl = getProductImageUrl(product);
                     const variant = product.firstAvailableVariant;
 
                     return (
@@ -365,99 +307,31 @@ export const config: ComponentConfig<ProductGridProps> = {
     },
   },
   defaultProps: {
-    title: 'Featured Products',
-    columns: 3,
-    showPrice: true,
-    showDescription: false,
+    ...productGridDefaultProps,
+    selectedProductIds: [],
   },
-  render: ({ title, selectedProducts, columns = 3, showPrice = true, showDescription = false }) => {
-    // Grid column classes based on selection
-    const gridCols = {
-      2: 'grid-cols-1 sm:grid-cols-2',
-      3: 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3',
-      4: 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-4',
+  // Extract product IDs for lightweight persistence while keeping full products for preview
+  resolveData: async ({ props }) => {
+    const { selectedProducts, ...rest } = props;
+    const selectedProductIds = selectedProducts
+      ?.map((p) => p.id)
+      .filter((id): id is number => id != null);
+
+    return {
+      props: {
+        ...rest,
+        selectedProductIds,
+        selectedProducts,
+      },
     };
-
-    // Handle no products selected state
-    if (!selectedProducts || !Array.isArray(selectedProducts) || selectedProducts.length === 0) {
-      return (
-        <section className="py-12">
-          <div className="container mx-auto px-4">
-            {title && <h2 className="mb-8 text-2xl font-bold">{title}</h2>}
-            <div className="rounded-lg border-2 border-dashed border-gray-300 p-12 text-center">
-              <p className="text-gray-500">
-                No products selected. Click to select products from your store.
-              </p>
-            </div>
-          </div>
-        </section>
-      );
-    }
-
-    return (
-      <section className="py-12">
-        <div className="container mx-auto px-4">
-          {title && <h2 className="mb-8 text-2xl font-bold">{title}</h2>}
-          <div className={`grid gap-6 ${gridCols[columns]}`}>
-            {selectedProducts.map((product: Product) => {
-              const variant = product.firstAvailableVariant;
-              const image = variant?.featuredImage || variant?.image;
-
-              return (
-                <article
-                  key={product.id}
-                  className="group overflow-hidden rounded-lg border bg-white shadow-sm transition-shadow hover:shadow-md"
-                >
-                  {/* Product Image */}
-                  <div className="aspect-square overflow-hidden bg-gray-100">
-                    {image?.url ? (
-                      <img
-                        src={image.url}
-                        alt={image.alt || product.title || ''}
-                        className="h-full w-full object-cover transition-transform group-hover:scale-105"
-                      />
-                    ) : (
-                      <div className="flex h-full w-full items-center justify-center bg-gray-200">
-                        <span className="text-gray-400">No image</span>
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Product Info */}
-                  <div className="p-4">
-                    <h3 className="font-medium text-gray-900">{product.title}</h3>
-
-                    {showDescription && product.shortDescription && (
-                      <p className="mt-1 line-clamp-2 text-sm text-gray-500">
-                        {product.shortDescription}
-                      </p>
-                    )}
-
-                    {showPrice && variant?.price != null && (
-                      <div className="mt-2">
-                        {variant.originalPrice && variant.originalPrice > variant.price ? (
-                          <div className="flex items-center gap-2">
-                            <span className="font-semibold text-red-600">
-                              {variant.price.toFixed(2)} €
-                            </span>
-                            <span className="text-sm text-gray-400 line-through">
-                              {variant.originalPrice.toFixed(2)} €
-                            </span>
-                          </div>
-                        ) : (
-                          <span className="font-semibold text-gray-900">
-                            {variant.price.toFixed(2)} €
-                          </span>
-                        )}
-                      </div>
-                    )}
-                  </div>
-                </article>
-              );
-            })}
-          </div>
-        </div>
-      </section>
-    );
   },
+  render: ({ title, selectedProducts, columns, showPrice, showDescription }) => (
+    <ProductGrid
+      title={title}
+      products={selectedProducts}
+      columns={columns}
+      showPrice={showPrice}
+      showDescription={showDescription}
+    />
+  ),
 };

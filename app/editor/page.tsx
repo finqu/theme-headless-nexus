@@ -3,7 +3,7 @@
 import { Suspense, useCallback, useEffect, useRef, useState } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { Puck, type Data } from '@puckeditor/core';
-import { config } from '@/.storefront/puck.edit.config';
+import { editorConfig, type EditorMetadata } from '@/lib/puck-config';
 import '@puckeditor/core/puck.css';
 import {
   TEMPLATE_TYPES,
@@ -105,6 +105,9 @@ function EditorContent() {
   const [hasOverride, setHasOverride] = useState(false);
   const [hasUnpublishedChanges, setHasUnpublishedChanges] = useState(false);
 
+  // Layout metadata for Puck (header/footer data)
+  const [editorMetadata, setEditorMetadata] = useState<EditorMetadata | null>(null);
+
   // Build API URL based on mode
   const getApiUrl = useCallback(
     (action?: 'publish' | 'reset') => {
@@ -131,6 +134,23 @@ function EditorContent() {
     async function loadData() {
       const url = getApiUrl();
 
+      // Always fetch layout data for header/footer
+      try {
+        const layoutRes = await fetch('/api/layout/editor-data');
+        if (layoutRes.ok) {
+          const layoutData = await layoutRes.json();
+          setEditorMetadata({
+            navbarMenu: layoutData.navbarMenu,
+            footerMenu: layoutData.footerMenu,
+            storeName: layoutData.storeName,
+            logoUrl: layoutData.logoUrl,
+            layoutSettings: layoutData.layoutSettings,
+          });
+        }
+      } catch (err) {
+        console.error('Failed to load layout data:', err);
+      }
+
       // Handle new page/template (no slug for pages)
       if (mode === 'page' && !slug) {
         setInitialData(emptyData);
@@ -150,20 +170,21 @@ function EditorContent() {
       }
 
       try {
-        const res = await fetch(`${url}?draft=true`);
+        // Fetch page/template data
+        const pageRes = await fetch(`${url}?draft=true`);
 
-        if (res.status === 404) {
+        if (pageRes.status === 404) {
           // No existing data - start with empty
           setInitialData(emptyData);
           setLoading(false);
           return;
         }
 
-        if (!res.ok) {
+        if (!pageRes.ok) {
           throw new Error('Failed to load data');
         }
 
-        const json = await res.json();
+        const json = await pageRes.json();
         setInitialData(json.data || emptyData);
         setIsInherited(json.meta?.isInherited || false);
         setHasOverride(json.meta?.hasOverride || false);
@@ -341,10 +362,11 @@ function EditorContent() {
       {/* Puck editor */}
       <div className="flex-1">
         <Puck
-          config={config}
+          config={editorConfig}
           data={initialData}
           onChange={handleChange}
           onPublish={handlePublish}
+          metadata={editorMetadata ?? undefined}
         />
       </div>
     </div>

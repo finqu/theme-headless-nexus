@@ -4,6 +4,7 @@ import { config } from '@/.storefront/puck.render.config';
 import { getTemplateConfig } from '@/lib/puck-storage';
 import { storefrontServer } from '@/lib/storefront';
 import { TemplateType } from '@/lib/template-types';
+import { SiteLayout } from '@/components/layout';
 
 interface PageProps {
   params: Promise<{ slug: string }>;
@@ -24,20 +25,22 @@ export default async function ProductPage({ params }: PageProps) {
     // No template configured - you might want to render a default layout
     // or show a message that the template needs to be set up
     return (
-      <div className="flex min-h-screen items-center justify-center">
-        <div className="text-center">
-          <h1 className="text-2xl font-bold">Product Template Not Configured</h1>
-          <p className="text-muted-foreground mt-2">
-            Please set up a product template in the editor.
-          </p>
-          <a
-            href={`/editor?mode=template&type=product`}
-            className="bg-primary text-primary-foreground mt-4 inline-block rounded-md px-4 py-2"
-          >
-            Configure Template
-          </a>
+      <SiteLayout>
+        <div className="flex min-h-[60vh] items-center justify-center">
+          <div className="text-center">
+            <h1 className="text-2xl font-bold">Product Template Not Configured</h1>
+            <p className="text-muted-foreground mt-2">
+              Please set up a product template in the editor.
+            </p>
+            <a
+              href={`/editor?mode=template&type=product`}
+              className="bg-primary text-primary-foreground mt-4 inline-block rounded-md px-4 py-2"
+            >
+              Configure Template
+            </a>
+          </div>
         </div>
-      </div>
+      </SiteLayout>
     );
   }
 
@@ -47,7 +50,11 @@ export default async function ProductPage({ params }: PageProps) {
   // For now, pass slug as context that components can use
   // In a real implementation, you'd pass product data to Puck components
 
-  return <Render config={config} data={templateData} />;
+  return (
+    <SiteLayout>
+      <Render config={config} data={templateData} />
+    </SiteLayout>
+  );
 }
 
 /**

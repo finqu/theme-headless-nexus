@@ -5,7 +5,7 @@ import {
   savePageDraft,
   publishPage,
   deletePage,
-  hasUnpublishedChanges,
+  hasPageUnpublishedChanges,
 } from '@/lib/puck-storage';
 
 interface RouteParams {
@@ -40,7 +40,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
   }
 
   // Include metadata about draft status
-  const hasChanges = wantDraft ? await hasUnpublishedChanges('page' as any, slug) : false;
+  const hasChanges = wantDraft ? await hasPageUnpublishedChanges(slug) : false;
 
   return NextResponse.json({
     data,

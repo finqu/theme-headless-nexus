@@ -1,7 +1,7 @@
 'use client';
 
 import { Suspense, useCallback, useEffect, useRef, useState } from 'react';
-import { useSearchParams } from 'next/navigation';
+import { useSearchParams, useRouter } from 'next/navigation';
 import { Puck, type Data } from '@puckeditor/core';
 import { config } from '@/.storefront/puck.edit.config';
 import '@puckeditor/core/puck.css';
@@ -11,6 +11,7 @@ import {
   isValidTemplateType,
   type TemplateType,
 } from '@/lib/template-types';
+import { EditorHeader } from '@/components/editor/EditorHeader';
 
 /**
  * Editor mode: either editing a static page or a template
@@ -81,11 +82,19 @@ export default function EditorPage() {
 
 function EditorContent() {
   const searchParams = useSearchParams();
+  const router = useRouter();
 
   // Parse URL params
   const mode = (searchParams.get('mode') as EditorMode) || 'page';
   const type = searchParams.get('type') as TemplateType | null;
   const slug = searchParams.get('slug');
+
+  // Redirect to Home page by default if no params provided
+  useEffect(() => {
+    if (!searchParams.get('mode') && !searchParams.get('slug') && !searchParams.get('type')) {
+      router.replace('/editor?mode=page&slug=home');
+    }
+  }, [searchParams, router]);
 
   // Editor state
   const [initialData, setInitialData] = useState<Data | null>(null);
@@ -276,21 +285,6 @@ function EditorContent() {
     }
   }, [mode, slug, getApiUrl]);
 
-  // Build editor title
-  const getEditorTitle = () => {
-    if (mode === 'page') {
-      return slug ? `Editing Page: ${slug}` : 'New Page';
-    }
-    if (mode === 'template' && type) {
-      const typeLabel = TEMPLATE_TYPE_LABELS[type] || type;
-      if (slug) {
-        return `${typeLabel} Template: ${slug}`;
-      }
-      return `Default ${typeLabel} Template`;
-    }
-    return 'Editor';
-  };
-
   // Render loading state
   if (loading) {
     return (
@@ -321,47 +315,28 @@ function EditorContent() {
 
   return (
     <div className="flex h-screen flex-col">
-      {/* Status bar */}
-      <div className="flex items-center justify-between border-b bg-white px-4 py-2">
-        <div className="flex items-center gap-4">
-          <h1 className="text-sm font-medium">{getEditorTitle()}</h1>
+      {/* Editor Header */}
+      <EditorHeader
+        mode={mode}
+        type={type}
+        slug={slug}
+        hasUnpublishedChanges={hasUnpublishedChanges}
+        isInherited={isInherited}
+        hasOverride={hasOverride}
+        saveStatus={saveStatus}
+      />
 
-          {/* Inheritance indicator */}
-          {isInherited && (
-            <span className="rounded bg-yellow-100 px-2 py-1 text-xs text-yellow-800">
-              Using default template
-            </span>
-          )}
-
-          {/* Save status */}
-          <span
-            className={`text-xs ${saveStatus === 'saving' ? 'text-gray-500' : saveStatus === 'saved' ? 'text-green-600' : saveStatus === 'error' ? 'text-red-600' : 'text-gray-400'}`}
+      {/* Reset to default button (only for template overrides) */}
+      {mode === 'template' && slug && (hasOverride || hasUnpublishedChanges) && (
+        <div className="flex items-center justify-end border-b bg-white px-4 py-2">
+          <button
+            onClick={handleResetToDefault}
+            className="rounded border border-gray-300 px-3 py-1 text-sm hover:bg-gray-50"
           >
-            {saveStatus === 'saving' && 'Saving...'}
-            {saveStatus === 'saved' && 'Draft saved'}
-            {saveStatus === 'error' && 'Save failed'}
-          </span>
-
-          {/* Unpublished changes indicator */}
-          {hasUnpublishedChanges && (
-            <span className="rounded bg-orange-100 px-2 py-1 text-xs text-orange-800">
-              Unpublished changes
-            </span>
-          )}
+            Reset to Default
+          </button>
         </div>
-
-        <div className="flex items-center gap-2">
-          {/* Reset to default button (only for template overrides) */}
-          {mode === 'template' && slug && (hasOverride || hasUnpublishedChanges) && (
-            <button
-              onClick={handleResetToDefault}
-              className="rounded border border-gray-300 px-3 py-1 text-sm hover:bg-gray-50"
-            >
-              Reset to Default
-            </button>
-          )}
-        </div>
-      </div>
+      )}
 
       {/* Puck editor */}
       <div className="flex-1">
@@ -403,6 +378,22 @@ function EditorHome() {
                 View All Pages
               </a>
             </div>
+          </div>
+        </section>
+
+        {/* Layout Settings section */}
+        <section className="mb-8">
+          <h2 className="mb-4 text-xl font-semibold">Layout Settings</h2>
+          <div className="rounded-lg border bg-white p-6">
+            <p className="mb-4 text-gray-600">
+              Configure global header and footer settings that apply across all pages.
+            </p>
+            <a
+              href="/editor/settings"
+              className="bg-primary text-primary-foreground inline-block rounded px-4 py-2 hover:opacity-90"
+            >
+              Edit Layout Settings
+            </a>
           </div>
         </section>
 

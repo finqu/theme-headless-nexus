@@ -2,6 +2,7 @@ import { notFound } from 'next/navigation';
 import { Render } from '@puckeditor/core';
 import { config } from '@/.storefront/puck.render.config';
 import { getPageConfig } from '@/lib/puck-storage';
+import { SiteLayout } from '@/components/layout';
 
 interface PageProps {
   params: Promise<{ slug: string[] }>;
@@ -25,7 +26,11 @@ export default async function DynamicPage({ params }: PageProps) {
     notFound();
   }
 
-  return <Render config={config} data={data} />;
+  return (
+    <SiteLayout>
+      <Render config={config} data={data} />
+    </SiteLayout>
+  );
 }
 
 /**

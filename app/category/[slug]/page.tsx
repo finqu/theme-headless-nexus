@@ -4,6 +4,7 @@ import { config } from '@/.storefront/puck.render.config';
 import { getTemplateConfig } from '@/lib/puck-storage';
 import { storefrontServer } from '@/lib/storefront';
 import { TemplateType } from '@/lib/template-types';
+import { SiteLayout } from '@/components/layout';
 
 interface PageProps {
   params: Promise<{ slug: string }>;
@@ -22,27 +23,33 @@ export default async function CategoryPage({ params }: PageProps) {
 
   if (!templateData) {
     return (
-      <div className="flex min-h-screen items-center justify-center">
-        <div className="text-center">
-          <h1 className="text-2xl font-bold">Category Template Not Configured</h1>
-          <p className="text-muted-foreground mt-2">
-            Please set up a category template in the editor.
-          </p>
-          <a
-            href={`/editor?mode=template&type=category`}
-            className="bg-primary text-primary-foreground mt-4 inline-block rounded-md px-4 py-2"
-          >
-            Configure Template
-          </a>
+      <SiteLayout>
+        <div className="flex min-h-[60vh] items-center justify-center">
+          <div className="text-center">
+            <h1 className="text-2xl font-bold">Category Template Not Configured</h1>
+            <p className="text-muted-foreground mt-2">
+              Please set up a category template in the editor.
+            </p>
+            <a
+              href={`/editor?mode=template&type=category`}
+              className="bg-primary text-primary-foreground mt-4 inline-block rounded-md px-4 py-2"
+            >
+              Configure Template
+            </a>
+          </div>
         </div>
-      </div>
+      </SiteLayout>
     );
   }
 
   // TODO: Fetch category data from Storefront API
   // const category = await storefrontServer.getCategory({ handle: slug });
 
-  return <Render config={config} data={templateData} />;
+  return (
+    <SiteLayout>
+      <Render config={config} data={templateData} />
+    </SiteLayout>
+  );
 }
 
 export async function generateMetadata({ params }: PageProps) {

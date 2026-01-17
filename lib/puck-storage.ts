@@ -97,6 +97,23 @@ export async function listPages(): Promise<string[]> {
   });
 }
 
+/**
+ * Check if a page has unpublished changes
+ * @param slug - Page slug
+ */
+export async function hasPageUnpublishedChanges(slug: string): Promise<boolean> {
+  const storage = getStorage();
+
+  const draft = await storage.get<Data>(puckKeys.page(slug, 'draft'));
+  const published = await storage.get<Data>(puckKeys.page(slug, 'published'));
+
+  if (!draft) return false;
+  if (!published) return true;
+
+  // Simple comparison - in production might want deep comparison
+  return JSON.stringify(draft) !== JSON.stringify(published);
+}
+
 // ============================================================================
 // Template Operations
 // ============================================================================

@@ -62,12 +62,9 @@ export const config: ComponentConfig<ProductGridProps> = {
               const image = variant?.featuredImage || variant?.image;
 
               return (
-                <article
-                  key={product.id}
-                  className="group overflow-hidden rounded-lg border bg-white shadow-sm transition-shadow hover:shadow-md"
-                >
+                <article key={product.id} className="group overflow-hidden">
                   {/* Product Image */}
-                  <div className="aspect-square overflow-hidden bg-gray-100">
+                  <div className="aspect-square overflow-hidden rounded-md bg-gray-100">
                     {image?.url ? (
                       <img
                         src={image.url}
@@ -82,7 +79,7 @@ export const config: ComponentConfig<ProductGridProps> = {
                   </div>
 
                   {/* Product Info */}
-                  <div className="p-4">
+                  <div className="py-4">
                     <h3 className="font-medium text-gray-900">{product.title}</h3>
 
                     {showDescription && product.shortDescription && (

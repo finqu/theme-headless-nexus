@@ -29,12 +29,7 @@ export const config: ComponentConfig<TextBlockProps> = {
     alignment: 'left',
   },
   render: ({ content, alignment }) => (
-    <div
-      style={{
-        padding: '2rem',
-        textAlign: alignment,
-      }}
-    >
+    <div className="container mx-auto px-4 py-12">
       <p>{content}</p>
     </div>
   ),

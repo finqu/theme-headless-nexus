@@ -51,10 +51,61 @@ function ProductPickerField({
   const fetchProducts = async () => {
     setIsLoading(true);
     try {
-      const result = await products(storefrontServer, {
-        query: searchQuery || undefined,
-        first: 20,
-      });
+      const result = await products(
+        storefrontServer,
+        {
+          query: searchQuery || undefined,
+          first: 20,
+        },
+        {
+          query: `
+            query Products($query: String, $limit: Int, $offset: Int, $sort: String, $productGroup: String, $priceMin: Float, $priceMax: Float, $onlyDiscounted: Boolean, $onlyNew: Boolean, $first: Int, $after: String, $last: Int, $before: String, $sortKey: String, $reverse: Boolean) {
+                products(query: $query, limit: $limit, offset: $offset, sort: $sort, productGroup: $productGroup, priceMin: $priceMin, priceMax: $priceMax, onlyDiscounted: $onlyDiscounted, onlyNew: $onlyNew, first: $first, after: $after, last: $last, before: $before, sortKey: $sortKey, reverse: $reverse) {
+                  edges {
+                    node {
+                      handle
+                      seoDescription
+                      seoTitle
+                      seoKeywords
+                      id
+                      hasOnlyDefaultVariant
+                      inPreview
+                      isAvailable
+                      isDirectlyBuyable
+                      title
+                      shortDescription
+                      description
+                      returnPolicyTimeLimit
+                      rating
+                      reviewCount
+                      maxRating
+                      reviewsAreEnabled
+                      rate
+                      firstAvailableVariant {
+                        id
+                        title
+                        sku
+                        price
+                        featuredImage {
+                          url
+                          alt
+                        }
+                      }
+                    }
+                    cursor
+                  }
+                  pageInfo {
+                    hasNextPage
+                    hasPreviousPage
+                    startCursor
+                    endCursor
+                  }
+                  totalCount
+                }
+              }
+          `,
+        }
+      );
       const productList = result.edges?.map((edge) => edge.node).filter(Boolean) || [];
       setAvailableProducts(productList as Product[]);
     } catch (error) {

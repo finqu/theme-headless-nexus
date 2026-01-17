@@ -9,6 +9,9 @@ export const TemplateType = {
   BLOG: 'blog',
   MANUFACTURER: 'manufacturer',
   PAGE: 'page',
+  CART: 'cart',
+  CATALOG: 'catalog',
+  WISHLIST: 'wishlist',
 } as const;
 
 export type TemplateType = (typeof TemplateType)[keyof typeof TemplateType];
@@ -48,4 +51,7 @@ export const TEMPLATE_TYPE_LABELS: Record<TemplateType, string> = {
   [TemplateType.BLOG]: 'Blog',
   [TemplateType.MANUFACTURER]: 'Manufacturer',
   [TemplateType.PAGE]: 'Page',
+  [TemplateType.CART]: 'Cart',
+  [TemplateType.CATALOG]: 'Catalog',
+  [TemplateType.WISHLIST]: 'Wishlist',
 };

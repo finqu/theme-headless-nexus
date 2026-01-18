@@ -2,8 +2,8 @@
 
 import type { Config, DefaultRootRenderProps, PuckContext } from '@puckeditor/core';
 import { config as baseConfig } from '@/.storefront/puck.edit.config';
-import { NavbarClient } from '@/components/layout/NavbarClient';
-import { FooterClient } from '@/components/layout/FooterClient';
+import { NavbarClient } from '@/components/layout/navbar-client';
+import { FooterClient } from '@/components/layout/footer-client';
 import type { MenuWithLinks } from '@/lib/menu-queries';
 import type { LayoutSettings } from '@/lib/layout-settings';
 import type { ReactNode } from 'react';

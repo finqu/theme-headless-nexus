@@ -1,7 +1,7 @@
 import { fetchMenuWithLinks } from '@/lib/menu-queries';
 import { storefrontServer } from '@/lib/storefront';
 import { store, currencies } from '@finqu/storefront-lib/server';
-import { NavbarClient } from './NavbarClient';
+import { NavbarClient } from './navbar-client';
 
 interface NavbarProps {
   menuHandle: string;

@@ -1,6 +1,6 @@
-export { Navbar } from './Navbar';
-export { NavbarClient } from './NavbarClient';
-export { Footer } from './Footer';
-export { FooterClient } from './FooterClient';
-export { NewsletterForm } from './NewsletterForm';
-export { SiteLayout } from './SiteLayout';
+export { Navbar } from './navbar';
+export { NavbarClient } from './navbar-client';
+export { Footer } from './footer';
+export { FooterClient } from './footer-client';
+export { NewsletterForm } from './newsletter-form';
+export { SiteLayout } from './site-layout';

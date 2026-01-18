@@ -186,7 +186,7 @@ function ProductPickerField({
                   {availableProducts.map((product) => {
                     const isSelected = selectedIds.has(product.id);
                     const imageUrl = getProductImageUrl(product);
-                    const variant = product.firstAvailableVariant;
+                    const variant = product.defaultOrSelectedVariant;
 
                     return (
                       <div

@@ -16,7 +16,7 @@ export const PRODUCTS_QUERY = `
           title
           shortDescription
           isAvailable
-          firstAvailableVariant {
+          defaultOrSelectedVariant {
             id
             title
             sku
@@ -30,6 +30,9 @@ export const PRODUCTS_QUERY = `
               url
               alt
             }
+          },
+          variants {
+            id
           }
         }
         cursor
@@ -46,9 +49,9 @@ export const PRODUCTS_QUERY = `
 `;
 
 export interface FetchProductsOptions {
-    query?: string;
-    first?: number;
-    productIds?: (number | null | undefined)[];
+  query?: string;
+  first?: number;
+  productIds?: (number | null | undefined)[];
 }
 
 /**
@@ -56,36 +59,36 @@ export interface FetchProductsOptions {
  * Can optionally filter by product IDs after fetching.
  */
 export async function fetchProducts(options: FetchProductsOptions = {}): Promise<Product[]> {
-    const { query: searchQuery, first = 50, productIds } = options;
+  const { query: searchQuery, first = 50, productIds } = options;
 
-    try {
-        const result = await products(
-            storefrontServer,
-            {
-                query: searchQuery || undefined,
-                first,
-            },
-            { query: PRODUCTS_QUERY }
-        );
+  try {
+    const result = await products(
+      storefrontServer,
+      {
+        query: searchQuery || undefined,
+        first,
+      },
+      { query: PRODUCTS_QUERY }
+    );
 
-        let productList = (result.edges?.map((edge) => edge.node).filter(Boolean) || []) as Product[];
+    let productList = (result.edges?.map((edge) => edge.node).filter(Boolean) || []) as Product[];
 
-        // If specific product IDs are requested, filter and maintain order
-        if (productIds && productIds.length > 0) {
-            const validIds = new Set(productIds.filter((id): id is number => id != null));
-            const productMap = new Map(productList.map((p) => [p.id, p]));
+    // If specific product IDs are requested, filter and maintain order
+    if (productIds && productIds.length > 0) {
+      const validIds = new Set(productIds.filter((id): id is number => id != null));
+      const productMap = new Map(productList.map((p) => [p.id, p]));
 
-            // Maintain the order of requested IDs
-            productList = productIds
-                .filter((id): id is number => id != null && productMap.has(id))
-                .map((id) => productMap.get(id)!);
-        }
-
-        return productList;
-    } catch (error) {
-        console.error('Failed to fetch products:', error);
-        return [];
+      // Maintain the order of requested IDs
+      productList = productIds
+        .filter((id): id is number => id != null && productMap.has(id))
+        .map((id) => productMap.get(id)!);
     }
+
+    return productList;
+  } catch (error) {
+    console.error('Failed to fetch products:', error);
+    return [];
+  }
 }
 
 /**
@@ -93,14 +96,14 @@ export async function fetchProducts(options: FetchProductsOptions = {}): Promise
  * Useful for rendering saved ProductGrid components with fresh data.
  */
 export async function fetchProductsByIds(
-    productIds: (number | null | undefined)[]
+  productIds: (number | null | undefined)[]
 ): Promise<Product[]> {
-    if (!productIds || productIds.length === 0) {
-        return [];
-    }
+  if (!productIds || productIds.length === 0) {
+    return [];
+  }
 
-    // Fetch a larger set to ensure we get all requested products
-    return fetchProducts({ first: 100, productIds });
+  // Fetch a larger set to ensure we get all requested products
+  return fetchProducts({ first: 100, productIds });
 }
 
 /**
@@ -108,17 +111,17 @@ export async function fetchProductsByIds(
  * Useful for storing minimal data in Puck component props.
  */
 export function extractProductIds(productList: Product[] | undefined): number[] {
-    if (!productList || !Array.isArray(productList)) {
-        return [];
-    }
-    return productList.map((p) => p.id).filter((id): id is number => id != null);
+  if (!productList || !Array.isArray(productList)) {
+    return [];
+  }
+  return productList.map((p) => p.id).filter((id): id is number => id != null);
 }
 
 /**
  * Gets the product image URL from a product.
  */
 export function getProductImageUrl(product: Product): string | undefined {
-    const variant = product.firstAvailableVariant;
-    const url = variant?.featuredImage?.url || variant?.image?.url;
-    return url || undefined;
+  const variant = product.defaultOrSelectedVariant;
+  const url = variant?.featuredImage?.url || variant?.image?.url;
+  return url || undefined;
 }

@@ -2,7 +2,7 @@ import Link from 'next/link';
 import { fetchMenuWithLinks } from '@/lib/menu-queries';
 import { storefrontServer } from '@/lib/storefront';
 import { store } from '@finqu/storefront-lib/server';
-import { NewsletterForm } from './NewsletterForm';
+import { NewsletterForm } from './newsletter-form';
 import type { MenuLink } from '@/lib/menu-queries';
 
 interface FooterProps {

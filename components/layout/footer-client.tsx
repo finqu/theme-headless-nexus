@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { NewsletterForm } from './NewsletterForm';
+import { NewsletterForm } from './newsletter-form';
 import type { MenuLink, MenuWithLinks } from '@/lib/menu-queries';
 
 interface FooterClientProps {

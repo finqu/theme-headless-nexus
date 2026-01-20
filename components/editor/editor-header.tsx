@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Settings, Home, LayoutTemplate, FileText } from 'lucide-react';
+import { LayoutTemplate, FileText } from 'lucide-react';
 import {
   Select,
   SelectContent,
@@ -12,20 +12,24 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { Button } from '@/components/ui/button';
+import { SettingsDialog } from './settings-dialog';
 import { TEMPLATE_TYPES, TEMPLATE_TYPE_LABELS, type TemplateType } from '@/lib/template-types';
 
 type EditorMode = 'page' | 'template';
 
 interface Page {
-  slug: string;
+  id: string; // Finqu's stable page ID
+  slug: string; // Current locale's URL slug (for display)
+  title: string;
   editUrl: string;
+  source: 'local' | 'storefront';
 }
 
 interface EditorHeaderProps {
   mode: EditorMode;
   type?: TemplateType | null;
-  slug?: string | null;
+  pageId?: string | null; // For pages - Finqu's stable page ID
+  slug?: string | null; // For template overrides
   hasUnpublishedChanges?: boolean;
   isInherited?: boolean;
   hasOverride?: boolean;
@@ -35,6 +39,7 @@ interface EditorHeaderProps {
 export function EditorHeader({
   mode,
   type,
+  pageId,
   slug,
   hasUnpublishedChanges = false,
   isInherited = false,
@@ -61,13 +66,20 @@ export function EditorHeader({
   }, []);
 
   // Compute current selection value for the combined dropdown
+  // For pages, use page:{id} with Finqu's stable page ID
+  // For templates, use template:{type}
   const currentSelection =
-    mode === 'page' ? `page:${slug || 'home'}` : `template:${type || TEMPLATE_TYPES[0]}`;
+    mode === 'page' && pageId
+      ? `page:${pageId}`
+      : mode === 'template'
+        ? `template:${type || TEMPLATE_TYPES[0]}`
+        : '';
 
   const handleSelectionChange = (value: string) => {
     if (value.startsWith('page:')) {
-      const pageSlug = value.replace('page:', '');
-      router.push(`/editor?mode=page&slug=${pageSlug}`);
+      // Navigate to page editor using Finqu's stable page ID
+      const selectedPageId = value.replace('page:', '');
+      router.push(`/editor?mode=page&id=${selectedPageId}`);
     } else if (value.startsWith('template:')) {
       const templateType = value.replace('template:', '');
       router.push(`/editor?mode=template&type=${templateType}`);
@@ -89,28 +101,24 @@ export function EditorHeader({
               <SelectLabel className="text-zinc-400">Pages</SelectLabel>
               {pages.length === 0 ? (
                 <SelectItem
-                  value="page:home"
+                  value="no-pages"
+                  disabled
                   className="text-xs focus:bg-zinc-800 focus:text-white"
                 >
-                  <span className="flex items-center gap-2">
-                    <Home className="h-3 w-3" />
-                    Home
+                  <span className="flex items-center gap-2 text-zinc-500">
+                    No pages available
                   </span>
                 </SelectItem>
               ) : (
                 pages.map((page) => (
                   <SelectItem
-                    key={page.slug}
-                    value={`page:${page.slug}`}
+                    key={page.id}
+                    value={`page:${page.id}`}
                     className="text-xs focus:bg-zinc-800 focus:text-white"
                   >
                     <span className="flex items-center gap-2">
-                      {page.slug === 'home' ? (
-                        <Home className="h-3 w-3" />
-                      ) : (
-                        <FileText className="h-3 w-3" />
-                      )}
-                      {page.slug.charAt(0).toUpperCase() + page.slug.slice(1)}
+                      <FileText className="h-3 w-3" />
+                      {page.title}
                     </span>
                   </SelectItem>
                 ))
@@ -148,17 +156,8 @@ export function EditorHeader({
           <span className="rounded bg-zinc-700 px-2 py-0.5 text-xs">Using default</span>
         )}
 
-        {/* Settings link */}
-        <Button
-          variant="ghost"
-          size="sm"
-          className="text-xs text-zinc-400 hover:bg-zinc-800 hover:text-white"
-          onClick={() => router.push('/editor/settings')}
-          title="Layout Settings"
-        >
-          Settings
-          <Settings className="h-4 w-4" />
-        </Button>
+        {/* Settings dialog */}
+        <SettingsDialog />
       </div>
 
       {/* Right section: Status and settings */}

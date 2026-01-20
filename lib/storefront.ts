@@ -23,8 +23,8 @@ import { createStorefrontClient } from '@finqu/storefront-lib';
  * ```
  */
 export const storefrontServer = createServerClient({
-  baseUrl: process.env.NEXT_PUBLIC_FINQU_STOREFRONT_URL!,
-  token: process.env.NEXT_PUBLIC_FINQU_STOREFRONT_TOKEN,
+  baseUrl: process.env.FINQU_STOREFRONT_URL!,
+  token: process.env.FINQU_STOREFRONT_TOKEN,
   next: {
     revalidate: 60, // Cache for 60 seconds by default
   },

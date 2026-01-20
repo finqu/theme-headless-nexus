@@ -4,15 +4,14 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "storefront dev",
-    "build": "storefront build && next build",
+    "dev": "finqu storefront dev",
+    "build": "finqu storefront build && next build",
     "start": "next start",
     "lint": "next lint",
     "format": "prettier --write .",
     "format:check": "prettier --check ."
   },
   "dependencies": {
-    "@finqu/storefront-cli": "0.1.0-alpha.14",
     "@finqu/storefront-lib": "^1.0.9",
     "@finqu/storefront-sdk": "0.1.0-alpha.14",
     "@puckeditor/core": "^0.21.0",
@@ -20,6 +19,7 @@
     "@radix-ui/react-navigation-menu": "^1.2.14",
     "@radix-ui/react-select": "^2.2.6",
     "@radix-ui/react-slot": "^1.2.4",
+    "@radix-ui/react-tabs": "^1.1.13",
     "@tailwindcss/postcss": "^4.1.18",
     "@tailwindplus/elements": "^1.0.22",
     "@tanstack/react-query": "^5.90.19",

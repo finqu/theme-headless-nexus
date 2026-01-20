@@ -9,18 +9,21 @@ import {
 } from '@/lib/puck-storage';
 
 interface RouteParams {
-  params: Promise<{ slug: string }>;
+  params: Promise<{ id: string }>;
 }
 
 /**
- * GET /api/puck/pages/[slug]
- * Get a page config by slug
+ * GET /api/puck/pages/[id]
+ * Get a page config by Finqu page ID
+ *
+ * The ID parameter is Finqu's stable page ID, which remains consistent
+ * across all localized versions of a page.
  *
  * Query params:
  * - draft=true: Get draft version instead of published
  */
 export async function GET(request: NextRequest, { params }: RouteParams) {
-  const { slug } = await params;
+  const { id: pageId } = await params;
   const searchParams = request.nextUrl.searchParams;
   const wantDraft = searchParams.get('draft') === 'true';
 
@@ -33,19 +36,19 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
   }
 
   const version = wantDraft ? 'draft' : 'published';
-  const data = await getPageConfig(slug, version);
+  const data = await getPageConfig(pageId, version);
 
   if (!data) {
     return NextResponse.json({ error: 'Page not found' }, { status: 404 });
   }
 
   // Include metadata about draft status
-  const hasChanges = wantDraft ? await hasPageUnpublishedChanges(slug) : false;
+  const hasChanges = wantDraft ? await hasPageUnpublishedChanges(pageId) : false;
 
   return NextResponse.json({
     data,
     meta: {
-      slug,
+      pageId,
       version,
       hasUnpublishedChanges: hasChanges,
     },
@@ -53,7 +56,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
 }
 
 /**
- * PUT /api/puck/pages/[slug]
+ * PUT /api/puck/pages/[id]
  * Save page draft (auto-save)
  */
 export async function PUT(request: NextRequest, { params }: RouteParams) {
@@ -62,11 +65,11 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
     return NextResponse.json({ error: auth.error }, { status: 401 });
   }
 
-  const { slug } = await params;
+  const { id: pageId } = await params;
 
   try {
     const data = await request.json();
-    await savePageDraft(slug, data);
+    await savePageDraft(pageId, data);
 
     return NextResponse.json({
       success: true,
@@ -79,7 +82,7 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
 }
 
 /**
- * POST /api/puck/pages/[slug]
+ * POST /api/puck/pages/[id]
  * Publish page (copy draft to published)
  */
 export async function POST(request: NextRequest, { params }: RouteParams) {
@@ -88,10 +91,10 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
     return NextResponse.json({ error: auth.error }, { status: 401 });
   }
 
-  const { slug } = await params;
+  const { id: pageId } = await params;
 
   try {
-    const success = await publishPage(slug);
+    const success = await publishPage(pageId);
 
     if (!success) {
       return NextResponse.json({ error: 'No draft to publish' }, { status: 404 });
@@ -108,7 +111,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
 }
 
 /**
- * DELETE /api/puck/pages/[slug]
+ * DELETE /api/puck/pages/[id]
  * Delete a page (both draft and published)
  */
 export async function DELETE(request: NextRequest, { params }: RouteParams) {
@@ -117,10 +120,10 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
     return NextResponse.json({ error: auth.error }, { status: 401 });
   }
 
-  const { slug } = await params;
+  const { id: pageId } = await params;
 
   try {
-    await deletePage(slug);
+    await deletePage(pageId);
 
     return NextResponse.json({
       success: true,

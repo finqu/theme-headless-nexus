@@ -12,9 +12,14 @@ export type ConfigVersion = 'draft' | 'published';
  */
 export const puckKeys = {
   /**
-   * Key for a static page (e.g., /about, /contact)
+   * Key for a page layout config.
+   * Uses Finqu's stable page ID (not the localized URL slug) to ensure
+   * the same layout is used across all language versions of a page.
+   *
+   * @param pageId - Finqu's stable page ID (e.g., "123", "abc-def")
+   * @param version - draft or published
    */
-  page: (slug: string, version: ConfigVersion) => `page:${slug}:${version}`,
+  page: (pageId: string, version: ConfigVersion) => `page:${pageId}:${version}`,
 
   /**
    * Key for a default template (used when no slug-specific override exists)
@@ -34,64 +39,67 @@ export const puckKeys = {
 // ============================================================================
 
 /**
- * Get a page config by slug
- * @param slug - Page slug (e.g., "about", "contact")
+ * Get a page config by Finqu page ID.
+ * Uses the stable page ID (not URL slug) to ensure consistent layouts across localized routes.
+ *
+ * @param pageId - Finqu's stable page ID
  * @param version - Which version to get ("draft" or "published")
  */
 export async function getPageConfig(
-  slug: string,
+  pageId: string,
   version: ConfigVersion = 'published'
 ): Promise<Data | null> {
   const storage = getStorage();
-  return storage.get<Data>(puckKeys.page(slug, version));
+  return storage.get<Data>(puckKeys.page(pageId, version));
 }
 
 /**
  * Save a page config as draft
- * @param slug - Page slug
+ * @param pageId - Finqu's stable page ID
  * @param data - Puck editor data
  */
-export async function savePageDraft(slug: string, data: Data): Promise<void> {
+export async function savePageDraft(pageId: string, data: Data): Promise<void> {
   const storage = getStorage();
-  await storage.set(puckKeys.page(slug, 'draft'), data);
+  await storage.set(puckKeys.page(pageId, 'draft'), data);
 }
 
 /**
  * Publish a page (copy draft to published)
- * @param slug - Page slug
+ * @param pageId - Finqu's stable page ID
  * @returns true if published successfully, false if no draft exists
  */
-export async function publishPage(slug: string): Promise<boolean> {
+export async function publishPage(pageId: string): Promise<boolean> {
   const storage = getStorage();
-  const draft = await storage.get<Data>(puckKeys.page(slug, 'draft'));
+  const draft = await storage.get<Data>(puckKeys.page(pageId, 'draft'));
 
   if (!draft) {
     return false;
   }
 
-  await storage.set(puckKeys.page(slug, 'published'), draft);
+  await storage.set(puckKeys.page(pageId, 'published'), draft);
   return true;
 }
 
 /**
  * Delete a page (both draft and published)
- * @param slug - Page slug
+ * @param pageId - Finqu's stable page ID
  */
-export async function deletePage(slug: string): Promise<void> {
+export async function deletePage(pageId: string): Promise<void> {
   const storage = getStorage();
-  await storage.delete(puckKeys.page(slug, 'draft'));
-  await storage.delete(puckKeys.page(slug, 'published'));
+  await storage.delete(puckKeys.page(pageId, 'draft'));
+  await storage.delete(puckKeys.page(pageId, 'published'));
 }
 
 /**
- * List all page slugs
+ * List all page IDs that have Puck configs stored
+ * @returns Array of Finqu page IDs
  */
-export async function listPages(): Promise<string[]> {
+export async function listPageIds(): Promise<string[]> {
   const storage = getStorage();
   const keys = await storage.keys('page:*:published');
 
   return keys.map((key) => {
-    // Extract slug from "page:{slug}:published"
+    // Extract pageId from "page:{pageId}:published"
     const parts = key.split(':');
     return parts[1];
   });
@@ -99,13 +107,13 @@ export async function listPages(): Promise<string[]> {
 
 /**
  * Check if a page has unpublished changes
- * @param slug - Page slug
+ * @param pageId - Finqu's stable page ID
  */
-export async function hasPageUnpublishedChanges(slug: string): Promise<boolean> {
+export async function hasPageUnpublishedChanges(pageId: string): Promise<boolean> {
   const storage = getStorage();
 
-  const draft = await storage.get<Data>(puckKeys.page(slug, 'draft'));
-  const published = await storage.get<Data>(puckKeys.page(slug, 'published'));
+  const draft = await storage.get<Data>(puckKeys.page(pageId, 'draft'));
+  const published = await storage.get<Data>(puckKeys.page(pageId, 'published'));
 
   if (!draft) return false;
   if (!published) return true;

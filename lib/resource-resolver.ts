@@ -1,12 +1,20 @@
 import { unstable_cache } from 'next/cache';
 import type { Resource, ResourceType } from '@finqu/storefront-lib';
 import { createServerClientWithLocale } from './storefront';
+import type { Alternate } from './alternates-context';
 
 // Re-export types for convenience
 export type { Resource, ResourceType };
 
 /**
- * GraphQL query to resolve a URL path to a resource type and ID.
+ * Extended resource with alternates for locale switching
+ */
+export interface ResourceWithAlternates extends Resource {
+  alternates?: Alternate[];
+}
+
+/**
+ * GraphQL query to resolve a URL path to a resource type, ID, and alternates.
  * This is the foundation of Finqu's dynamic URL routing system.
  */
 const RESOURCE_BY_PATH_QUERY = `
@@ -14,6 +22,11 @@ const RESOURCE_BY_PATH_QUERY = `
     resourceByPath(path: $path) {
       type
       id
+      alternates {
+        hreflang
+        path
+        url
+      }
     }
   }
 `;
@@ -22,7 +35,7 @@ const RESOURCE_BY_PATH_QUERY = `
  * Response type for the resourceByPath query
  */
 interface ResourceByPathResponse {
-  resourceByPath: Resource | null;
+  resourceByPath: ResourceWithAlternates | null;
 }
 
 /**
@@ -31,12 +44,12 @@ interface ResourceByPathResponse {
  *
  * @param path - URL path without locale prefix (e.g., "/products/my-product")
  * @param locale - ISO language code for localized path resolution
- * @returns Resource with type and optional ID, or null if not found
+ * @returns Resource with type, optional ID, and alternates, or null if not found
  */
 async function fetchResourceByPath(
   path: string,
   locale: string
-): Promise<Resource | null> {
+): Promise<ResourceWithAlternates | null> {
   const client = createServerClientWithLocale(locale);
 
   try {
@@ -56,7 +69,7 @@ async function fetchResourceByPath(
  * Get resource information for a URL path with aggressive caching.
  *
  * This is the primary function for URL routing. It resolves any URL path
- * to a resource type (product, category, page, etc.) and optional ID.
+ * to a resource type (product, category, page, etc.), optional ID, and alternates.
  *
  * Caching strategy:
  * - Results are cached for 1 hour (3600 seconds)
@@ -65,22 +78,22 @@ async function fetchResourceByPath(
  *
  * @param path - URL path without locale prefix (e.g., "/products/my-product")
  * @param locale - ISO language code for localized path resolution
- * @returns Resource with type and optional ID, or null if resolution fails
+ * @returns Resource with type, optional ID, and alternates, or null if resolution fails
  *
  * @example
  * ```tsx
  * const resource = await getResourceByPath('/tuotteet/sininen-paita', 'fi');
- * // resource = { type: 'PRODUCT', id: '123' }
+ * // resource = { type: 'PRODUCT', id: '123', alternates: [...] }
  *
  * const category = await getResourceByPath('/categories/clothing', 'en');
- * // category = { type: 'PRODUCT_GROUP', id: '456' }
+ * // category = { type: 'PRODUCT_GROUP', id: '456', alternates: [...] }
  *
  * const cart = await getResourceByPath('/cart', 'en');
- * // cart = { type: 'CART', id: null }
+ * // cart = { type: 'CART', id: null, alternates: [...] }
  * ```
  */
 export const getResourceByPath = unstable_cache(
-  async (path: string, locale: string): Promise<Resource | null> => {
+  async (path: string, locale: string): Promise<ResourceWithAlternates | null> => {
     return fetchResourceByPath(path, locale);
   },
   ['resource-by-path'],

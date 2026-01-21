@@ -40,8 +40,8 @@ export async function GET(request: Request) {
         // Fetch menus, store info, and locales in parallel
         // Menus and store info use the locale-aware client for localized content
         const [navbarMenu, footerMenu, storeInfo, localesData] = await Promise.all([
-            fetchMenuWithLinks(layoutSettings.navbar.menuHandle, client),
-            fetchMenuWithLinks(layoutSettings.footer.menuHandle, client),
+            fetchMenuWithLinks(layoutSettings.navbar.menuHandle, locale || ''),
+            fetchMenuWithLinks(layoutSettings.footer.menuHandle, locale || ''),
             store(client, {}).catch(() => null),
             // Locales query doesn't need locale context - it returns all available locales
             storefrontServer.execute<{ locales: Locale[] }>(LOCALES_QUERY).catch(() => ({ locales: [] })),
@@ -51,8 +51,7 @@ export async function GET(request: Request) {
             layoutSettings,
             navbarMenu,
             footerMenu,
-            storeName: storeInfo?.name || 'Store',
-            logoUrl: storeInfo?.logo || undefined,
+            storeInfo: storeInfo || { name: 'Store' },
             locales: localesData?.locales || [],
         });
     } catch (error) {

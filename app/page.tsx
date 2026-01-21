@@ -1,9 +1,8 @@
-import { headers } from 'next/headers';
 import { Render } from '@puckeditor/core';
 import { config } from '@/.storefront/puck.render.config';
 import { getPageConfig } from '@/lib/puck-storage';
 import { getResourceByPath } from '@/lib/resource-resolver';
-import { getStoreInfo } from '@/lib/store-cache';
+import { getLocale, getPathname } from '@/lib/locale';
 import { SiteLayout } from '@/components/layout';
 
 /**
@@ -12,20 +11,16 @@ import { SiteLayout } from '@/components/layout';
  * This page uses resourceByPath to verify the root path resolves to HOME type,
  * ensuring consistency with the rest of the routing system.
  *
- * The locale is determined from the x-locale header set by middleware.
- * Middleware parses locale from URL (e.g., /en -> locale: en, rewrite to /)
- * and passes it via headers. Falls back to store's default locale.
+ * The locale and pathname are determined from middleware headers.
  *
  * If no Puck config exists, shows a welcome message with link to editor.
  */
 export default async function HomePage() {
-  // Get locale from middleware header (set during URL rewrite)
-  const headersList = await headers();
-  const storeInfo = await getStoreInfo();
-  const locale = headersList.get('x-locale') || storeInfo.defaultLocale;
-  // Verify root path resolves to HOME (for consistency with routing system)
-  // This also warms the cache for the root path
-  const resource = await getResourceByPath('/', locale);
+  // Get locale and path from middleware headers
+  const [locale, path] = await Promise.all([getLocale(), getPathname()]);
+
+  // Verify root path resolves to HOME and get alternates for locale switcher
+  const resource = await getResourceByPath(path, locale);
 
   // The root path should always resolve to HOME type
   // If it doesn't, something is misconfigured, but we continue anyway
@@ -40,7 +35,7 @@ export default async function HomePage() {
 
   if (!data) {
     return (
-      <SiteLayout locale={locale}>
+      <SiteLayout locale={locale} alternates={resource?.alternates}>
         <div className="flex min-h-[60vh] items-center justify-center bg-gray-50">
           <div className="max-w-md text-center">
             <h1 className="mb-4 text-4xl font-bold">Welcome to Horizon</h1>
@@ -60,7 +55,7 @@ export default async function HomePage() {
   }
 
   return (
-    <SiteLayout locale={locale}>
+    <SiteLayout locale={locale} alternates={resource?.alternates}>
       <Render config={config} data={data} />
     </SiteLayout>
   );

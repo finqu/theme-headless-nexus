@@ -1,4 +1,5 @@
 import type { Config, DefaultRootRenderProps, PuckContext } from '@puckeditor/core';
+import type { StoreInfo } from '@finqu/storefront-lib/server';
 import { config as baseConfig } from '@/.storefront/puck.render.config';
 import { NavbarClient } from '@/components/layout/navbar-client';
 import { FooterClient } from '@/components/layout/footer-client';
@@ -12,8 +13,7 @@ import type { ReactNode } from 'react';
 export interface EditorMetadata {
   navbarMenu: MenuWithLinks | null;
   footerMenu: MenuWithLinks | null;
-  storeName: string;
-  logoUrl?: string;
+  storeInfo: StoreInfo;
   layoutSettings: LayoutSettings;
   /** Current locale/language code (e.g., 'fi', 'en') for fetching localized content */
   locale?: string;
@@ -36,17 +36,12 @@ export const editorConfig: Config = {
         return <>{children}</>;
       }
 
-      const { navbarMenu, footerMenu, storeName, logoUrl, layoutSettings } = metadata;
+      const { navbarMenu, footerMenu, storeInfo, layoutSettings } = metadata;
 
       return (
         <div className="flex min-h-screen flex-col">
           {/* Header */}
-          <NavbarClient
-            menu={navbarMenu}
-            storeName={storeName}
-            logoUrl={logoUrl}
-            isEditing={isEditing}
-          />
+          <NavbarClient menu={navbarMenu} storeInfo={storeInfo} isEditing={isEditing} />
 
           {/* Main content area - where Puck components are rendered */}
           <main className="flex-1">{children}</main>
@@ -54,8 +49,8 @@ export const editorConfig: Config = {
           {/* Footer */}
           <FooterClient
             menu={footerMenu}
-            storeName={storeName}
-            logoUrl={logoUrl}
+            storeName={storeInfo.name ?? undefined}
+            logoUrl={storeInfo.logo ?? undefined}
             tagline={layoutSettings.footer.tagline}
             copyrightText={layoutSettings.footer.copyrightText}
             twitterUrl={layoutSettings.footer.twitterUrl}

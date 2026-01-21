@@ -1,11 +1,10 @@
-import { headers } from 'next/headers';
 import { notFound } from 'next/navigation';
 import { Render } from '@puckeditor/core';
 import { config } from '@/.storefront/puck.render.config';
 import { getTemplateConfig } from '@/lib/puck-storage';
 import { getResourceByPath, type ResourceType } from '@/lib/resource-resolver';
 import { getTemplateTypeForResource } from '@/lib/template-types';
-import { getStoreInfo } from '@/lib/store-cache';
+import { getLocale, getPathname } from '@/lib/locale';
 import { SiteLayout } from '@/components/layout';
 import { SystemPage } from '@/components/system-pages';
 
@@ -14,35 +13,12 @@ interface PageProps {
 }
 
 /**
- * Get locale from middleware headers.
- *
- * The middleware parses locale from URL (e.g., /en/products -> locale: en)
- * and rewrites the URL to strip the locale prefix (/en/products -> /products).
- * The detected locale is passed via the x-locale header.
- *
- * @returns The locale from middleware, or store's default locale as fallback
- */
-async function getLocaleFromHeaders(): Promise<string> {
-  const headersList = await headers();
-  const localeHeader = headersList.get('x-locale');
-
-  if (localeHeader) {
-    return localeHeader;
-  }
-
-  // Fallback to store's default locale
-  const storeInfo = await getStoreInfo();
-  return storeInfo.defaultLocale;
-}
-
-/**
  * Dynamic page renderer using Finqu's resourceByPath API.
  *
  * This component handles all URL routing by:
- * 1. Reading locale from x-locale header (set by middleware)
- * 2. Middleware already strips locale prefix from URL, so slug is the path
- * 3. Resolving the URL path to a resource type and ID via resourceByPath
- * 4. Routing to the appropriate renderer based on resource type:
+ * 1. Reading locale and original pathname from middleware headers
+ * 2. Resolving the URL path to a resource type and ID via resourceByPath
+ * 3. Routing to the appropriate renderer based on resource type:
  *    - Templatable resources (product, category, page, etc.) -> Puck templates
  *    - System pages (login, cart, account, etc.) -> Dedicated components
  *    - NOT_FOUND -> 404 page
@@ -51,18 +27,14 @@ async function getLocaleFromHeaders(): Promise<string> {
  * rarely change. This enables fast, locale-aware routing without repeated API calls.
  *
  * Examples:
- * - /en/products/shirt -> middleware sets x-locale: en, slug: ['products', 'shirt']
- * - /tuotteet/paita -> middleware sets x-locale: fi (default), slug: ['tuotteet', 'paita']
+ * - /en/products/shirt -> x-pathname: /en/products/shirt, x-locale: en
+ * - /tuotteet/paita -> x-pathname: /tuotteet/paita, x-locale: fi (default)
  */
-export default async function DynamicPage({ params }: PageProps) {
-  const { slug } = await params;
+export default async function DynamicPage() {
+  // Get locale and original path from middleware headers
+  const [locale, path] = await Promise.all([getLocale(), getPathname()]);
 
-  // Get locale from middleware header (middleware already parsed from URL)
-  const locale = await getLocaleFromHeaders();
-  // Build path from slug (locale prefix already stripped by middleware)
-  const path = '/' + slug.join('/');
-
-  // Resolve path to resource type and ID
+  // Resolve path to resource type, ID, and alternates
   const resource = await getResourceByPath(path, locale);
 
   // Handle not found or failed resolution
@@ -83,7 +55,7 @@ export default async function DynamicPage({ params }: PageProps) {
       // For now, fall through to system page handler which will show a placeholder
     } else {
       return (
-        <SiteLayout locale={locale}>
+        <SiteLayout locale={locale} alternates={resource.alternates}>
           <Render config={config} data={data} />
         </SiteLayout>
       );
@@ -93,12 +65,8 @@ export default async function DynamicPage({ params }: PageProps) {
   // Handle as system page (login, cart, account, etc.)
   // Or templatable resource without custom template yet
   return (
-    <SiteLayout locale={locale}>
-      <SystemPage
-        type={resource.type}
-        id={resource.id ?? undefined}
-        locale={locale}
-      />
+    <SiteLayout locale={locale} alternates={resource.alternates}>
+      <SystemPage type={resource.type} id={resource.id ?? undefined} locale={locale} />
     </SiteLayout>
   );
 }
@@ -106,13 +74,9 @@ export default async function DynamicPage({ params }: PageProps) {
 /**
  * Generate metadata for the page based on resource type
  */
-export async function generateMetadata({ params }: PageProps) {
-  const { slug } = await params;
-
-  // Get locale from middleware header
-  const locale = await getLocaleFromHeaders();
-  // Build path from slug (locale prefix already stripped by middleware)
-  const path = '/' + slug.join('/');
+export async function generateMetadata() {
+  // Get locale and original path from middleware headers
+  const [locale, path] = await Promise.all([getLocale(), getPathname()]);
 
   // Resolve path to resource type and ID
   const resource = await getResourceByPath(path, locale);
@@ -124,6 +88,15 @@ export async function generateMetadata({ params }: PageProps) {
   // Generate title based on resource type
   const title = getPageTitle(resource.type, path);
 
+  // Build hreflang alternate links from resource alternates
+  const alternates: Record<string, string> = {};
+  if (resource.alternates) {
+    for (const alt of resource.alternates) {
+      // Use hreflang as key (e.g., 'en', 'fi', 'x-default')
+      alternates[alt.hreflang] = alt.url;
+    }
+  }
+
   // Check for Puck template with custom metadata
   const templateType = getTemplateTypeForResource(resource.type);
 
@@ -133,12 +106,18 @@ export async function generateMetadata({ params }: PageProps) {
     if (data) {
       const puckTitle = (data.root?.props as Record<string, unknown>)?.title as string;
       if (puckTitle) {
-        return { title: puckTitle };
+        return {
+          title: puckTitle,
+          alternates: { languages: alternates },
+        };
       }
     }
   }
 
-  return { title };
+  return {
+    title,
+    alternates: { languages: alternates },
+  };
 }
 
 /**

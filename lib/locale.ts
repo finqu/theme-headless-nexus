@@ -1,88 +1,106 @@
-import { getStoreInfo, isKnownLocale } from './store-cache';
+import { headers } from 'next/headers';
+import { getStoreInfo } from './store-cache';
 
 /**
- * Result of locale resolution from URL
+ * Locale information from middleware headers.
+ * This is the SINGLE SOURCE OF TRUTH for locale in server components.
  */
-export interface LocaleResolution {
-  /** The resolved locale code (e.g., 'fi', 'en', 'sv') */
+export interface LocaleInfo {
+  /** Current locale code (e.g., 'fi', 'en', 'sv') */
   locale: string;
-  /** The store's default locale */
+  /** Default locale code (first available from store) */
   defaultLocale: string;
-  /** The URL path with locale prefix stripped (if any) */
-  path: string;
-  /** Whether the resolved locale is the default */
-  isDefault: boolean;
+  /** Original pathname from the URL (before rewrite) */
+  pathname: string;
 }
 
 /**
- * Resolve locale from URL path segments.
+ * Get locale information from middleware headers.
  *
- * This is the SINGLE SOURCE OF TRUTH for locale resolution in server components.
- * It determines the locale from the URL and returns the appropriate path.
+ * This is the SINGLE SOURCE OF TRUTH for locale in server components.
+ * The middleware sets x-locale, x-default-locale, and x-pathname headers
+ * on the REQUEST based on URL detection.
  *
- * Rules:
- * - If first segment matches a known locale → use that locale, strip from path
- * - If no locale in URL → use store's default locale
- *
- * @param segments - URL path segments (e.g., ['fi', 'tuotteet', 'paita'] or ['products', 'shirt'])
- * @returns LocaleResolution with locale, path, and metadata
+ * @returns LocaleInfo object with locale, defaultLocale, and pathname
  *
  * @example
- * ```ts
- * // With locale prefix
- * await resolveLocale(['fi', 'tuotteet', 'paita']);
- * // { locale: 'fi', defaultLocale: 'fi', path: '/tuotteet/paita', isDefault: true }
- *
- * // Without locale prefix (uses default)
- * await resolveLocale(['products', 'shirt']);
- * // { locale: 'fi', defaultLocale: 'fi', path: '/products/shirt', isDefault: true }
- *
- * // Root path
- * await resolveLocale([]);
- * // { locale: 'fi', defaultLocale: 'fi', path: '/', isDefault: true }
+ * ```tsx
+ * // In a server component or page
+ * const { locale, defaultLocale, pathname } = await getLocaleInfo();
+ * const products = await fetchProducts(locale);
  * ```
  */
-export async function resolveLocale(segments: string[]): Promise<LocaleResolution> {
-  const storeInfo = await getStoreInfo();
-  const firstSegment = segments[0]?.toLowerCase();
+export async function getLocaleInfo(): Promise<LocaleInfo> {
+  const headersList = await headers();
+  const locale = headersList.get('x-locale');
+  const defaultLocale = headersList.get('x-default-locale');
+  const pathname = headersList.get('x-pathname') || '/';
 
-  // Check if first segment is a known locale
-  if (firstSegment && isKnownLocale(firstSegment, storeInfo.locales)) {
-    const locale = firstSegment;
-    const pathSegments = segments.slice(1);
-    const path = pathSegments.length > 0 ? '/' + pathSegments.join('/') : '/';
-
-    return {
-      locale,
-      defaultLocale: storeInfo.defaultLocale,
-      path,
-      isDefault: locale === storeInfo.defaultLocale,
-    };
+  if (locale && defaultLocale) {
+    return { locale, defaultLocale, pathname };
   }
 
-  // No locale prefix - use default locale
-  const path = segments.length > 0 ? '/' + segments.join('/') : '/';
-
+  // Fallback to store info if headers not set (edge case)
+  const storeInfo = await getStoreInfo();
   return {
-    locale: storeInfo.defaultLocale,
-    defaultLocale: storeInfo.defaultLocale,
-    path,
-    isDefault: true,
+    locale: locale || storeInfo.defaultLocale,
+    defaultLocale: defaultLocale || storeInfo.defaultLocale,
+    pathname,
   };
 }
 
 /**
- * Get the default locale for the store.
+ * Get the current locale from middleware headers.
  *
- * Use this when you need just the default locale without URL parsing.
+ * This is the SINGLE SOURCE OF TRUTH for locale in server components.
+ * The middleware sets x-locale header based on URL detection.
+ *
+ * @returns The current locale code (e.g., 'fi', 'en', 'sv')
+ *
+ * @example
+ * ```tsx
+ * // In a server component or page
+ * const locale = await getLocale();
+ * const products = await fetchProducts(locale);
+ * ```
+ */
+export async function getLocale(): Promise<string> {
+  const { locale } = await getLocaleInfo();
+  return locale;
+}
+
+/**
+ * Get the default locale from middleware headers.
+ *
+ * @returns The store's default locale code
  *
  * @example
  * ```ts
- * const locale = await getDefaultLocale();
+ * const defaultLocale = await getDefaultLocale();
  * // 'fi'
  * ```
  */
 export async function getDefaultLocale(): Promise<string> {
-  const storeInfo = await getStoreInfo();
-  return storeInfo.defaultLocale;
+  const { defaultLocale } = await getLocaleInfo();
+  return defaultLocale;
+}
+
+/**
+ * Get the original pathname from the request.
+ *
+ * The middleware sets x-pathname header with the original URL path
+ * before any rewrites. This is needed for APIs that expect the full
+ * path including locale prefix.
+ *
+ * @returns The original pathname (e.g., '/fi/blogi' or '/blog')
+ *
+ * @example
+ * ```tsx
+ * const pathname = await getPathname();
+ * const resource = await getResourceByPath(pathname, locale);
+ * ```
+ */
+export async function getPathname(): Promise<string> {
+  const { pathname } = await getLocaleInfo();
+  return pathname;
 }

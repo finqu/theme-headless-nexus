@@ -16,8 +16,8 @@ interface ProvidersProps {
  * Application providers wrapper
  * Sets up React Query for data fetching/caching and locale context
  *
- * Note: StorefrontProvider can be added here when client-side
- * storefront hooks are needed
+ * Note: AlternatesProvider is added by individual pages since alternates
+ * are page-specific data from resourceByPath API.
  */
 export function Providers({ children, locale, defaultLocale }: ProvidersProps) {
   // Create a new QueryClient for each session to avoid shared state

@@ -18,13 +18,14 @@ const SKIP_PATHS = ['/api/', '/editor', '/_next/', '/favicon.ico', '/robots.txt'
  * Middleware for locale detection from URL path.
  *
  * This middleware:
- * 1. Detects the locale from the first path segment (e.g., /se/produkter -> 'se')
- * 2. Strips the locale prefix from the URL (rewrites /se/produkter -> /produkter)
- * 3. Sets x-locale and x-default-locale headers for downstream components
+ * 1. Detects the locale from the first path segment (e.g., /en/products -> 'en')
+ * 2. Strips the locale prefix from the URL (rewrites /en/products -> /products)
+ * 3. Sets x-locale and x-pathname headers on the REQUEST for downstream server components
  *
- * Default locale has no prefix:
- * - /about -> default locale, path stays /about
- * - /se/about -> 'se' locale, path becomes /about
+ * IMPORTANT: Headers must be set on the REQUEST (not response) for server components
+ * to access them via the headers() function.
+ *
+ * URL is the single source of truth. No redirects.
  */
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
@@ -40,24 +41,34 @@ export async function middleware(request: NextRequest) {
   const segments = pathname.split('/').filter(Boolean);
   const firstSegment = segments[0]?.toLowerCase();
 
-  // Detect locale from path (non-default locales only have prefix)
+  // Check if URL has a locale prefix (any supported locale)
   const matchedLocale = storeInfo.locales.find(
-    (l) =>
-      l.isoCode.toLowerCase() === firstSegment &&
-      l.isoCode !== storeInfo.defaultLocale
+    (l) => l.isoCode.toLowerCase() === firstSegment
   );
 
-  const locale = matchedLocale?.isoCode || storeInfo.defaultLocale;
-  const pathWithoutLocale = matchedLocale
-    ? '/' + segments.slice(1).join('/') || '/'
-    : pathname;
+  // Clone request headers to add our custom headers
+  const requestHeaders = new Headers(request.headers);
 
-  // Rewrite URL to strip locale prefix, pass locale via headers
-  const response = NextResponse.rewrite(new URL(pathWithoutLocale, request.url));
-  response.headers.set('x-locale', locale);
-  response.headers.set('x-default-locale', storeInfo.defaultLocale);
+  if (matchedLocale) {
+    // URL has locale prefix - set headers and strip locale from path
+    requestHeaders.set('x-locale', matchedLocale.isoCode);
+    requestHeaders.set('x-default-locale', storeInfo.defaultLocale);
+    requestHeaders.set('x-pathname', pathname);
 
-  return response;
+    const pathWithoutLocale = '/' + segments.slice(1).join('/') || '/';
+    return NextResponse.rewrite(new URL(pathWithoutLocale, request.url), {
+      request: { headers: requestHeaders },
+    });
+  }
+
+  // No locale prefix - use default locale
+  requestHeaders.set('x-locale', storeInfo.defaultLocale);
+  requestHeaders.set('x-default-locale', storeInfo.defaultLocale);
+  requestHeaders.set('x-pathname', pathname);
+
+  return NextResponse.next({
+    request: { headers: requestHeaders },
+  });
 }
 
 export const config = {

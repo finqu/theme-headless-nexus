@@ -77,11 +77,7 @@ function PreviewWithViewport() {
 
   // Determine width style based on viewport
   const width = currentViewport?.width;
-  const widthStyle = typeof width === 'number'
-    ? `${width}px`
-    : width === '100%'
-      ? '100%'
-      : '100%';
+  const widthStyle = typeof width === 'number' ? `${width}px` : width === '100%' ? '100%' : '100%';
 
   return (
     <div
@@ -242,8 +238,7 @@ function EditorContent() {
           setEditorMetadata({
             navbarMenu: layoutData.navbarMenu,
             footerMenu: layoutData.footerMenu,
-            storeName: layoutData.storeName,
-            logoUrl: layoutData.logoUrl,
+            storeInfo: layoutData.storeInfo,
             layoutSettings: layoutData.layoutSettings,
             locale: urlLocale || undefined,
           });
@@ -261,9 +256,7 @@ function EditorContent() {
 
           // Handle page mode without URL ID - load homepage by default
           if (mode === 'page' && !urlPageId) {
-            const homepage = pagesData.pages?.find(
-              (p: { slug: string }) => p.slug === 'home'
-            );
+            const homepage = pagesData.pages?.find((p: { slug: string }) => p.slug === 'home');
             if (homepage?.id) {
               setResolvedPageId(homepage.id);
             } else {
@@ -481,10 +474,7 @@ function EditorContent() {
       <div className="flex h-screen items-center justify-center">
         <div className="text-center">
           <div className="text-lg text-red-600">{error}</div>
-          <button
-            onClick={() => window.location.reload()}
-            className="mt-4 text-blue-600 underline"
-          >
+          <button onClick={() => window.location.reload()} className="mt-4 text-blue-600 underline">
             Try again
           </button>
         </div>
@@ -501,15 +491,10 @@ function EditorContent() {
       <div className="flex h-screen items-center justify-center bg-gray-50">
         <div className="text-center">
           <div className="mb-2 text-6xl">🌐</div>
-          <h2 className="mb-2 text-xl font-semibold text-gray-800">
-            Page not available
-          </h2>
+          <h2 className="mb-2 text-xl font-semibold text-gray-800">Page not available</h2>
           <p className="mb-4 text-gray-600">
             This page is not available in{' '}
-            <span className="font-medium">
-              {currentLocaleInfo?.endonymName || urlLocale}
-            </span>
-            .
+            <span className="font-medium">{currentLocaleInfo?.endonymName || urlLocale}</span>.
           </p>
           <p className="mb-6 text-sm text-gray-500">
             The page may not have been translated to this language yet.
@@ -631,7 +616,9 @@ function EditorLayout({
   // Get publish function from Puck's onPublish
   const handlePublish = () => {
     // Trigger the native Puck publish which calls our onPublish handler
-    const publishButton = document.querySelector('[data-puck-action="publish"]') as HTMLButtonElement;
+    const publishButton = document.querySelector(
+      '[data-puck-action="publish"]'
+    ) as HTMLButtonElement;
     if (publishButton) {
       publishButton.click();
     } else {
@@ -710,4 +697,3 @@ function EditorLayout({
     </div>
   );
 }
-

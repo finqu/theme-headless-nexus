@@ -9,11 +9,14 @@ importers:
   .:
     dependencies:
       '@finqu/storefront-lib':
-        specifier: ^2.2.0
-        version: 2.2.0(@tanstack/react-query@5.90.19(react@19.2.3))(react@19.2.3)
+        specifier: ^2.3.0
+        version: 2.3.0(@tanstack/react-query@5.90.19(react@19.2.3))(react@19.2.3)
       '@finqu/storefront-sdk':
         specifier: 0.1.0-alpha.14
-        version: 0.1.0-alpha.14(@finqu/storefront-lib@2.2.0(@tanstack/react-query@5.90.19(react@19.2.3))(react@19.2.3))(@puckeditor/core@0.21.0(@floating-ui/dom@1.7.4)(@types/react-dom@19.2.3(@types/react@19.2.9))(@types/react@19.2.9)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)(use-sync-external-store@1.6.0(react@19.2.3)))(react@19.2.3)
+        version: 0.1.0-alpha.14(@finqu/storefront-lib@2.3.0(@tanstack/react-query@5.90.19(react@19.2.3))(react@19.2.3))(@puckeditor/core@0.21.0(@floating-ui/dom@1.7.4)(@types/react-dom@19.2.3(@types/react@19.2.9))(@types/react@19.2.9)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)(use-sync-external-store@1.6.0(react@19.2.3)))(react@19.2.3)
+      '@formatjs/intl-localematcher':
+        specifier: ^0.8.0
+        version: 0.8.0
       '@puckeditor/core':
         specifier: ^0.21.0
         version: 0.21.0(@floating-ui/dom@1.7.4)(@types/react-dom@19.2.3(@types/react@19.2.9))(@types/react@19.2.9)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)(use-sync-external-store@1.6.0(react@19.2.3))
@@ -65,6 +68,9 @@ importers:
       lucide-react:
         specifier: ^0.562.0
         version: 0.562.0(react@19.2.3)
+      negotiator:
+        specifier: ^1.0.0
+        version: 1.0.0
       next:
         specifier: ^16.1.4
         version: 16.1.4(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
@@ -81,6 +87,9 @@ importers:
         specifier: ^4.1.18
         version: 4.1.18
     devDependencies:
+      '@types/negotiator':
+        specifier: ^0.6.4
+        version: 0.6.4
       '@types/node':
         specifier: ^25.0.9
         version: 25.0.9
@@ -136,12 +145,17 @@ packages:
   '@emnapi/runtime@1.8.1':
     resolution: {integrity: sha512-mehfKSMWjjNol8659Z8KxEMrdSJDDot5SXMq00dM8BN4o+CLNXQ0xH2V7EchNHV4RmbZLmmPdEaXZc5H2FXmDg==}
 
-  '@finqu/storefront-lib@2.2.0':
-    resolution: {integrity: sha512-yHIL4QF7rL/y4nOTuPvrOM1YThhhcZlxqsfZnG801Fc1v9XwhO05Lh5kzHAoUAZHJCA1+lRDkf+jHDkRkLN1Dg==, tarball: https://npm.pkg.github.com/download/@finqu/storefront-lib/2.2.0/e9d53ef0bd4bb550034d9a78060b2fbbfd775df0}
+  '@finqu/storefront-lib@2.3.0':
+    resolution: {integrity: sha512-fxnS2V0mR5r6Wra9PgnPZLNWzhlGeGxWC6WAAk4WnMcr9w43nrc2vzG3RFrXBFRRmnEUTH74btsHuI8Lc8sacQ==, tarball: https://npm.pkg.github.com/download/@finqu/storefront-lib/2.3.0/4c2d3daa120c890f4c832f09b2c77a6f89dc8672}
     engines: {node: '>=18.0.0'}
     peerDependencies:
       '@tanstack/react-query': '>=5.0.0'
       react: '>=19.0.0'
+    peerDependenciesMeta:
+      '@tanstack/react-query':
+        optional: true
+      react:
+        optional: true
 
   '@finqu/storefront-sdk@0.1.0-alpha.14':
     resolution: {integrity: sha512-nHJe/CwERnYy3XIEpjEV4vRMUbbKe4G3IVBNSzDt4qEdhhSd8aixTgK4PXpJehYzG2XDyfBksWbzSa480SpRMg==, tarball: https://npm.pkg.github.com/download/@finqu/storefront-sdk/0.1.0-alpha.14/3844658bdf18d1024189846c53bb7841e10ef7f1}
@@ -164,6 +178,12 @@ packages:
 
   '@floating-ui/utils@0.2.10':
     resolution: {integrity: sha512-aGTxbpbg8/b5JfU1HXSrbH3wXZuLPJcNEcZQFMxLs3oSzgtVu6nFPkbbGGUvBcUjKV2YyB9Wxxabo+HEH9tcRQ==}
+
+  '@formatjs/fast-memoize@3.1.0':
+    resolution: {integrity: sha512-b5mvSWCI+XVKiz5WhnBCY3RJ4ZwfjAidU0yVlKa3d3MSgKmH1hC3tBGEAtYyN5mqL7N0G5x0BOUYyO8CEupWgg==}
+
+  '@formatjs/intl-localematcher@0.8.0':
+    resolution: {integrity: sha512-zgMYWdUlmEZpX2Io+v3LHrfq9xZ6khpQVf9UAw2xYWhGerGgI9XgH1HvL/A34jWiruUJpYlP5pk4g8nIcaDrXQ==}
 
   '@img/colour@1.0.0':
     resolution: {integrity: sha512-A5P/LfWGFSl6nsckYtjw9da+19jB8hkJ6ACTGcDfEJ0aE+l2n2El7dsVM7UVHZQ9s2lmYMWlrS21YLy2IR1LUw==}
@@ -1004,6 +1024,9 @@ packages:
   '@types/mdurl@2.0.0':
     resolution: {integrity: sha512-RGdgjQUZba5p6QEFAVx2OGb8rQDL/cPRG7GiedRzMcJ1tYnUANBncjbSB1NRGwbvjcPeikRABz2nshyPk1bhWg==}
 
+  '@types/negotiator@0.6.4':
+    resolution: {integrity: sha512-elf6BsTq+AkyNsb2h5cGNst2Mc7dPliVoAPm1fXglC/BM3f2pFA40BaSSv3E5lyHteEawVKLP+8TwiY1DMNb3A==}
+
   '@types/node@25.0.9':
     resolution: {integrity: sha512-/rpCXHlCWeqClNBwUhDcusJxXYDjZTyE8v5oTO7WbL8eij2nKhUeU89/6xgjU7N4/Vh3He0BtyhJdQbDyhiXAw==}
 
@@ -1034,8 +1057,8 @@ packages:
     resolution: {integrity: sha512-ik3ZgC9dY/lYVVM++OISsaYDeg1tb0VtP5uL3ouh1koGOaUMDPpbFIei4JkFimWUFPn90sbMNMXQAIVOlnYKJA==}
     engines: {node: '>=10'}
 
-  baseline-browser-mapping@2.9.16:
-    resolution: {integrity: sha512-KeUZdBuxngy825i8xvzaK1Ncnkx0tBmb3k8DkEuqjKRkmtvNTjey2ZsNeh8Dw4lfKvbCOu9oeNx2TKm2vHqcRw==}
+  baseline-browser-mapping@2.9.17:
+    resolution: {integrity: sha512-agD0MgJFUP/4nvjqzIB29zRPUuCF7Ge6mEv9s8dHrtYD7QWXRcx75rOADE/d5ah1NI+0vkDl0yorDd5U852IQQ==}
     hasBin: true
 
   caniuse-lite@1.0.30001765:
@@ -1205,6 +1228,10 @@ packages:
     resolution: {integrity: sha512-N8SpfPUnUp1bK+PMYW8qSWdl9U+wwNWI4QKxOYDy9JAro3WMX7p2OeVRF9v+347pnakNevPmiHhNmZ2HbFA76w==}
     engines: {node: ^10 || ^12 || ^13.7 || ^14 || >=15.0.1}
     hasBin: true
+
+  negotiator@1.0.0:
+    resolution: {integrity: sha512-8Ofs/AUQh8MaEcrlq5xOX0CQ9ypTF5dl78mjlMNfOK08fzpgTHQRQPBxcPlEtIw0yRpws+Zo/3r+5WRby7u3Gg==}
+    engines: {node: '>= 0.6'}
 
   next@16.1.4:
     resolution: {integrity: sha512-gKSecROqisnV7Buen5BfjmXAm7Xlpx9o2ueVQRo5DxQcjC8d330dOM1xiGWc2k3Dcnz0In3VybyRPOsudwgiqQ==}
@@ -1605,14 +1632,14 @@ snapshots:
       tslib: 2.8.1
     optional: true
 
-  '@finqu/storefront-lib@2.2.0(@tanstack/react-query@5.90.19(react@19.2.3))(react@19.2.3)':
-    dependencies:
+  '@finqu/storefront-lib@2.3.0(@tanstack/react-query@5.90.19(react@19.2.3))(react@19.2.3)':
+    optionalDependencies:
       '@tanstack/react-query': 5.90.19(react@19.2.3)
       react: 19.2.3
 
-  '@finqu/storefront-sdk@0.1.0-alpha.14(@finqu/storefront-lib@2.2.0(@tanstack/react-query@5.90.19(react@19.2.3))(react@19.2.3))(@puckeditor/core@0.21.0(@floating-ui/dom@1.7.4)(@types/react-dom@19.2.3(@types/react@19.2.9))(@types/react@19.2.9)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)(use-sync-external-store@1.6.0(react@19.2.3)))(react@19.2.3)':
+  '@finqu/storefront-sdk@0.1.0-alpha.14(@finqu/storefront-lib@2.3.0(@tanstack/react-query@5.90.19(react@19.2.3))(react@19.2.3))(@puckeditor/core@0.21.0(@floating-ui/dom@1.7.4)(@types/react-dom@19.2.3(@types/react@19.2.9))(@types/react@19.2.9)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)(use-sync-external-store@1.6.0(react@19.2.3)))(react@19.2.3)':
     dependencies:
-      '@finqu/storefront-lib': 2.2.0(@tanstack/react-query@5.90.19(react@19.2.3))(react@19.2.3)
+      '@finqu/storefront-lib': 2.3.0(@tanstack/react-query@5.90.19(react@19.2.3))(react@19.2.3)
       '@puckeditor/core': 0.21.0(@floating-ui/dom@1.7.4)(@types/react-dom@19.2.3(@types/react@19.2.9))(@types/react@19.2.9)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)(use-sync-external-store@1.6.0(react@19.2.3))
       react: 19.2.3
 
@@ -1632,6 +1659,15 @@ snapshots:
       react-dom: 19.2.3(react@19.2.3)
 
   '@floating-ui/utils@0.2.10': {}
+
+  '@formatjs/fast-memoize@3.1.0':
+    dependencies:
+      tslib: 2.8.1
+
+  '@formatjs/intl-localematcher@0.8.0':
+    dependencies:
+      '@formatjs/fast-memoize': 3.1.0
+      tslib: 2.8.1
 
   '@img/colour@1.0.0':
     optional: true
@@ -2425,6 +2461,8 @@ snapshots:
 
   '@types/mdurl@2.0.0': {}
 
+  '@types/negotiator@0.6.4': {}
+
   '@types/node@25.0.9':
     dependencies:
       undici-types: 7.16.0
@@ -2455,7 +2493,7 @@ snapshots:
     dependencies:
       tslib: 2.8.1
 
-  baseline-browser-mapping@2.9.16: {}
+  baseline-browser-mapping@2.9.17: {}
 
   caniuse-lite@1.0.30001765: {}
 
@@ -2588,11 +2626,13 @@ snapshots:
 
   nanoid@3.3.11: {}
 
+  negotiator@1.0.0: {}
+
   next@16.1.4(react-dom@19.2.3(react@19.2.3))(react@19.2.3):
     dependencies:
       '@next/env': 16.1.4
       '@swc/helpers': 0.5.15
-      baseline-browser-mapping: 2.9.16
+      baseline-browser-mapping: 2.9.17
       caniuse-lite: 1.0.30001765
       postcss: 8.4.31
       react: 19.2.3

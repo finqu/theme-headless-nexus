@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { getStoreInfo } from '@/lib/store-cache';
+import { getLocaleInfo } from '@/lib/locale';
 import { Providers } from './providers';
 import './globals.css';
 
@@ -9,15 +9,13 @@ export const metadata: Metadata = {
 };
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
-  // Get locale from store API - this is the default for the root layout
-  // Individual pages will determine their specific locale from URL
-  const storeInfo = await getStoreInfo();
-  const defaultLocale = storeInfo.defaultLocale;
+  // Get locale info from middleware headers (single source of truth)
+  const { locale, defaultLocale } = await getLocaleInfo();
 
   return (
-    <html lang={defaultLocale}>
+    <html lang={locale}>
       <body>
-        <Providers locale={defaultLocale} defaultLocale={defaultLocale}>
+        <Providers locale={locale} defaultLocale={defaultLocale}>
           {children}
         </Providers>
       </body>

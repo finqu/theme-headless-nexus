@@ -31,6 +31,31 @@ export const storefrontServer = createServerClient({
 });
 
 /**
+ * Create a locale-aware server-side Storefront client
+ * Use this when you need to fetch data for a specific locale
+ *
+ * @param language - ISO 639-1 language code (e.g., 'fi', 'en', 'sv')
+ * @returns A StorefrontClient configured with the specified locale
+ *
+ * @example
+ * ```tsx
+ * const client = createServerClientWithLocale('fi');
+ * const products = await products(client, { first: 10 });
+ * // Products will be returned in Finnish
+ * ```
+ */
+export function createServerClientWithLocale(language?: string) {
+  return createServerClient({
+    baseUrl: process.env.FINQU_STOREFRONT_URL!,
+    token: process.env.FINQU_STOREFRONT_TOKEN,
+    storeContext: language ? { language } : undefined,
+    next: {
+      revalidate: 60,
+    },
+  });
+}
+
+/**
  * Client-side Storefront client factory
  * Use this to create a client instance for the StorefrontProvider
  *
@@ -46,5 +71,6 @@ export const storefrontServer = createServerClient({
 export function createClientSideStorefront() {
   return createStorefrontClient({
     baseUrl: process.env.NEXT_PUBLIC_FINQU_STOREFRONT_URL!,
+    token: process.env.NEXT_PUBLIC_FINQU_STOREFRONT_TOKEN,
   });
 }

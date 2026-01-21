@@ -9,6 +9,7 @@ import {
   type ProductGridViewProps,
 } from '../ui/product-grid';
 import { fetchProducts, getProductImageUrl } from './shared';
+import { useLocaleOptional } from '@/lib/locale-context';
 
 /**
  * Props for the ProductGrid Puck component.
@@ -42,19 +43,24 @@ function ProductPickerField({
   const [searchQuery, setSearchQuery] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
+  // Access locale from context (returns null if outside provider)
+  const localeContext = useLocaleOptional();
+  const locale = localeContext?.locale;
+
   const selectedProducts = value || [];
   const selectedIds = new Set(selectedProducts.map((p) => p.id));
 
-  // Fetch products when dialog opens
+  // Fetch products when dialog opens or locale changes
   useEffect(() => {
     if (isOpen) {
       loadProducts();
     }
-  }, [isOpen, searchQuery]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isOpen, searchQuery, locale]);
 
   const loadProducts = async () => {
     setIsLoading(true);
-    const products = await fetchProducts({ query: searchQuery, first: 20 });
+    const products = await fetchProducts({ query: searchQuery, first: 20, locale: locale || undefined });
     setAvailableProducts(products);
     setIsLoading(false);
   };

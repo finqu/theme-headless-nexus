@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { listPageIds } from '@/lib/puck-storage';
-import { storefrontServer } from '@/lib/storefront';
+import { storefrontServer, createServerClientWithLocale } from '@/lib/storefront';
 import { pages as fetchStorefrontPages } from '@finqu/storefront-lib/server';
 
 /**
@@ -20,13 +20,26 @@ interface PageItem {
  *
  * Pages are identified by Finqu's stable page ID, which remains consistent
  * across all localized versions of a page.
+ *
+ * Query params:
+ * - locale: Optional locale code (e.g., 'fi', 'en') to fetch pages for that locale.
+ *           When specified, only pages that have translations in that locale are returned.
  */
-export async function GET() {
+export async function GET(request: Request) {
   try {
+    // Parse locale from query params
+    const { searchParams } = new URL(request.url);
+    const locale = searchParams.get('locale');
+
+    // Create locale-aware client if locale is specified
+    const client = locale
+      ? createServerClientWithLocale(locale)
+      : storefrontServer;
+
     // Fetch local page IDs and storefront pages in parallel
     const [localPageIds, storefrontPagesResult] = await Promise.all([
       listPageIds(),
-      fetchStorefrontPages(storefrontServer, {}).catch((err) => {
+      fetchStorefrontPages(client, {}).catch((err) => {
         console.error('Failed to fetch storefront pages:', err);
         return null;
       }),

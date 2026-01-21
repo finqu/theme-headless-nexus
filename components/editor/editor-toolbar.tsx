@@ -1,7 +1,9 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import { usePuck } from '@puckeditor/core';
+import { createUsePuck } from '@puckeditor/core';
+
+// Create usePuck hook with selector support to avoid unnecessary re-renders
+const usePuck = createUsePuck();
 import {
   Monitor,
   Smartphone,
@@ -24,13 +26,15 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
+import { ButtonGroup } from '@/components/ui/button-group';
+import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 import { SettingsDialog } from './settings-dialog';
 import { TEMPLATE_TYPES, TEMPLATE_TYPE_LABELS, type TemplateType } from '@/lib/template-types';
 
 type EditorMode = 'page' | 'template';
 type SaveStatus = 'idle' | 'saving' | 'saved' | 'error';
 
-interface Page {
+export interface Page {
   id: string;
   slug: string;
   title: string;
@@ -74,7 +78,13 @@ interface EditorToolbarProps {
   hasOverride?: boolean;
   saveStatus?: SaveStatus;
   locales?: Locale[];
+  /** Current locale/language code */
+  currentLocale?: string;
+  /** Pages list (controlled from parent to support locale changes) */
+  pages?: Page[];
   onPublish: () => void;
+  /** Called when language is changed in the selector */
+  onLanguageChange?: (locale: string) => void;
 }
 
 export function EditorToolbar({
@@ -85,33 +95,27 @@ export function EditorToolbar({
   hasUnpublishedChanges = false,
   saveStatus = 'idle',
   locales = [],
+  currentLocale,
+  pages = [],
   onPublish,
+  onLanguageChange,
 }: EditorToolbarProps) {
-  const { appState, dispatch, history } = usePuck();
-  const [pages, setPages] = useState<Page[]>([]);
+  // Use selectors to only subscribe to the state we need
+  const currentViewport = usePuck((s) => s.appState?.ui?.viewports?.current);
+  const dispatch = usePuck((s) => s.dispatch);
+  const history = usePuck((s) => s.history);
 
   // Find primary locale or use first one
   const primaryLocale = locales.find(l => l.primary) || locales[0];
-  const [selectedLanguage, setSelectedLanguage] = useState(primaryLocale?.isoCode || 'fi');
+  // Use controlled locale from props, or fallback to primary
+  const selectedLanguage = currentLocale || primaryLocale?.isoCode || 'fi';
 
-  // Fetch pages on mount
-  useEffect(() => {
-    async function fetchPages() {
-      try {
-        const res = await fetch('/api/puck/pages');
-        if (res.ok) {
-          const data = await res.json();
-          setPages(data.pages || []);
-        }
-      } catch (error) {
-        console.error('Failed to fetch pages:', error);
-      }
+  // Handle language change
+  const handleLanguageChange = (newLocale: string) => {
+    if (onLanguageChange) {
+      onLanguageChange(newLocale);
     }
-    fetchPages();
-  }, []);
-
-  // Get current viewport
-  const currentViewport = appState?.ui?.viewports?.current;
+  };
 
   // Select viewport
   const selectViewport = (viewport: (typeof defaultViewports)[number]) => {
@@ -155,13 +159,16 @@ export function EditorToolbar({
         : '';
 
   const handleSelectionChange = (value: string) => {
+    // Preserve current locale in navigation URLs
+    const localeParam = currentLocale ? `&locale=${currentLocale}` : '';
+
     if (value.startsWith('page:')) {
       const selectedPageId = value.replace('page:', '');
       // Use window.location for navigation as router.push doesn't work well inside Puck context
-      window.location.href = `/editor?mode=page&id=${selectedPageId}`;
+      window.location.href = `/editor?mode=page&id=${selectedPageId}${localeParam}`;
     } else if (value.startsWith('template:')) {
       const templateType = value.replace('template:', '');
-      window.location.href = `/editor?mode=template&type=${templateType}`;
+      window.location.href = `/editor?mode=template&type=${templateType}${localeParam}`;
     }
   };
 
@@ -181,28 +188,9 @@ export function EditorToolbar({
       : '/';
 
   return (
-    <header className="flex h-10 items-center justify-between border-b border-zinc-800 bg-zinc-900 px-2 text-white">
-      {/* Left section: Theme dropdown */}
+    <header className="flex items-center justify-between border-b border-zinc-800 bg-zinc-900 p-2 text-white">
+      {/* Left section: Preview button */}
       <div className="flex items-center gap-1.5">
-        {/* Theme/Preview dropdown */}
-        <div className="group relative">
-          <button className="flex items-center gap-1 rounded bg-zinc-700 px-2 py-1 text-xs font-medium transition-colors hover:bg-zinc-600">
-            Theme
-            <ChevronDown className="h-3 w-3" />
-          </button>
-          <div className="invisible absolute left-0 top-full z-50 mt-1 w-40 rounded-md border border-zinc-700 bg-zinc-800 py-1 opacity-0 shadow-lg transition-all group-hover:visible group-hover:opacity-100">
-            <a
-              href={previewUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center gap-2 px-3 py-1.5 text-xs text-zinc-300 hover:bg-zinc-700 hover:text-white"
-            >
-              <ExternalLink className="h-3 w-3" />
-              Preview
-            </a>
-          </div>
-        </div>
-
         {/* Settings */}
         <SettingsDialog />
       </div>
@@ -210,31 +198,42 @@ export function EditorToolbar({
       {/* Center section: Viewports, Page selector, Language */}
       <div className="flex items-center gap-2">
         {/* Viewport controls */}
-        <div className="flex items-center rounded bg-zinc-800">
+        <ToggleGroup
+          type="single"
+          value={
+            currentViewport?.width !== undefined
+              ? String(currentViewport.width)
+              : String(defaultViewports[0].width)
+          }
+          onValueChange={(value: string) => {
+            const viewport = defaultViewports.find(
+              (v) => String(v.width) === value
+            );
+            if (viewport) {
+              selectViewport(viewport);
+            }
+          }}
+          className="rounded bg-zinc-800"
+        >
           {defaultViewports.map((viewport, index) => {
-            const isActive = currentViewport?.width === viewport.width;
             const icon = viewportIcons[viewport.icon] || <Monitor className="h-3.5 w-3.5" />;
 
             return (
-              <button
+              <ToggleGroupItem
                 key={`${viewport.width}-${index}`}
-                onClick={() => selectViewport(viewport)}
-                className={`flex items-center justify-center rounded p-1 transition-colors ${
-                  isActive
-                    ? 'bg-zinc-600 text-white'
-                    : 'text-zinc-400 hover:bg-zinc-700 hover:text-white'
-                }`}
-                title={viewport.label}
+                value={String(viewport.width)}
+                aria-label={viewport.label}
+                className="w-10"
               >
                 {icon}
-              </button>
+              </ToggleGroupItem>
             );
           })}
-        </div>
+        </ToggleGroup>
 
         {/* Page/Template selector */}
         <Select value={currentSelection} onValueChange={handleSelectionChange}>
-          <SelectTrigger className="h-6 w-[160px] border-zinc-700 bg-zinc-800 text-xs text-white focus:ring-0 focus:ring-offset-0">
+          <SelectTrigger size='sm' className="w-[160px] border-zinc-700 bg-zinc-800 text-xs text-white focus:ring-0 focus:ring-offset-0">
             <div className="flex items-center gap-1.5">
               {mode === 'page' ? (
                 <FileText className="h-3 w-3 text-zinc-400" />
@@ -290,10 +289,9 @@ export function EditorToolbar({
 
         {/* Language selector */}
         {locales.length > 0 && (
-          <Select value={selectedLanguage} onValueChange={setSelectedLanguage}>
-            <SelectTrigger className="h-6 w-[60px] border-zinc-700 bg-zinc-800 text-xs text-white focus:ring-0 focus:ring-offset-0">
+          <Select value={selectedLanguage} onValueChange={handleLanguageChange}>
+            <SelectTrigger size='sm' className="w-[60px] border-zinc-700 bg-zinc-800 text-xs text-white focus:ring-0 focus:ring-offset-0">
               <div className="flex items-center gap-1">
-                <Globe className="h-3 w-3 text-zinc-400" />
                 <span className="uppercase">{selectedLanguage}</span>
               </div>
             </SelectTrigger>
@@ -326,37 +324,34 @@ export function EditorToolbar({
         </div>
 
         {/* Undo/Redo buttons */}
-        <div className="flex items-center rounded bg-zinc-800">
-          <button
+        <ButtonGroup>
+          <Button
+            variant="ghost"
+            size="icon-sm"
             onClick={handleUndo}
             disabled={!canUndo}
-            className={`flex items-center justify-center rounded p-1 transition-colors ${
-              canUndo
-                ? 'text-zinc-400 hover:bg-zinc-700 hover:text-white'
-                : 'cursor-not-allowed text-zinc-600'
-            }`}
+            className="text-zinc-400 hover:bg-zinc-700 hover:text-zinc-200 disabled:text-zinc-600"
             title="Undo"
           >
             <Undo2 className="h-3.5 w-3.5" />
-          </button>
-          <button
+          </Button>
+          <Button
+            variant="ghost"
+            size="icon-sm"
             onClick={handleRedo}
             disabled={!canRedo}
-            className={`flex items-center justify-center rounded p-1 transition-colors ${
-              canRedo
-                ? 'text-zinc-400 hover:bg-zinc-700 hover:text-white'
-                : 'cursor-not-allowed text-zinc-600'
-            }`}
+            className="text-zinc-400 hover:bg-zinc-700 hover:text-zinc-200 disabled:text-zinc-600"
             title="Redo"
           >
             <Redo2 className="h-3.5 w-3.5" />
-          </button>
-        </div>
+          </Button>
+        </ButtonGroup>
 
         {/* Publish button */}
         <Button
           onClick={onPublish}
-          className="h-6 bg-blue-600 px-3 text-xs font-medium text-white hover:bg-blue-700"
+          size='sm'
+          className="bg-blue-600/50 ring-blue-600 text-xs font-medium text-white hover:bg-blue-700"
         >
           Publish
         </Button>

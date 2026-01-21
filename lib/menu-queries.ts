@@ -5,21 +5,21 @@ import { storefrontServer } from './storefront';
  * Menu link type with nested links support
  */
 export interface MenuLink {
-    title?: string | null;
-    url?: string | null;
-    type?: string | null;
-    target?: string | null;
-    links?: MenuLink[] | null;
+  title?: string | null;
+  url?: string | null;
+  type?: string | null;
+  target?: string | null;
+  links?: MenuLink[] | null;
 }
 
 /**
  * Menu with full link structure
  */
 export interface MenuWithLinks {
-    handle?: string | null;
-    title?: string | null;
-    levels?: number | null;
-    links?: MenuLink[] | null;
+  handle?: string | null;
+  title?: string | null;
+  levels?: number | null;
+  links?: MenuLink[] | null;
 }
 
 /**
@@ -56,21 +56,23 @@ export const MENU_WITH_LINKS_QUERY = `
 /**
  * Fetch a menu with its full link structure
  * Cached for 5 minutes
+ *
+ * @param handle - Menu handle to fetch
  */
 export async function fetchMenuWithLinks(
-    handle: string
+  handle: string
 ): Promise<MenuWithLinks | null> {
-    try {
-        const result = await menu(
-            storefrontServer,
-            { handle },
-            {
-                query: MENU_WITH_LINKS_QUERY,
-            }
-        );
-        return result as MenuWithLinks;
-    } catch (error) {
-        console.error(`Failed to fetch menu "${handle}":`, error);
-        return null;
-    }
+  try {
+    const result = await menu(
+      storefrontServer,
+      { handle },
+      {
+        query: MENU_WITH_LINKS_QUERY,
+      }
+    );
+    return result as MenuWithLinks;
+  } catch (error) {
+    console.error(`Failed to fetch menu "${handle}":`, error);
+    return null;
+  }
 }

@@ -2,12 +2,17 @@
 
 import { Suspense, useCallback, useEffect, useRef, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
-import { Puck, usePuck, type Data } from '@puckeditor/core';
+import { Puck, createUsePuck, type Data } from '@puckeditor/core';
+
+// Create usePuck hook with selector support to avoid unnecessary re-renders
+const usePuck = createUsePuck();
 import { editorConfig, type EditorMetadata } from '@/lib/puck-config';
 import '@puckeditor/core/puck.css';
 import { isValidTemplateType, type TemplateType } from '@/lib/template-types';
-import { EditorToolbar } from '@/components/editor/editor-toolbar';
+import { EditorToolbar, type Page } from '@/components/editor/editor-toolbar';
+import { LocaleProvider } from '@/lib/locale-context';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
+import type { Locale } from '@/lib/store-cache';
 
 /**
  * Editor mode: either editing a static page or a template
@@ -67,8 +72,8 @@ function useDebouncedCallback<T extends (...args: never[]) => void>(callback: T,
  * Preview wrapper that applies viewport width
  */
 function PreviewWithViewport() {
-  const { appState } = usePuck();
-  const currentViewport = appState?.ui?.viewports?.current;
+  // Use selector to only subscribe to viewport changes
+  const currentViewport = usePuck((s) => s.appState?.ui?.viewports?.current);
 
   // Determine width style based on viewport
   const width = currentViewport?.width;
@@ -121,10 +126,12 @@ function EditorContent() {
   // - id: Finqu's stable page ID (for pages)
   // - type: Template type (for templates)
   // - slug: Template override slug (for templates only)
+  // - locale: Current locale (REQUIRED - redirects if missing)
   const mode = (searchParams.get('mode') as EditorMode) || 'page';
   const urlPageId = searchParams.get('id'); // For pages - Finqu's stable page ID from URL
   const type = searchParams.get('type') as TemplateType | null;
   const slug = searchParams.get('slug'); // For template overrides only
+  const urlLocale = searchParams.get('locale'); // Locale from URL (required)
 
   // Editor state
   const [initialData, setInitialData] = useState<Data | null>(null);
@@ -142,13 +149,48 @@ function EditorContent() {
   const [editorMetadata, setEditorMetadata] = useState<EditorMetadata | null>(null);
 
   // Store locales for language selector
-  const [locales, setLocales] = useState<Array<{
-    endonymName: string;
-    isoCode: string;
-    name: string;
-    primary: boolean;
-    rootUrl: string;
-  }>>([]);
+  const [locales, setLocales] = useState<Locale[]>([]);
+
+  // Default locale (first available from store)
+  const [defaultLocale, setDefaultLocale] = useState<string>('en');
+
+  // Pages list (controlled to support locale changes)
+  const [pages, setPages] = useState<Page[]>([]);
+
+  // Page not available in selected locale
+  const [pageNotAvailable, setPageNotAvailable] = useState(false);
+
+  // Phase 1: If no locale in URL, fetch store info and redirect with default locale
+  useEffect(() => {
+    if (urlLocale) return; // Already have locale, skip phase 1
+
+    async function fetchAndRedirect() {
+      try {
+        // Fetch layout data which includes locales
+        const res = await fetch('/api/layout/editor-data');
+        if (!res.ok) throw new Error('Failed to fetch store info');
+
+        const data = await res.json();
+        const firstLocale = data.locales?.[0]?.isoCode;
+
+        if (firstLocale) {
+          // Redirect to same URL with locale param
+          const params = new URLSearchParams(window.location.search);
+          params.set('locale', firstLocale);
+          window.location.href = `/editor?${params.toString()}`;
+        } else {
+          setError('No locales configured. Please check your Finqu store settings.');
+          setLoading(false);
+        }
+      } catch (err) {
+        console.error('Failed to fetch store info:', err);
+        setError('Failed to load store configuration.');
+        setLoading(false);
+      }
+    }
+
+    fetchAndRedirect();
+  }, [urlLocale]);
 
   // Update resolved page ID when URL param changes
   useEffect(() => {
@@ -180,59 +222,68 @@ function EditorContent() {
     [mode, resolvedPageId, type, slug]
   );
 
-  // Load initial data
+  // Phase 2: Load initial data using locale from URL
   useEffect(() => {
+    // Skip if no locale (Phase 1 will handle redirect)
+    if (!urlLocale) return;
+
     async function loadData() {
-      // Always fetch layout data for header/footer
+      // Fetch layout data and pages list with locale
       try {
-        const layoutRes = await fetch('/api/layout/editor-data');
+        const [layoutRes, pagesRes] = await Promise.all([
+          fetch(`/api/layout/editor-data?locale=${urlLocale}`),
+          fetch(`/api/puck/pages?locale=${urlLocale}`),
+        ]);
+
         if (layoutRes.ok) {
           const layoutData = await layoutRes.json();
+          const firstLocale = layoutData.locales?.[0];
+
           setEditorMetadata({
             navbarMenu: layoutData.navbarMenu,
             footerMenu: layoutData.footerMenu,
             storeName: layoutData.storeName,
             logoUrl: layoutData.logoUrl,
             layoutSettings: layoutData.layoutSettings,
+            locale: urlLocale || undefined,
           });
+
           // Set locales from API response
           if (layoutData.locales) {
             setLocales(layoutData.locales);
+            setDefaultLocale(firstLocale?.isoCode || 'en');
           }
         }
-      } catch (err) {
-        console.error('Failed to load layout data:', err);
-      }
 
-      // Handle page mode without URL ID - load homepage by default
-      if (mode === 'page' && !urlPageId) {
-        try {
-          // Fetch pages list to find homepage (handle: 'home')
-          const pagesRes = await fetch('/api/puck/pages');
-          if (pagesRes.ok) {
-            const pagesData = await pagesRes.json();
+        if (pagesRes.ok) {
+          const pagesData = await pagesRes.json();
+          setPages(pagesData.pages || []);
+
+          // Handle page mode without URL ID - load homepage by default
+          if (mode === 'page' && !urlPageId) {
             const homepage = pagesData.pages?.find(
               (p: { slug: string }) => p.slug === 'home'
             );
             if (homepage?.id) {
               setResolvedPageId(homepage.id);
-              // Don't return - continue loading with the resolved ID
             } else {
               setError('Homepage not found. Please check your Finqu configuration.');
               setLoading(false);
               return;
             }
-          } else {
+          }
+        } else {
+          if (mode === 'page' && !urlPageId) {
             setError('Failed to fetch pages list.');
             setLoading(false);
             return;
           }
-        } catch (err) {
-          console.error('Failed to fetch homepage:', err);
-          setError('Failed to load homepage.');
-          setLoading(false);
-          return;
         }
+      } catch (err) {
+        console.error('Failed to load data:', err);
+        setError('Failed to load editor data.');
+        setLoading(false);
+        return;
       }
 
       // Handle new default template (no slug override)
@@ -244,7 +295,7 @@ function EditorContent() {
     setLoading(true);
     setError(null);
     loadData();
-  }, [mode, urlPageId, type, slug]);
+  }, [mode, urlPageId, type, slug, urlLocale]);
 
   // Load page/template data when resolvedPageId is set
   useEffect(() => {
@@ -373,6 +424,20 @@ function EditorContent() {
     [getApiUrl]
   );
 
+  // Handle locale/language change - redirects to new URL
+  const handleLocaleChange = useCallback(
+    (newLocale: string) => {
+      if (newLocale === urlLocale) return;
+
+      // Redirect to same URL with new locale param
+      // This triggers a full refetch of all resources with the new locale
+      const params = new URLSearchParams(window.location.search);
+      params.set('locale', newLocale);
+      window.location.href = `/editor?${params.toString()}`;
+    },
+    [urlLocale]
+  );
+
   // Reset to default function (for template overrides)
   const handleResetToDefault = useCallback(async () => {
     if (!slug || mode !== 'template') return;
@@ -427,6 +492,41 @@ function EditorContent() {
     );
   }
 
+  // Render page not available state
+  if (pageNotAvailable) {
+    const currentLocaleInfo = locales.find((l) => l.isoCode === urlLocale);
+    const firstLocale = locales[0];
+
+    return (
+      <div className="flex h-screen items-center justify-center bg-gray-50">
+        <div className="text-center">
+          <div className="mb-2 text-6xl">🌐</div>
+          <h2 className="mb-2 text-xl font-semibold text-gray-800">
+            Page not available
+          </h2>
+          <p className="mb-4 text-gray-600">
+            This page is not available in{' '}
+            <span className="font-medium">
+              {currentLocaleInfo?.endonymName || urlLocale}
+            </span>
+            .
+          </p>
+          <p className="mb-6 text-sm text-gray-500">
+            The page may not have been translated to this language yet.
+          </p>
+          {firstLocale && firstLocale.isoCode !== urlLocale && (
+            <button
+              onClick={() => handleLocaleChange(firstLocale.isoCode)}
+              className="rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
+            >
+              Switch to {firstLocale.endonymName}
+            </button>
+          )}
+        </div>
+      </div>
+    );
+  }
+
   // Still loading or waiting for data
   if (!initialData) {
     return (
@@ -436,44 +536,58 @@ function EditorContent() {
     );
   }
 
-  return (
-    <div className="flex h-screen flex-col">
-      {/* Puck editor with custom layout - header is inside to access context */}
-      <div className="relative min-h-0 flex-1 [&>div]:h-full">
-        <Puck
-          config={editorConfig}
-          data={initialData}
-          onChange={handleChange}
-          onPublish={handlePublish}
-          metadata={editorMetadata ?? undefined}
-          ui={{
-            leftSideBarVisible: false,
-            viewports: {
-              current: {
-                width: '100%',
-                height: 'auto',
-              },
-              controlsVisible: true,
-              options: defaultViewports,
-            },
-          }}
-          viewports={defaultViewports}
-        >
-          <EditorLayout
-            mode={mode}
-            type={type}
-            pageId={resolvedPageId}
-            slug={slug}
-            hasUnpublishedChanges={hasUnpublishedChanges}
-            isInherited={isInherited}
-            hasOverride={hasOverride}
-            saveStatus={saveStatus}
-            locales={locales}
-            onResetToDefault={handleResetToDefault}
-          />
-        </Puck>
+  // Guard: urlLocale must be set by this point (Phase 1 redirects if missing)
+  if (!urlLocale) {
+    return (
+      <div className="flex h-screen items-center justify-center">
+        <div className="text-lg">Initializing locale...</div>
       </div>
-    </div>
+    );
+  }
+
+  return (
+    <LocaleProvider locale={urlLocale} defaultLocale={defaultLocale}>
+      <div className="flex h-screen flex-col">
+        {/* Puck editor with custom layout - header is inside to access context */}
+        <div className="relative min-h-0 flex-1 [&>div]:h-full">
+          <Puck
+            config={editorConfig}
+            data={initialData}
+            onChange={handleChange}
+            onPublish={handlePublish}
+            metadata={editorMetadata ?? undefined}
+            ui={{
+              leftSideBarVisible: false,
+              viewports: {
+                current: {
+                  width: '100%',
+                  height: 'auto',
+                },
+                controlsVisible: true,
+                options: defaultViewports,
+              },
+            }}
+            viewports={defaultViewports}
+          >
+            <EditorLayout
+              mode={mode}
+              type={type}
+              pageId={resolvedPageId}
+              slug={slug}
+              hasUnpublishedChanges={hasUnpublishedChanges}
+              isInherited={isInherited}
+              hasOverride={hasOverride}
+              saveStatus={saveStatus}
+              locales={locales}
+              currentLocale={urlLocale}
+              pages={pages}
+              onResetToDefault={handleResetToDefault}
+              onLanguageChange={handleLocaleChange}
+            />
+          </Puck>
+        </div>
+      </div>
+    </LocaleProvider>
   );
 }
 
@@ -489,14 +603,11 @@ interface EditorLayoutProps {
   isInherited: boolean;
   hasOverride: boolean;
   saveStatus: 'idle' | 'saving' | 'saved' | 'error';
-  locales: Array<{
-    endonymName: string;
-    isoCode: string;
-    name: string;
-    primary: boolean;
-    rootUrl: string;
-  }>;
+  locales: Locale[];
+  currentLocale: string;
+  pages: Page[];
   onResetToDefault: () => void;
+  onLanguageChange: (locale: string) => void;
 }
 
 function EditorLayout({
@@ -509,9 +620,13 @@ function EditorLayout({
   hasOverride,
   saveStatus,
   locales,
+  currentLocale,
+  pages,
   onResetToDefault,
+  onLanguageChange,
 }: EditorLayoutProps) {
-  const { appState } = usePuck();
+  // Use selector to only subscribe to data changes (for publish)
+  const data = usePuck((s) => s.appState?.data);
 
   // Get publish function from Puck's onPublish
   const handlePublish = () => {
@@ -522,7 +637,7 @@ function EditorLayout({
     } else {
       // Fallback: dispatch publish action manually
       // The onPublish callback receives the current data
-      const event = new CustomEvent('puck-publish', { detail: appState?.data });
+      const event = new CustomEvent('puck-publish', { detail: data });
       window.dispatchEvent(event);
     }
   };
@@ -540,7 +655,10 @@ function EditorLayout({
         hasOverride={hasOverride}
         saveStatus={saveStatus}
         locales={locales}
+        currentLocale={currentLocale}
+        pages={pages}
         onPublish={handlePublish}
+        onLanguageChange={onLanguageChange}
       />
 
       {/* Reset to default button (only for template overrides) */}

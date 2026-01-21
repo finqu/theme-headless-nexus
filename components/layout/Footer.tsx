@@ -25,6 +25,7 @@ export async function Footer({
   facebookUrl,
   linkedinUrl,
 }: FooterProps) {
+  console.log(process.env.FINQU_STOREFRONT_URL);
   // Fetch menu and store info in parallel
   const [menu, storeInfo] = await Promise.all([
     fetchMenuWithLinks(menuHandle),

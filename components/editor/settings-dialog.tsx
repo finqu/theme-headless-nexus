@@ -97,8 +97,9 @@ export function SettingsDialog() {
           className="text-xs text-zinc-400 hover:bg-zinc-800 hover:text-white"
           title="Layout Settings"
         >
-          Settings
           <Settings className="h-4 w-4" />
+          Settings
+
         </Button>
       </DialogTrigger>
       <DialogContent className="max-h-[85vh] overflow-y-auto sm:max-w-[550px]">

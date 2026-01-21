@@ -1,7 +1,5 @@
-'use client';
-
 import type { Config, DefaultRootRenderProps, PuckContext } from '@puckeditor/core';
-import { config as baseConfig } from '@/.storefront/puck.edit.config';
+import { config as baseConfig } from '@/.storefront/puck.render.config';
 import { NavbarClient } from '@/components/layout/navbar-client';
 import { FooterClient } from '@/components/layout/footer-client';
 import type { MenuWithLinks } from '@/lib/menu-queries';
@@ -17,6 +15,8 @@ export interface EditorMetadata {
   storeName: string;
   logoUrl?: string;
   layoutSettings: LayoutSettings;
+  /** Current locale/language code (e.g., 'fi', 'en') for fetching localized content */
+  locale?: string;
 }
 
 /**

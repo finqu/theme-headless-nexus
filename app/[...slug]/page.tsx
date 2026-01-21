@@ -1,9 +1,10 @@
 import { notFound } from 'next/navigation';
+import { headers } from 'next/headers';
 import { Render } from '@puckeditor/core';
 import { pageByHandle } from '@finqu/storefront-lib/server';
 import { config } from '@/.storefront/puck.render.config';
 import { getPageConfig } from '@/lib/puck-storage';
-import { storefrontServer } from '@/lib/storefront';
+import { createServerClientWithLocale } from '@/lib/storefront';
 import { SiteLayout } from '@/components/layout';
 
 interface PageProps {
@@ -14,22 +15,30 @@ interface PageProps {
  * Dynamic page renderer for Finqu pages with Puck layouts.
  *
  * This component handles localized routes by:
- * 1. Looking up the page in Finqu by its localized handle (URL slug)
- * 2. Getting the stable page ID from Finqu
- * 3. Fetching the Puck layout using the stable ID
+ * 1. Reading the locale from middleware headers (x-locale)
+ * 2. Looking up the page in Finqu by its localized handle using locale-aware client
+ * 3. Getting the stable page ID from Finqu
+ * 4. Fetching the Puck layout using the stable ID
  *
  * This ensures the same layout is used across all language versions of a page.
  *
  * Examples:
- * - /about -> looks up "about" -> gets page ID -> fetches Puck config
- * - /fi/tietoa -> looks up "fi/tietoa" -> gets same page ID -> same Puck config
+ * - /about -> default locale, looks up "about" -> gets page ID -> fetches Puck config
+ * - /se/produkter -> middleware rewrites to /produkter, sets x-locale: se
  */
 export default async function DynamicPage({ params }: PageProps) {
   const { slug } = await params;
   const pageHandle = slug.join('/');
 
+  // Read locale from middleware headers
+  const headersList = await headers();
+  const locale = headersList.get('x-locale') || 'en';
+
+  // Create locale-aware client for fetching localized content
+  const client = createServerClientWithLocale(locale);
+
   // Look up page in Finqu to get the stable page ID
-  const page = await pageByHandle(storefrontServer, { handle: pageHandle });
+  const page = await pageByHandle(client, { handle: pageHandle });
 
   if (!page?.id) {
     notFound();
@@ -60,8 +69,15 @@ export async function generateMetadata({ params }: PageProps) {
   const { slug } = await params;
   const pageHandle = slug.join('/');
 
+  // Read locale from middleware headers
+  const headersList = await headers();
+  const locale = headersList.get('x-locale') || 'en';
+
+  // Create locale-aware client
+  const client = createServerClientWithLocale(locale);
+
   // Look up page in Finqu to get the stable page ID and metadata
-  const page = await pageByHandle(storefrontServer, { handle: pageHandle });
+  const page = await pageByHandle(client, { handle: pageHandle });
 
   if (!page?.id) {
     return {};

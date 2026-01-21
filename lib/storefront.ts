@@ -50,7 +50,10 @@ export function createServerClientWithLocale(language?: string) {
     token: process.env.FINQU_STOREFRONT_TOKEN,
     storeContext: language ? { language } : undefined,
     next: {
+      // Use cache tags to allow locale-specific cache invalidation
+      // Include language in tags to differentiate cached responses by locale
       revalidate: 60,
+      tags: language ? [`locale-${language}`] : undefined,
     },
   });
 }

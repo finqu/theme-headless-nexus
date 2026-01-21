@@ -2,7 +2,9 @@
 
 import Link from 'next/link';
 import { NewsletterForm } from './newsletter-form';
+import { LocaleSwitcher } from './locale-switcher';
 import type { MenuLink, MenuWithLinks } from '@/lib/menu-queries';
+import type { Locale } from '@/lib/store-cache';
 
 interface FooterClientProps {
   menu: MenuWithLinks | null;
@@ -14,6 +16,7 @@ interface FooterClientProps {
   facebookUrl?: string;
   linkedinUrl?: string;
   isEditing?: boolean;
+  locales?: Locale[];
 }
 
 /**
@@ -30,6 +33,7 @@ export function FooterClient({
   facebookUrl,
   linkedinUrl,
   isEditing = false,
+  locales = [],
 }: FooterClientProps) {
   const currentYear = new Date().getFullYear();
 
@@ -118,8 +122,9 @@ export function FooterClient({
         <div className="container flex flex-col items-center justify-between gap-4 py-6 sm:flex-row">
           <p className="text-muted-foreground text-sm">{parsedCopyright}</p>
 
-          {/* Social icons */}
+          {/* Locale switcher and social icons */}
           <div className="flex items-center gap-4">
+            {locales.length > 0 && <LocaleSwitcher locales={locales} isEditing={isEditing} />}
             {twitterUrl && (
               <a
                 href={isEditing ? '#' : twitterUrl}

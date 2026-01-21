@@ -1,5 +1,5 @@
 import { menu } from '@finqu/storefront-lib/server';
-import { storefrontServer } from './storefront';
+import { createServerClientWithLocale } from './storefront';
 
 /**
  * Menu link type with nested links support
@@ -55,16 +55,18 @@ export const MENU_WITH_LINKS_QUERY = `
 
 /**
  * Fetch a menu with its full link structure
- * Cached for 5 minutes
  *
  * @param handle - Menu handle to fetch
+ * @param locale - Locale for localized menu content
  */
 export async function fetchMenuWithLinks(
-  handle: string
+  handle: string,
+  locale: string
 ): Promise<MenuWithLinks | null> {
   try {
+    const client = createServerClientWithLocale(locale);
     const result = await menu(
-      storefrontServer,
+      client,
       { handle },
       {
         query: MENU_WITH_LINKS_QUERY,

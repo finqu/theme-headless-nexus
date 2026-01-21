@@ -55,3 +55,44 @@ export const TEMPLATE_TYPE_LABELS: Record<TemplateType, string> = {
   [TemplateType.CATALOG]: 'Catalog',
   [TemplateType.WISHLIST]: 'Wishlist',
 };
+
+/**
+ * Map Finqu API ResourceType to internal TemplateType.
+ *
+ * This mapping is used to determine which Puck template to use
+ * when rendering a resource resolved by resourceByPath.
+ *
+ * Only resource types that support customizable templates are included.
+ * System pages (login, cart, checkout, etc.) are handled separately.
+ */
+export const RESOURCE_TYPE_TO_TEMPLATE: Record<string, TemplateType> = {
+  // Content resources with customizable templates
+  PRODUCT: TemplateType.PRODUCT,
+  PRODUCT_GROUP: TemplateType.CATEGORY,
+  PAGE: TemplateType.PAGE,
+  ARTICLE: TemplateType.ARTICLE,
+  MANUFACTURER: TemplateType.MANUFACTURER,
+
+  // System pages that can have templates
+  BLOG: TemplateType.BLOG,
+  CART: TemplateType.CART,
+  PRODUCTS: TemplateType.CATALOG,
+  ACCOUNT_WISHLIST: TemplateType.WISHLIST,
+};
+
+/**
+ * Get the TemplateType for a given ResourceType.
+ *
+ * @param resourceType - The API ResourceType (e.g., 'PRODUCT', 'PRODUCT_GROUP')
+ * @returns The corresponding TemplateType, or undefined if not templatable
+ *
+ * @example
+ * ```ts
+ * getTemplateTypeForResource('PRODUCT'); // 'product'
+ * getTemplateTypeForResource('PRODUCT_GROUP'); // 'category'
+ * getTemplateTypeForResource('LOGIN'); // undefined (system page)
+ * ```
+ */
+export function getTemplateTypeForResource(resourceType: string): TemplateType | undefined {
+  return RESOURCE_TYPE_TO_TEMPLATE[resourceType];
+}

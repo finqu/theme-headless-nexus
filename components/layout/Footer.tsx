@@ -1,8 +1,10 @@
 import Link from 'next/link';
 import { fetchMenuWithLinks } from '@/lib/menu-queries';
-import { storefrontServer } from '@/lib/storefront';
+import { createServerClientWithLocale } from '@/lib/storefront';
 import { store } from '@finqu/storefront-lib/server';
+import { getStoreInfo } from '@/lib/store-cache';
 import { NewsletterForm } from './newsletter-form';
+import { LocaleSwitcher } from './locale-switcher';
 import type { MenuLink } from '@/lib/menu-queries';
 
 interface FooterProps {
@@ -12,6 +14,7 @@ interface FooterProps {
   twitterUrl?: string;
   facebookUrl?: string;
   linkedinUrl?: string;
+  locale: string;
 }
 
 /**
@@ -24,12 +27,15 @@ export async function Footer({
   twitterUrl,
   facebookUrl,
   linkedinUrl,
+  locale,
 }: FooterProps) {
-  console.log(process.env.FINQU_STOREFRONT_URL);
-  // Fetch menu and store info in parallel
-  const [menu, storeInfo] = await Promise.all([
-    fetchMenuWithLinks(menuHandle),
-    store(storefrontServer, {}).catch(() => null),
+  const client = createServerClientWithLocale(locale);
+
+  // Fetch menu, store info, and store info with locales in parallel
+  const [menu, storeInfo, storeInfoWithLocales] = await Promise.all([
+    fetchMenuWithLinks(menuHandle, locale),
+    store(client, {}).catch(() => null),
+    getStoreInfo(),
   ]);
 
   const storeName = storeInfo?.name || 'Store';
@@ -113,8 +119,9 @@ export async function Footer({
         <div className="container flex flex-col items-center justify-between gap-4 py-6 sm:flex-row">
           <p className="text-muted-foreground text-sm">{parsedCopyright}</p>
 
-          {/* Social icons */}
+          {/* Locale switcher and social icons */}
           <div className="flex items-center gap-4">
+            <LocaleSwitcher locales={storeInfoWithLocales.locales} />
             {twitterUrl && (
               <a
                 href={twitterUrl}

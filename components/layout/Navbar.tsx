@@ -1,28 +1,32 @@
 import { fetchMenuWithLinks } from '@/lib/menu-queries';
-import { storefrontServer } from '@/lib/storefront';
-import { store, currencies } from '@finqu/storefront-lib/server';
+import { createServerClientWithLocale } from '@/lib/storefront';
+import { store, currencies, routes } from '@finqu/storefront-lib/server';
 import { NavbarClient } from './navbar-client';
 
 interface NavbarProps {
   menuHandle: string;
+  locale: string;
 }
 
 /**
  * Server component that fetches menu data, store info, and currencies
  */
-export async function Navbar({ menuHandle }: NavbarProps) {
+export async function Navbar({ menuHandle, locale }: NavbarProps) {
+  const client = createServerClientWithLocale(locale);
+
   // Fetch menu, store info, and currencies in parallel
-  const [menu, storeInfo, currencyList] = await Promise.all([
-    fetchMenuWithLinks(menuHandle),
-    store(storefrontServer, {}).catch(() => null),
-    currencies(storefrontServer, {}).catch(() => null),
+  const [menu, storeInfo, routesData, currencyList] = await Promise.all([
+    fetchMenuWithLinks(menuHandle, locale),
+    store(client, {}).catch(() => null),
+    routes(client, {}).catch(() => null),
+    currencies(client, {}).catch(() => null),
   ]);
 
   return (
     <NavbarClient
       menu={menu}
-      storeName={storeInfo?.name || undefined}
-      logoUrl={storeInfo?.logo || undefined}
+      storeInfo={storeInfo}
+      routes={routesData}
       currencies={currencyList ? (Array.isArray(currencyList) ? currencyList : [currencyList]) : []}
     />
   );

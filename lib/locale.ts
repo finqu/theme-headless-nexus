@@ -1,115 +1,88 @@
-import { getStoreInfo, type Locale } from './store-cache';
-
-export type { Locale };
+import { getStoreInfo, isKnownLocale } from './store-cache';
 
 /**
- * Result of locale detection from URL path
+ * Result of locale resolution from URL
  */
-export interface LocaleDetectionResult {
-  /** The detected locale code */
+export interface LocaleResolution {
+  /** The resolved locale code (e.g., 'fi', 'en', 'sv') */
   locale: string;
-  /** The path with locale prefix removed (if any) */
-  pathWithoutLocale: string;
-  /** Whether this is the default locale (no URL prefix) */
+  /** The store's default locale */
+  defaultLocale: string;
+  /** The URL path with locale prefix stripped (if any) */
+  path: string;
+  /** Whether the resolved locale is the default */
   isDefault: boolean;
 }
 
 /**
- * Detect locale from URL path segments.
+ * Resolve locale from URL path segments.
  *
- * The first path segment is checked against known locales.
- * If it matches a non-default locale, that locale is used and the segment is stripped.
- * Otherwise, the default locale is used and the path remains unchanged.
+ * This is the SINGLE SOURCE OF TRUTH for locale resolution in server components.
+ * It determines the locale from the URL and returns the appropriate path.
+ *
+ * Rules:
+ * - If first segment matches a known locale → use that locale, strip from path
+ * - If no locale in URL → use store's default locale
+ *
+ * @param segments - URL path segments (e.g., ['fi', 'tuotteet', 'paita'] or ['products', 'shirt'])
+ * @returns LocaleResolution with locale, path, and metadata
  *
  * @example
- * ```tsx
- * // Store has locales: ['fi', 'en', 'sv'], default is 'fi'
+ * ```ts
+ * // With locale prefix
+ * await resolveLocale(['fi', 'tuotteet', 'paita']);
+ * // { locale: 'fi', defaultLocale: 'fi', path: '/tuotteet/paita', isDefault: true }
  *
- * detectLocaleFromPath('/se/produkter')
- * // -> { locale: 'sv', pathWithoutLocale: '/produkter', isDefault: false }
+ * // Without locale prefix (uses default)
+ * await resolveLocale(['products', 'shirt']);
+ * // { locale: 'fi', defaultLocale: 'fi', path: '/products/shirt', isDefault: true }
  *
- * detectLocaleFromPath('/about')
- * // -> { locale: 'fi', pathWithoutLocale: '/about', isDefault: true }
- *
- * detectLocaleFromPath('/')
- * // -> { locale: 'fi', pathWithoutLocale: '/', isDefault: true }
+ * // Root path
+ * await resolveLocale([]);
+ * // { locale: 'fi', defaultLocale: 'fi', path: '/', isDefault: true }
  * ```
  */
-export async function detectLocaleFromPath(
-  pathname: string
-): Promise<LocaleDetectionResult> {
+export async function resolveLocale(segments: string[]): Promise<LocaleResolution> {
   const storeInfo = await getStoreInfo();
-  const segments = pathname.split('/').filter(Boolean);
   const firstSegment = segments[0]?.toLowerCase();
 
-  // Check if first segment is a known locale (but not the default)
-  const matchedLocale = storeInfo.locales.find(
-    (l) =>
-      l.isoCode.toLowerCase() === firstSegment &&
-      l.isoCode !== storeInfo.defaultLocale
-  );
+  // Check if first segment is a known locale
+  if (firstSegment && isKnownLocale(firstSegment, storeInfo.locales)) {
+    const locale = firstSegment;
+    const pathSegments = segments.slice(1);
+    const path = pathSegments.length > 0 ? '/' + pathSegments.join('/') : '/';
 
-  if (matchedLocale) {
-    const pathWithoutLocale = '/' + segments.slice(1).join('/') || '/';
     return {
-      locale: matchedLocale.isoCode,
-      pathWithoutLocale,
-      isDefault: false,
+      locale,
+      defaultLocale: storeInfo.defaultLocale,
+      path,
+      isDefault: locale === storeInfo.defaultLocale,
     };
   }
 
+  // No locale prefix - use default locale
+  const path = segments.length > 0 ? '/' + segments.join('/') : '/';
+
   return {
     locale: storeInfo.defaultLocale,
-    pathWithoutLocale: pathname,
+    defaultLocale: storeInfo.defaultLocale,
+    path,
     isDefault: true,
   };
 }
 
 /**
- * Build a localized URL path.
- * Default locale has no prefix, others get /{locale}/path
+ * Get the default locale for the store.
+ *
+ * Use this when you need just the default locale without URL parsing.
  *
  * @example
- * ```tsx
- * // Store has default locale 'fi'
- *
- * buildLocalizedPath('/about', 'fi')
- * // -> '/about' (no prefix for default)
- *
- * buildLocalizedPath('/about', 'en')
- * // -> '/en/about'
- *
- * buildLocalizedPath('/', 'sv')
- * // -> '/sv'
+ * ```ts
+ * const locale = await getDefaultLocale();
+ * // 'fi'
  * ```
  */
-export async function buildLocalizedPath(
-  path: string,
-  locale: string
-): Promise<string> {
+export async function getDefaultLocale(): Promise<string> {
   const storeInfo = await getStoreInfo();
-
-  // Default locale has no prefix
-  if (locale === storeInfo.defaultLocale) {
-    return path;
-  }
-
-  const cleanPath = path.startsWith('/') ? path : `/${path}`;
-  return `/${locale}${cleanPath === '/' ? '' : cleanPath}`;
-}
-
-/**
- * Synchronous version of buildLocalizedPath when you already have store info
- */
-export function buildLocalizedPathSync(
-  path: string,
-  locale: string,
-  defaultLocale: string
-): string {
-  if (locale === defaultLocale) {
-    return path;
-  }
-
-  const cleanPath = path.startsWith('/') ? path : `/${path}`;
-  return `/${locale}${cleanPath === '/' ? '' : cleanPath}`;
+  return storeInfo.defaultLocale;
 }

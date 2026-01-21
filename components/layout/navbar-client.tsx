@@ -13,6 +13,7 @@ import {
   ElPopover,
   ElPopoverGroup,
 } from '@tailwindplus/elements/react';
+import { Routes, StoreInfo } from '@finqu/storefront-lib/server';
 
 interface Currency {
   id?: number | string | null;
@@ -23,8 +24,8 @@ interface Currency {
 
 interface NavbarClientProps {
   menu: MenuWithLinks | null;
-  storeName?: string;
-  logoUrl?: string;
+  storeInfo?: StoreInfo | null;
+  routes?: Routes | null;
   currencies?: Currency[];
   isEditing?: boolean;
 }
@@ -33,8 +34,8 @@ const MAX_VISIBLE_LINKS = 4;
 
 export function NavbarClient({
   menu,
-  storeName = 'Store',
-  logoUrl,
+  storeInfo,
+  routes,
   currencies = [],
   isEditing = false,
 }: NavbarClientProps) {
@@ -42,6 +43,9 @@ export function NavbarClient({
   const [selectedCurrency, setSelectedCurrency] = React.useState<Currency | null>(
     currencies[0] || null
   );
+
+  const storeName = storeInfo?.name || 'Store';
+  const logoUrl = storeInfo?.logo;
 
   // Limit visible root-level links to MAX_VISIBLE_LINKS, put rest under "More"
   const visibleLinks = allLinks.slice(0, MAX_VISIBLE_LINKS);
@@ -162,21 +166,23 @@ export function NavbarClient({
                 </div>
               )}
 
-              <div className="space-y-6 border-t border-gray-200 px-4 py-6">
-                <div className="flow-root">
-                  <Link href="/account/login" className="-m-2 block p-2 font-medium text-gray-900">
-                    Sign in
-                  </Link>
+              { storeInfo?.customerAccountsEnabled && (
+                <div className="space-y-6 border-t border-gray-200 px-4 py-6">
+                  <div className="flow-root">
+                    <Link href={routes?.accountLoginUrl || '#'} className="-m-2 block p-2 font-medium text-gray-900">
+                      Sign in
+                    </Link>
+                  </div>
+                  <div className="flow-root">
+                    <Link
+                      href={routes?.accountRegisterUrl || '#'}
+                      className="-m-2 block p-2 font-medium text-gray-900"
+                    >
+                      Create account
+                    </Link>
+                  </div>
                 </div>
-                <div className="flow-root">
-                  <Link
-                    href="/account/register"
-                    className="-m-2 block p-2 font-medium text-gray-900"
-                  >
-                    Create account
-                  </Link>
-                </div>
-              </div>
+              )}
 
               {/* Currency selector in mobile */}
               {currencies.length > 0 && selectedCurrency && (
@@ -228,7 +234,7 @@ export function NavbarClient({
 
               {/* Logo */}
               <div className="ml-4 flex lg:ml-0">
-                <Link href="/">
+                <Link href={routes?.rootUrl || '/'}>
                   <span className="sr-only">{storeName}</span>
                   {logoUrl ? (
                     <img src={logoUrl} alt={storeName} className="h-8 w-auto" />
@@ -373,21 +379,23 @@ export function NavbarClient({
               </ElPopoverGroup>
 
               <div className="ml-auto flex items-center">
-                <div className="hidden lg:flex lg:flex-1 lg:items-center lg:justify-end lg:space-x-6">
-                  <Link
-                    href="/account/login"
-                    className="text-sm font-medium text-gray-700 hover:text-gray-800"
-                  >
-                    Sign in
-                  </Link>
-                  <span aria-hidden="true" className="h-6 w-px bg-gray-200"></span>
-                  <Link
-                    href="/account/register"
-                    className="text-sm font-medium text-gray-700 hover:text-gray-800"
-                  >
-                    Create account
-                  </Link>
-                </div>
+                { storeInfo?.customerAccountsEnabled && (
+                  <div className="hidden lg:flex lg:flex-1 lg:items-center lg:justify-end lg:space-x-6">
+                    <Link
+                      href={routes?.accountLoginUrl || '#'}
+                      className="text-sm font-medium text-gray-700 hover:text-gray-800"
+                    >
+                      Sign in
+                    </Link>
+                    <span aria-hidden="true" className="h-6 w-px bg-gray-200"></span>
+                    <Link
+                      href={routes?.accountRegisterUrl || '#'}
+                      className="text-sm font-medium text-gray-700 hover:text-gray-800"
+                    >
+                      Create account
+                    </Link>
+                  </div>
+                )}
 
                 {/* Currency selector */}
                 {currencies.length > 0 && selectedCurrency && (
@@ -401,7 +409,7 @@ export function NavbarClient({
 
                 {/* Search */}
                 <div className="flex lg:ml-6">
-                  <Link href="/search" className="p-2 text-gray-400 hover:text-gray-500">
+                  <Link href={routes?.searchUrl || '#'} className="p-2 text-gray-400 hover:text-gray-500">
                     <span className="sr-only">Search</span>
                     <svg
                       viewBox="0 0 24 24"
@@ -422,7 +430,7 @@ export function NavbarClient({
 
                 {/* Cart */}
                 <div className="ml-4 flow-root lg:ml-6">
-                  <Link href="/cart" className="group -m-2 flex items-center p-2">
+                  <Link href={routes?.cartUrl || '#'} className="group -m-2 flex items-center p-2">
                     <svg
                       viewBox="0 0 24 24"
                       fill="none"

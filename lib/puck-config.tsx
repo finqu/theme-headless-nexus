@@ -1,5 +1,5 @@
 import type { Config, DefaultRootRenderProps, PuckContext } from '@puckeditor/core';
-import type { StoreInfo } from '@finqu/storefront-lib/server';
+import type { StoreInfo } from '@finqu/storefront-types';
 import { config as baseConfig } from '@/.storefront/puck.render.config';
 import { NavbarClient } from '@/components/layout/navbar-client';
 import { FooterClient } from '@/components/layout/footer-client';
@@ -13,7 +13,7 @@ import type { ReactNode } from 'react';
 export interface EditorMetadata {
   navbarMenu: MenuWithLinks | null;
   footerMenu: MenuWithLinks | null;
-  storeInfo: StoreInfo;
+  storeInfo: StoreInfo | null;
   layoutSettings: LayoutSettings;
   /** Current locale/language code (e.g., 'fi', 'en') for fetching localized content */
   locale?: string;
@@ -49,8 +49,8 @@ export const editorConfig: Config = {
           {/* Footer */}
           <FooterClient
             menu={footerMenu}
-            storeName={storeInfo.name ?? undefined}
-            logoUrl={storeInfo.logo ?? undefined}
+            storeName={storeInfo?.name ?? undefined}
+            logoUrl={storeInfo?.logo ?? undefined}
             tagline={layoutSettings.footer.tagline}
             copyrightText={layoutSettings.footer.copyrightText}
             twitterUrl={layoutSettings.footer.twitterUrl}

@@ -1,57 +1,20 @@
-import { menu } from '@finqu/storefront-lib/server';
-import { createServerClientWithLocale } from './storefront';
+import { storefrontClient, cachePresets, withLocale } from './storefront';
+import {
+  MENU_QUERY,
+  type MenuQueryResponse,
+} from './queries';
+import type { Menu, Link } from '@finqu/storefront-types';
+
+// Re-export types for convenience
+export type { Menu, Link };
+
+// Backwards compatibility alias
+export type MenuLink = Link;
 
 /**
- * Menu link type with nested links support
+ * Menu with full link structure (alias for backwards compatibility)
  */
-export interface MenuLink {
-  title?: string | null;
-  url?: string | null;
-  type?: string | null;
-  target?: string | null;
-  links?: MenuLink[] | null;
-}
-
-/**
- * Menu with full link structure
- */
-export interface MenuWithLinks {
-  handle?: string | null;
-  title?: string | null;
-  levels?: number | null;
-  links?: MenuLink[] | null;
-}
-
-/**
- * GraphQL query for menu with nested links (2 levels deep)
- */
-export const MENU_WITH_LINKS_QUERY = `
-  query Menu($handle: String!) {
-    menu(handle: $handle) {
-      handle
-      title
-      levels
-      links {
-        title
-        url
-        type
-        target
-        links {
-          title
-          url
-          type
-          target
-          links {
-            title
-            url
-            type
-            target
-          }
-        }
-      }
-    }
-  }
-`;
+export type MenuWithLinks = Menu;
 
 /**
  * Fetch a menu with its full link structure
@@ -62,17 +25,14 @@ export const MENU_WITH_LINKS_QUERY = `
 export async function fetchMenuWithLinks(
   handle: string,
   locale: string
-): Promise<MenuWithLinks | null> {
+): Promise<Menu | null> {
   try {
-    const client = createServerClientWithLocale(locale);
-    const result = await menu(
-      client,
+    const result = await storefrontClient.query<MenuQueryResponse>(
+      MENU_QUERY,
       { handle },
-      {
-        query: MENU_WITH_LINKS_QUERY,
-      }
+      withLocale(locale, cachePresets.static)
     );
-    return result as MenuWithLinks;
+    return result.menu;
   } catch (error) {
     console.error(`Failed to fetch menu "${handle}":`, error);
     return null;

@@ -24,7 +24,7 @@ export function LocaleSwitcher({ locales, isEditing = false }: LocaleSwitcherPro
   // Find the matching locale object (case-insensitive) to get the exact isoCode
   // This ensures the select value matches the option values exactly
   const matchedLocale = locales.find(
-    (l) => l.isoCode.toLowerCase() === currentLocale.toLowerCase()
+    (l) => l.isoCode?.toLowerCase() === currentLocale.toLowerCase()
   );
   const normalizedCurrentLocale = matchedLocale?.isoCode || currentLocale;
 
@@ -73,11 +73,13 @@ export function LocaleSwitcher({ locales, isEditing = false }: LocaleSwitcherPro
         className="text-muted-foreground border-muted-foreground/20 hover:border-muted-foreground/40 cursor-pointer rounded border bg-transparent px-2 py-1 text-sm transition-colors disabled:cursor-not-allowed disabled:opacity-50"
         aria-label="Select language"
       >
-        {locales.map((locale) => (
-          <option key={locale.isoCode} value={locale.isoCode}>
-            {locale.endonymName || locale.name}
-          </option>
-        ))}
+        {locales
+          .filter((locale): locale is typeof locale & { isoCode: string } => !!locale.isoCode)
+          .map((locale) => (
+            <option key={locale.isoCode} value={locale.isoCode}>
+              {locale.endonymName || locale.name}
+            </option>
+          ))}
       </select>
     </div>
   );

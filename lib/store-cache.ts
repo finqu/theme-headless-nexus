@@ -1,17 +1,15 @@
 import { unstable_cache } from 'next/cache';
-import { storefrontServer } from './storefront';
-import { store, LOCALES_QUERY } from '@finqu/storefront-lib/server';
+import { storefrontClient, cachePresets } from './storefront';
+import {
+  STORE_QUERY,
+  LOCALES_QUERY,
+  type StoreQueryResponse,
+  type LocalesQueryResponse,
+} from './queries';
+import type { Locale } from '@finqu/storefront-types';
 
-/**
- * Locale information from the store
- */
-export interface Locale {
-  isoCode: string;
-  endonymName: string;
-  name: string;
-  primary: boolean;
-  rootUrl: string;
-}
+// Re-export Locale type for convenience
+export type { Locale };
 
 /**
  * Store information including available locales
@@ -41,9 +39,11 @@ export interface StoreInfo {
 export const getStoreInfo = unstable_cache(
   async (): Promise<StoreInfo> => {
     const [storeData, localesData] = await Promise.all([
-      store(storefrontServer, {}).catch(() => null),
-      storefrontServer
-        .execute<{ locales: Locale[] }>(LOCALES_QUERY)
+      storefrontClient
+        .query<StoreQueryResponse>(STORE_QUERY, undefined, cachePresets.static)
+        .catch(() => ({ store: null })),
+      storefrontClient
+        .query<LocalesQueryResponse>(LOCALES_QUERY, undefined, cachePresets.static)
         .catch(() => ({ locales: [] })),
     ]);
 
@@ -54,24 +54,10 @@ export const getStoreInfo = unstable_cache(
     return {
       locales,
       defaultLocale,
-      storeName: storeData?.name || 'Store',
-      logoUrl: storeData?.logo || undefined,
+      storeName: storeData?.store?.name || 'Store',
+      logoUrl: storeData?.store?.logo || undefined,
     };
   },
   ['store-info'],
   { revalidate: 300, tags: ['store-info'] }
 );
-
-/**
- * Check if a code matches a known locale (case-insensitive)
- */
-export function isKnownLocale(code: string, locales: Locale[]): boolean {
-  return locales.some((l) => l.isoCode.toLowerCase() === code.toLowerCase());
-}
-
-/**
- * Find a locale by its ISO code (case-insensitive)
- */
-export function findLocale(code: string, locales: Locale[]): Locale | undefined {
-  return locales.find((l) => l.isoCode.toLowerCase() === code.toLowerCase());
-}

@@ -1,7 +1,11 @@
 import { unstable_cache } from 'next/cache';
-import type { Resource, ResourceType } from '@finqu/storefront-lib';
-import { createServerClientWithLocale } from './storefront';
-import type { Alternate } from './alternates-context';
+import type { ResourceType, Alternate } from '@finqu/storefront-types';
+import { storefrontClient, cachePresets, withLocale } from './storefront';
+import {
+  RESOURCE_BY_PATH_QUERY,
+  type ResourceByPathResponse,
+  type Resource,
+} from './queries';
 
 // Re-export types for convenience
 export type { Resource, ResourceType };
@@ -11,31 +15,6 @@ export type { Resource, ResourceType };
  */
 export interface ResourceWithAlternates extends Resource {
   alternates?: Alternate[];
-}
-
-/**
- * GraphQL query to resolve a URL path to a resource type, ID, and alternates.
- * This is the foundation of Finqu's dynamic URL routing system.
- */
-const RESOURCE_BY_PATH_QUERY = `
-  query ResourceByPath($path: String!) {
-    resourceByPath(path: $path) {
-      type
-      id
-      alternates {
-        hreflang
-        path
-        url
-      }
-    }
-  }
-`;
-
-/**
- * Response type for the resourceByPath query
- */
-interface ResourceByPathResponse {
-  resourceByPath: ResourceWithAlternates | null;
 }
 
 /**
@@ -50,12 +29,11 @@ async function fetchResourceByPath(
   path: string,
   locale: string
 ): Promise<ResourceWithAlternates | null> {
-  const client = createServerClientWithLocale(locale);
-
   try {
-    const response = await client.execute<ResourceByPathResponse>(
+    const response = await storefrontClient.query<ResourceByPathResponse>(
       RESOURCE_BY_PATH_QUERY,
-      { path }
+      { path },
+      withLocale(locale, cachePresets.static)
     );
 
     return response.resourceByPath;
@@ -102,56 +80,3 @@ export const getResourceByPath = unstable_cache(
     tags: ['resource-paths'],
   }
 );
-
-/**
- * Resource types that represent content with customizable templates.
- * These types have associated IDs and can use Puck editor templates.
- */
-export const TEMPLATABLE_RESOURCE_TYPES: ResourceType[] = [
-  'PRODUCT',
-  'PRODUCT_GROUP',
-  'PAGE',
-  'ARTICLE',
-  'MANUFACTURER',
-];
-
-/**
- * Resource types that represent system pages without specific IDs.
- * These are handled by dedicated components rather than templates.
- */
-export const SYSTEM_RESOURCE_TYPES: ResourceType[] = [
-  'HOME',
-  'LOGIN',
-  'LOGOUT',
-  'REGISTER',
-  'ACCOUNT',
-  'ACCOUNT_EDIT',
-  'ACCOUNT_ORDERS',
-  'ACCOUNT_WISHLIST',
-  'CHANGE_PASSWORD',
-  'RECOVER_PASSWORD',
-  'RESET_PASSWORD',
-  'CART',
-  'CHECKOUT',
-  'SEARCH',
-  'BLOG',
-  'PRODUCTS',
-  'PRIVACY_POLICY',
-  'SHIPPING_POLICY',
-  'REFUND_POLICY',
-  'TERMS_AND_CONDITIONS',
-];
-
-/**
- * Check if a resource type uses Puck templates
- */
-export function isTemplatableResource(type: ResourceType): boolean {
-  return TEMPLATABLE_RESOURCE_TYPES.includes(type);
-}
-
-/**
- * Check if a resource type is a system page
- */
-export function isSystemResource(type: ResourceType): boolean {
-  return SYSTEM_RESOURCE_TYPES.includes(type);
-}

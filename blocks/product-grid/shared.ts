@@ -1,11 +1,11 @@
-import type { Product } from '@finqu/storefront-lib/types';
-import { createStorefrontClient } from '@finqu/storefront-lib';
+import type { Product } from '@finqu/storefront-types';
+import { createFinquClient, type FinquClient } from '@finqu/storefront-sdk/graphql';
 
 /**
  * GraphQL query for fetching products with all fields needed for ProductGrid rendering.
  * Shared between edit and render Puck components.
  */
-export const PRODUCTS_QUERY = `
+export const PRODUCTS_QUERY = /* GraphQL */ `
   query Products($query: String, $limit: Int, $offset: Int, $sort: String, $productGroup: String, $priceMin: Float, $priceMax: Float, $onlyDiscounted: Boolean, $onlyNew: Boolean, $first: Int, $after: String, $last: Int, $before: String, $sortKey: String, $reverse: Boolean) {
     products(query: $query, limit: $limit, offset: $offset, sort: $sort, productGroup: $productGroup, priceMin: $priceMin, priceMax: $priceMax, onlyDiscounted: $onlyDiscounted, onlyNew: $onlyNew, first: $first, after: $after, last: $last, before: $before, sortKey: $sortKey, reverse: $reverse) {
       edges {
@@ -21,6 +21,7 @@ export const PRODUCTS_QUERY = `
             sku
             price
             originalPrice
+            url
             featuredImage {
               url
               alt
@@ -31,7 +32,8 @@ export const PRODUCTS_QUERY = `
             }
           },
           variants {
-            id
+            id,
+            url
           }
         }
         cursor
@@ -48,17 +50,14 @@ export const PRODUCTS_QUERY = `
 `;
 
 /**
- * Create a client-side Storefront client with optional locale support.
+ * Create a client-side Storefront client.
  * Use this for client-side data fetching in browser components.
  *
- * @param locale - Optional ISO 639-1 language code (e.g., 'fi', 'en', 'sv')
- * @returns A StorefrontClient configured for client-side use
+ * @returns A FinquClient configured for client-side use
  */
-export function createClientWithLocale(locale?: string) {
-  return createStorefrontClient({
-    baseUrl: process.env.NEXT_PUBLIC_FINQU_STOREFRONT_URL!,
-    token: process.env.NEXT_PUBLIC_FINQU_STOREFRONT_TOKEN,
-    storeContext: locale ? { language: locale } : undefined,
+export function createClientForBrowser(): FinquClient {
+  return createFinquClient({
+    publicKey: process.env.NEXT_PUBLIC_FINQU_PUBLIC_KEY!,
   });
 }
 
@@ -66,8 +65,6 @@ export interface FetchProductsOptions {
   query?: string;
   first?: number;
   productIds?: (number | null | undefined)[];
-  /** Locale code for fetching localized product data (e.g., 'fi', 'en') */
-  locale?: string;
 }
 
 interface ProductsQueryResult {
@@ -86,16 +83,14 @@ interface ProductsQueryResult {
 /**
  * Fetches products from the storefront API (client-side).
  * Can optionally filter by product IDs after fetching.
- *
- * @param options.locale - Optional locale to fetch localized product content
  */
 export async function fetchProducts(options: FetchProductsOptions = {}): Promise<Product[]> {
-  const { query: searchQuery, first = 50, productIds, locale } = options;
+  const { query: searchQuery, first = 50, productIds } = options;
 
-  const client = createClientWithLocale(locale);
+  const client = createClientForBrowser();
 
   try {
-    const result = await client.execute<ProductsQueryResult>(PRODUCTS_QUERY, {
+    const result = await client.query<ProductsQueryResult>(PRODUCTS_QUERY, {
       query: searchQuery || undefined,
       first,
     });
@@ -125,18 +120,16 @@ export async function fetchProducts(options: FetchProductsOptions = {}): Promise
  * Useful for rendering saved ProductGrid components with fresh data.
  *
  * @param productIds - Array of product IDs to fetch
- * @param locale - Optional locale to fetch localized product content
  */
 export async function fetchProductsByIds(
-  productIds: (number | null | undefined)[],
-  locale?: string
+  productIds: (number | null | undefined)[]
 ): Promise<Product[]> {
   if (!productIds || productIds.length === 0) {
     return [];
   }
 
   // Fetch a larger set to ensure we get all requested products
-  return fetchProducts({ first: 100, productIds, locale });
+  return fetchProducts({ first: 100, productIds });
 }
 
 /**

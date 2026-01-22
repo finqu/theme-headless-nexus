@@ -7,9 +7,11 @@ import { getTemplateTypeForResource } from '@/lib/template-types';
 import { getLocale, getPathname } from '@/lib/locale';
 import { SiteLayout } from '@/components/layout';
 import { SystemPage } from '@/components/system-pages';
+import { ProductPage } from '@/components/system-pages/pages/product-page';
 
 interface PageProps {
   params: Promise<{ slug: string[] }>;
+  searchParams?: Promise<Record<string, string | string[] | undefined>>;
 }
 
 /**
@@ -30,12 +32,13 @@ interface PageProps {
  * - /en/products/shirt -> x-pathname: /en/products/shirt, x-locale: en
  * - /tuotteet/paita -> x-pathname: /tuotteet/paita, x-locale: fi (default)
  */
-export default async function DynamicPage() {
+export default async function DynamicPage({ params, searchParams }: PageProps) {
+  const slug = '/' + (await params).slug.join('/');
   // Get locale and original path from middleware headers
   const [locale, path] = await Promise.all([getLocale(), getPathname()]);
 
   // Resolve path to resource type, ID, and alternates
-  const resource = await getResourceByPath(path, locale);
+  const resource = await getResourceByPath(slug, locale);
 
   // Handle not found or failed resolution
   if (!resource || resource.type === 'NOT_FOUND') {
@@ -50,10 +53,7 @@ export default async function DynamicPage() {
     // Try slug-specific override first, then fall back to default template
     const data = await getTemplateConfig(templateType, resource.id, 'published');
 
-    if (!data) {
-      // No template configured - show placeholder or notFound
-      // For now, fall through to system page handler which will show a placeholder
-    } else {
+    if (data) {
       return (
         <SiteLayout locale={locale} alternates={resource.alternates}>
           <Render config={config} data={data} />
@@ -64,9 +64,17 @@ export default async function DynamicPage() {
 
   // Handle as system page (login, cart, account, etc.)
   // Or templatable resource without custom template yet
+  // Parse ID to number if present (API returns IDs as strings, SDK expects numbers)
+  const numericId = resource.id ? parseInt(resource.id, 10) : undefined;
+
   return (
     <SiteLayout locale={locale} alternates={resource.alternates}>
-      <SystemPage type={resource.type} id={resource.id ?? undefined} locale={locale} />
+      <SystemPage
+        type={resource.type}
+        id={numericId}
+        locale={locale}
+        searchParams={searchParams ? await searchParams : undefined}
+      />
     </SiteLayout>
   );
 }

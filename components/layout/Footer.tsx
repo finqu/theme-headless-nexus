@@ -1,11 +1,10 @@
 import Link from 'next/link';
-import { fetchMenuWithLinks } from '@/lib/menu-queries';
-import { createServerClientWithLocale } from '@/lib/storefront';
-import { store } from '@finqu/storefront-lib/server';
+import { fetchMenuWithLinks, type MenuLink } from '@/lib/menu-queries';
+import { storefrontClient, cachePresets, withLocale } from '@/lib/storefront';
+import { STORE_QUERY, type StoreQueryResponse } from '@/lib/queries';
 import { getStoreInfo } from '@/lib/store-cache';
 import { NewsletterForm } from './newsletter-form';
 import { LocaleSwitcher } from './locale-switcher';
-import type { MenuLink } from '@/lib/menu-queries';
 
 interface FooterProps {
   menuHandle: string;
@@ -29,17 +28,19 @@ export async function Footer({
   linkedinUrl,
   locale,
 }: FooterProps) {
-  const client = createServerClientWithLocale(locale);
+  const cacheOptions = withLocale(locale, cachePresets.static);
 
   // Fetch menu, store info, and store info with locales in parallel
-  const [menu, storeInfo, storeInfoWithLocales] = await Promise.all([
+  const [menu, storeData, storeInfoWithLocales] = await Promise.all([
     fetchMenuWithLinks(menuHandle, locale),
-    store(client, {}).catch(() => null),
+    storefrontClient
+      .query<StoreQueryResponse>(STORE_QUERY, undefined, cacheOptions)
+      .catch(() => ({ store: null })),
     getStoreInfo(),
   ]);
 
-  const storeName = storeInfo?.name || 'Store';
-  const logoUrl = storeInfo?.logo;
+  const storeName = storeData.store?.name || 'Store';
+  const logoUrl = storeData.store?.logo;
   const currentYear = new Date().getFullYear();
 
   // Parse copyright text with placeholders

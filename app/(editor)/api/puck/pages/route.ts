@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { listPageIds } from '@/lib/puck-storage';
-import { storefrontServer, createServerClientWithLocale } from '@/lib/storefront';
-import { pages as fetchStorefrontPages } from '@finqu/storefront-lib/server';
+import { storefrontClient, cachePresets, withLocale } from '@/lib/storefront';
+import { PAGES_QUERY, type PagesQueryResponse } from '@/lib/queries';
 
 /**
  * Page item returned by the API
@@ -29,17 +29,17 @@ export async function GET(request: Request) {
   try {
     // Parse locale from query params
     const { searchParams } = new URL(request.url);
-    const locale = searchParams.get('locale');
+    const locale = searchParams.get('locale') || '';
 
-    // Create locale-aware client if locale is specified
-    const client = locale
-      ? createServerClientWithLocale(locale)
-      : storefrontServer;
+    // Create cache options
+    const cacheOptions = locale
+      ? withLocale(locale, cachePresets.static)
+      : cachePresets.static;
 
     // Fetch local page IDs and storefront pages in parallel
     const [localPageIds, storefrontPagesResult] = await Promise.all([
       listPageIds(),
-      fetchStorefrontPages(client, {}).catch((err) => {
+      storefrontClient.query<PagesQueryResponse>(PAGES_QUERY, { first: 100 }, cacheOptions).catch((err) => {
         console.error('Failed to fetch storefront pages:', err);
         return null;
       }),
@@ -52,8 +52,8 @@ export async function GET(request: Request) {
     const storefrontPages: PageItem[] = [];
     const storefrontPageIdSet = new Set<string>();
 
-    if (storefrontPagesResult?.edges) {
-      for (const edge of storefrontPagesResult.edges) {
+    if (storefrontPagesResult?.pages?.edges) {
+      for (const edge of storefrontPagesResult.pages.edges) {
         const page = edge?.node;
 
         if (page?.id && page?.handle) {

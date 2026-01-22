@@ -16,11 +16,9 @@ function createStorage(): StorageBackend {
   const useRedis = Boolean(process.env.UPSTASH_REDIS_REST_URL);
 
   if (useRedis) {
-    console.log('[Storage] Using Upstash Redis backend');
     return new RedisStorage();
   }
 
-  console.log('[Storage] Using file-based backend');
   return new FileStorage();
 }
 

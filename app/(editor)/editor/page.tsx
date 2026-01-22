@@ -499,9 +499,9 @@ function EditorContent() {
           <p className="mb-6 text-sm text-gray-500">
             The page may not have been translated to this language yet.
           </p>
-          {firstLocale && firstLocale.isoCode !== urlLocale && (
+          {firstLocale && firstLocale.isoCode && firstLocale.isoCode !== urlLocale && (
             <button
-              onClick={() => handleLocaleChange(firstLocale.isoCode)}
+              onClick={() => handleLocaleChange(firstLocale.isoCode!)}
               className="rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
             >
               Switch to {firstLocale.endonymName}

@@ -1,6 +1,13 @@
 import { fetchMenuWithLinks } from '@/lib/menu-queries';
-import { createServerClientWithLocale } from '@/lib/storefront';
-import { store, currencies, routes } from '@finqu/storefront-lib/server';
+import { storefrontClient, cachePresets, withLocale } from '@/lib/storefront';
+import {
+  STORE_QUERY,
+  CURRENCIES_QUERY,
+  STORE_ROUTES_QUERY,
+  type StoreQueryResponse,
+  type CurrenciesQueryResponse,
+  type StoreRoutesQueryResponse,
+} from '@/lib/queries';
 import { NavbarClient } from './navbar-client';
 
 interface NavbarProps {
@@ -12,22 +19,28 @@ interface NavbarProps {
  * Server component that fetches menu data, store info, and currencies
  */
 export async function Navbar({ menuHandle, locale }: NavbarProps) {
-  const client = createServerClientWithLocale(locale);
+  const cacheOptions = withLocale(locale, cachePresets.static);
 
-  // Fetch menu, store info, and currencies in parallel
-  const [menu, storeInfo, routesData, currencyList] = await Promise.all([
+  // Fetch menu, store info, routes, and currencies in parallel
+  const [menu, storeData, routesData, currencyData] = await Promise.all([
     fetchMenuWithLinks(menuHandle, locale),
-    store(client, {}).catch(() => null),
-    routes(client, {}).catch(() => null),
-    currencies(client, {}).catch(() => null),
+    storefrontClient
+      .query<StoreQueryResponse>(STORE_QUERY, undefined, cacheOptions)
+      .catch(() => ({ store: null })),
+    storefrontClient
+      .query<StoreRoutesQueryResponse>(STORE_ROUTES_QUERY, undefined, cacheOptions)
+      .catch(() => ({ storeRoutes: null })),
+    storefrontClient
+      .query<CurrenciesQueryResponse>(CURRENCIES_QUERY, undefined, cacheOptions)
+      .catch(() => ({ currencies: [] })),
   ]);
 
   return (
     <NavbarClient
       menu={menu}
-      storeInfo={storeInfo}
-      routes={routesData}
-      currencies={currencyList ? (Array.isArray(currencyList) ? currencyList : [currencyList]) : []}
+      storeInfo={storeData.store}
+      routes={routesData.storeRoutes}
+      currencies={currencyData.currencies}
     />
   );
 }

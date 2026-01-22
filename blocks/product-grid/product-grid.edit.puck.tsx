@@ -2,12 +2,12 @@
 
 import { useState, useEffect } from 'react';
 import type { ComponentConfig } from '@puckeditor/core';
-import type { Product } from '@finqu/storefront-lib/types';
+import type { Product } from '@finqu/storefront-types';
 import {
   ProductGrid,
   productGridDefaultProps,
   type ProductGridViewProps,
-} from '../ui/product-grid';
+} from '@/components/product-grid';
 import { fetchProducts, getProductImageUrl } from './shared';
 import { useLocaleOptional } from '@/lib/locale-context';
 
@@ -55,12 +55,15 @@ function ProductPickerField({
     if (isOpen) {
       loadProducts();
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isOpen, searchQuery, locale]);
 
   const loadProducts = async () => {
     setIsLoading(true);
-    const products = await fetchProducts({ query: searchQuery, first: 20, locale: locale || undefined });
+    const products = await fetchProducts({
+      query: searchQuery,
+      first: 20,
+    });
     setAvailableProducts(products);
     setIsLoading(false);
   };
@@ -175,7 +178,7 @@ function ProductPickerField({
                 placeholder="Search products..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full rounded-md border px-3 py-2 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus:outline-none"
+                className="w-full rounded-md border px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
               />
             </div>
 

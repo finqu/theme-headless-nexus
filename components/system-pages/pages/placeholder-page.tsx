@@ -2,7 +2,7 @@ import type { ResourceType } from '@/lib/resource-resolver';
 
 interface PlaceholderPageProps {
   type: ResourceType;
-  id?: string;
+  id?: number;
   title?: string;
   message?: string;
   templateType?: string;
@@ -26,20 +26,12 @@ export function PlaceholderPage({
   return (
     <div className="flex min-h-[60vh] items-center justify-center bg-gray-50">
       <div className="max-w-md text-center">
-        <div className="mb-4 text-6xl text-gray-300">
-          {getIconForType(type)}
-        </div>
+        <div className="mb-4 text-6xl text-gray-300">{getIconForType(type)}</div>
         <h1 className="mb-2 text-3xl font-bold text-gray-900">{displayTitle}</h1>
-        {id && (
-          <p className="mb-2 text-sm text-gray-500">ID: {id}</p>
-        )}
-        {message && (
-          <p className="mb-6 text-gray-600">{message}</p>
-        )}
+        {id && <p className="mb-2 text-sm text-gray-500">ID: {id}</p>}
+        {message && <p className="mb-6 text-gray-600">{message}</p>}
         {!message && (
-          <p className="mb-6 text-gray-600">
-            This page is coming soon. Check back later!
-          </p>
+          <p className="mb-6 text-gray-600">This page is coming soon. Check back later!</p>
         )}
         {showEditorLink && templateType && (
           <a

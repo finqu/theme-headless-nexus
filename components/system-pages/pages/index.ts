@@ -6,3 +6,4 @@ export { CartPage } from './cart-page';
 export { SearchPage } from './search-page';
 export { ProductsPage } from './products-page';
 export { PolicyPage } from './policy-page';
+export { ProductPage } from './product-page';

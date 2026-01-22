@@ -30,6 +30,7 @@ import { ButtonGroup } from '@/components/ui/button-group';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 import { SettingsDialog } from './settings-dialog';
 import { TEMPLATE_TYPES, TEMPLATE_TYPE_LABELS, type TemplateType } from '@/lib/template-types';
+import type { Locale } from '@finqu/storefront-types';
 
 type EditorMode = 'page' | 'template';
 type SaveStatus = 'idle' | 'saving' | 'saved' | 'error';
@@ -40,14 +41,6 @@ export interface Page {
   title: string;
   editUrl: string;
   source: 'local' | 'storefront';
-}
-
-interface Locale {
-  endonymName: string;
-  isoCode: string;
-  name: string;
-  primary: boolean;
-  rootUrl: string;
 }
 
 /**
@@ -106,7 +99,7 @@ export function EditorToolbar({
   const history = usePuck((s) => s.history);
 
   // Find primary locale or use first one
-  const primaryLocale = locales.find(l => l.primary) || locales[0];
+  const primaryLocale = locales.find((l) => l.primary) || locales[0];
   // Use controlled locale from props, or fallback to primary
   const selectedLanguage = currentLocale || primaryLocale?.isoCode || 'fi';
 
@@ -181,11 +174,12 @@ export function EditorToolbar({
         : 'Select template';
 
   // Preview URL - opens the current page in a new tab
-  const previewUrl = mode === 'page' && pageId
-    ? `/?preview=true&pageId=${pageId}`
-    : mode === 'template' && type
-      ? `/?preview=true&template=${type}`
-      : '/';
+  const previewUrl =
+    mode === 'page' && pageId
+      ? `/?preview=true&pageId=${pageId}`
+      : mode === 'template' && type
+        ? `/?preview=true&template=${type}`
+        : '/';
 
   return (
     <header className="flex items-center justify-between border-b border-zinc-800 bg-zinc-900 p-2 text-white">
@@ -206,9 +200,7 @@ export function EditorToolbar({
               : String(defaultViewports[0].width)
           }
           onValueChange={(value: string) => {
-            const viewport = defaultViewports.find(
-              (v) => String(v.width) === value
-            );
+            const viewport = defaultViewports.find((v) => String(v.width) === value);
             if (viewport) {
               selectViewport(viewport);
             }
@@ -233,7 +225,10 @@ export function EditorToolbar({
 
         {/* Page/Template selector */}
         <Select value={currentSelection} onValueChange={handleSelectionChange}>
-          <SelectTrigger size='sm' className="w-[160px] border-zinc-700 bg-zinc-800 text-xs text-white focus:ring-0 focus:ring-offset-0">
+          <SelectTrigger
+            size="sm"
+            className="w-[160px] border-zinc-700 bg-zinc-800 text-xs text-white focus:ring-0 focus:ring-offset-0"
+          >
             <div className="flex items-center gap-1.5">
               {mode === 'page' ? (
                 <FileText className="h-3 w-3 text-zinc-400" />
@@ -245,7 +240,7 @@ export function EditorToolbar({
           </SelectTrigger>
           <SelectContent className="max-h-80 overflow-y-auto border-zinc-700 bg-zinc-800 text-white">
             <SelectGroup>
-              <SelectLabel className="text-zinc-400 text-xs">Pages</SelectLabel>
+              <SelectLabel className="text-xs text-zinc-400">Pages</SelectLabel>
               {pages.length === 0 ? (
                 <SelectItem
                   value="no-pages"
@@ -270,7 +265,7 @@ export function EditorToolbar({
               )}
             </SelectGroup>
             <SelectGroup>
-              <SelectLabel className="text-zinc-400 text-xs">Templates</SelectLabel>
+              <SelectLabel className="text-xs text-zinc-400">Templates</SelectLabel>
               {TEMPLATE_TYPES.map((templateType) => (
                 <SelectItem
                   key={templateType}
@@ -290,22 +285,29 @@ export function EditorToolbar({
         {/* Language selector */}
         {locales.length > 0 && (
           <Select value={selectedLanguage} onValueChange={handleLanguageChange}>
-            <SelectTrigger size='sm' className="w-[60px] border-zinc-700 bg-zinc-800 text-xs text-white focus:ring-0 focus:ring-offset-0">
+            <SelectTrigger
+              size="sm"
+              className="w-[60px] border-zinc-700 bg-zinc-800 text-xs text-white focus:ring-0 focus:ring-offset-0"
+            >
               <div className="flex items-center gap-1">
                 <span className="uppercase">{selectedLanguage}</span>
               </div>
             </SelectTrigger>
             <SelectContent className="border-zinc-700 bg-zinc-800 text-white">
-              {locales.map((locale) => (
-                <SelectItem
-                  key={locale.isoCode}
-                  value={locale.isoCode}
-                  className="text-xs focus:bg-zinc-700 focus:text-white"
-                >
-                  <span className="uppercase">{locale.isoCode}</span>
-                  <span className="ml-1.5 text-zinc-400">({locale.endonymName})</span>
-                </SelectItem>
-              ))}
+              {locales
+                .filter((locale): locale is typeof locale & { isoCode: string } => !!locale.isoCode)
+                .map((locale) => (
+                  <SelectItem
+                    key={locale.isoCode}
+                    value={locale.isoCode}
+                    className="text-xs focus:bg-zinc-700 focus:text-white"
+                  >
+                    <span className="uppercase">{locale.isoCode}</span>
+                    <span className="ml-1.5 text-zinc-400">
+                      ({locale.endonymName || locale.name})
+                    </span>
+                  </SelectItem>
+                ))}
             </SelectContent>
           </Select>
         )}
@@ -350,8 +352,8 @@ export function EditorToolbar({
         {/* Publish button */}
         <Button
           onClick={onPublish}
-          size='sm'
-          className="bg-blue-600/50 ring-blue-600 text-xs font-medium text-white hover:bg-blue-700"
+          size="sm"
+          className="bg-blue-600/50 text-xs font-medium text-white ring-blue-600 hover:bg-blue-700"
         >
           Publish
         </Button>

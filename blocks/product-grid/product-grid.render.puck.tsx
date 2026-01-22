@@ -1,10 +1,10 @@
 import type { ComponentConfig } from '@puckeditor/core';
-import type { Product } from '@finqu/storefront-lib/types';
+import type { Product } from '@finqu/storefront-types';
 import {
   ProductGrid,
   productGridDefaultProps,
   type ProductGridViewProps,
-} from '../ui/product-grid';
+} from '@/components/product-grid';
 import { fetchProductsByIds } from './shared';
 
 /**

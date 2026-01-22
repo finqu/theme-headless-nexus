@@ -3,21 +3,15 @@ import type { NextRequest } from 'next/server';
 import { getStoreInfo } from '@/lib/store-cache';
 
 /**
- * Use Node.js runtime to access the cached GraphQL client directly.
- * This allows us to use @finqu/storefront-lib without creating a REST API.
- */
-export const runtime = 'nodejs';
-
-/**
  * Paths that should skip locale detection and handling.
  * These paths work independently of the locale system.
  */
 const SKIP_PATHS = ['/api/', '/editor', '/_next/', '/favicon.ico', '/robots.txt', '/sitemap.xml'];
 
 /**
- * Middleware for locale detection from URL path.
+ * Proxy for locale detection from URL path.
  *
- * This middleware:
+ * This proxy:
  * 1. Detects the locale from the first path segment (e.g., /en/products -> 'en')
  * 2. Strips the locale prefix from the URL (rewrites /en/products -> /products)
  * 3. Sets x-locale and x-pathname headers on the REQUEST for downstream server components
@@ -27,7 +21,7 @@ const SKIP_PATHS = ['/api/', '/editor', '/_next/', '/favicon.ico', '/robots.txt'
  *
  * URL is the single source of truth. No redirects.
  */
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   // Skip locale handling for certain paths
@@ -43,7 +37,7 @@ export async function middleware(request: NextRequest) {
 
   // Check if URL has a locale prefix (any supported locale)
   const matchedLocale = storeInfo.locales.find(
-    (l) => l.isoCode.toLowerCase() === firstSegment
+    (l) => l.isoCode?.toLowerCase() === firstSegment
   );
 
   // Clone request headers to add our custom headers
@@ -51,20 +45,15 @@ export async function middleware(request: NextRequest) {
 
   if (matchedLocale) {
     // URL has locale prefix - set headers and strip locale from path
-    requestHeaders.set('x-locale', matchedLocale.isoCode);
-    requestHeaders.set('x-default-locale', storeInfo.defaultLocale);
-    requestHeaders.set('x-pathname', pathname);
+    requestHeaders.set('x-locale', matchedLocale.isoCode!);
 
-    const pathWithoutLocale = '/' + segments.slice(1).join('/') || '/';
-    return NextResponse.rewrite(new URL(pathWithoutLocale, request.url), {
+    return NextResponse.next({
       request: { headers: requestHeaders },
     });
   }
 
   // No locale prefix - use default locale
-  requestHeaders.set('x-locale', storeInfo.defaultLocale);
-  requestHeaders.set('x-default-locale', storeInfo.defaultLocale);
-  requestHeaders.set('x-pathname', pathname);
+  requestHeaders.set('x-locale', storeInfo.defaultLocale!);
 
   return NextResponse.next({
     request: { headers: requestHeaders },

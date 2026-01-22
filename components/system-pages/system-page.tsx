@@ -7,11 +7,13 @@ import { SearchPage } from './pages/search-page';
 import { ProductsPage } from './pages/products-page';
 import { PolicyPage } from './pages/policy-page';
 import { PlaceholderPage } from './pages/placeholder-page';
+import { ProductPage } from './pages/product-page';
 
 export interface SystemPageProps {
   type: ResourceType;
-  id?: string;
+  id?: number;
   locale: string;
+  searchParams?: Record<string, string | string[] | undefined>;
 }
 
 /**
@@ -24,7 +26,7 @@ export interface SystemPageProps {
  * For resource types that should have templates but don't yet,
  * a placeholder is shown with a link to create the template.
  */
-export function SystemPage({ type, id, locale }: SystemPageProps) {
+export function SystemPage({ type, id, locale, searchParams }: SystemPageProps) {
   switch (type) {
     // Authentication pages
     case 'LOGIN':
@@ -55,7 +57,9 @@ export function SystemPage({ type, id, locale }: SystemPageProps) {
     case 'CART':
       return <CartPage locale={locale} />;
     case 'CHECKOUT':
-      return <PlaceholderPage type={type} title="Checkout" message="Checkout is handled externally." />;
+      return (
+        <PlaceholderPage type={type} title="Checkout" message="Checkout is handled externally." />
+      );
 
     // Discovery pages
     case 'SEARCH':
@@ -63,7 +67,7 @@ export function SystemPage({ type, id, locale }: SystemPageProps) {
     case 'BLOG':
       return <PlaceholderPage type={type} title="Blog" templateType="blog" />;
     case 'PRODUCTS':
-      return <ProductsPage locale={locale} />;
+      return <ProductsPage locale={locale} searchParams={searchParams} />;
 
     // Policy pages
     case 'PRIVACY_POLICY':
@@ -77,6 +81,10 @@ export function SystemPage({ type, id, locale }: SystemPageProps) {
 
     // Templatable resources without templates yet
     case 'PRODUCT':
+      if (id == null) {
+        return <PlaceholderPage type={type} message="Product ID is missing." />;
+      }
+      return <ProductPage id={id} locale={locale} />;
     case 'PRODUCT_GROUP':
     case 'PAGE':
     case 'ARTICLE':

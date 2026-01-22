@@ -1,79 +1,97 @@
-import { createServerClient } from '@finqu/storefront-lib/server';
-import { createStorefrontClient } from '@finqu/storefront-lib';
-
 /**
- * Server-side Storefront client
- * Use this in Server Components and API routes for data fetching
+ * Storefront Client Configuration
  *
- * Features:
- * - Automatic request deduplication
- * - Next.js cache integration
- * - Type-safe GraphQL operations
+ * This module provides the singleton server-side Finqu client for data fetching.
+ * Uses @finqu/storefront-sdk for GraphQL operations with built-in caching.
+ *
+ * Environment variables:
+ * - FINQU_SECRET_KEY: Server-side API key (required)
  *
  * @example
  * ```tsx
  * // In a Server Component
- * import { storefrontServer } from '@/lib/storefront';
- * import { productByHandle } from '@finqu/storefront-lib/server';
+ * import { storefrontClient, cachePresets } from '@/lib/storefront';
+ * import { getProduct } from '@finqu/storefront-sdk/server';
  *
  * export default async function ProductPage({ params }) {
- *   const product = await productByHandle(storefrontServer, { handle: params.slug });
+ *   const { product } = await getProduct(storefrontClient, { handle: params.slug });
  *   return <div>{product?.title}</div>;
  * }
  * ```
+ *
+ * @example
+ * ```tsx
+ * // With custom query
+ * import { storefrontClient, cachePresets } from '@/lib/storefront';
+ * import { STORE_QUERY, type StoreQueryResponse } from '@/lib/queries';
+ *
+ * const data = await storefrontClient.query<StoreQueryResponse>(
+ *   STORE_QUERY,
+ *   undefined,
+ *   cachePresets.static
+ * );
+ * ```
  */
-export const storefrontServer = createServerClient({
-  baseUrl: process.env.FINQU_STOREFRONT_URL!,
-  token: process.env.FINQU_STOREFRONT_TOKEN,
-  next: {
-    revalidate: 60, // Cache for 60 seconds by default
-  },
+
+import {
+  createFinquServerClient,
+  cachePresets as sdkCachePresets,
+  type FinquServerClient,
+  type ServerFetchOptions,
+} from '@finqu/storefront-sdk/server';
+
+/**
+ * Server-side Storefront client singleton
+ *
+ * Use this in Server Components and API routes for data fetching.
+ * Features:
+ * - Automatic request deduplication via React cache
+ * - Next.js ISR cache integration
+ * - Type-safe GraphQL operations
+ */
+export const storefrontClient: FinquServerClient = createFinquServerClient({
+  secretKey: process.env.FINQU_SECRET_KEY!,
 });
 
 /**
- * Create a locale-aware server-side Storefront client
- * Use this when you need to fetch data for a specific locale
+ * Re-export cache presets from SDK for convenience
  *
- * @param language - ISO 639-1 language code (e.g., 'fi', 'en', 'sv')
- * @returns A StorefrontClient configured with the specified locale
- *
- * @example
- * ```tsx
- * const client = createServerClientWithLocale('fi');
- * const products = await products(client, { first: 10 });
- * // Products will be returned in Finnish
- * ```
+ * Usage:
+ * - cachePresets.static: Long-lived data (categories, menus) - 1 hour
+ * - cachePresets.products: Product data - 1 minute
+ * - cachePresets.dynamic: No cache (cart, auth)
+ * - cachePresets.withTags(['tag']): ISR with on-demand revalidation
  */
-export function createServerClientWithLocale(language?: string) {
-  return createServerClient({
-    baseUrl: process.env.FINQU_STOREFRONT_URL!,
-    token: process.env.FINQU_STOREFRONT_TOKEN,
-    storeContext: language ? { language } : undefined,
-    next: {
-      // Use cache tags to allow locale-specific cache invalidation
-      // Include language in tags to differentiate cached responses by locale
-      revalidate: 60,
-      tags: language ? [`locale-${language}`] : undefined,
-    },
-  });
-}
+export const cachePresets = sdkCachePresets;
 
 /**
- * Client-side Storefront client factory
- * Use this to create a client instance for the StorefrontProvider
- *
- * @example
- * ```tsx
- * // In providers.tsx
- * const client = createClientSideStorefront();
- * <StorefrontProvider client={client}>
- *   {children}
- * </StorefrontProvider>
- * ```
+ * Re-export types for convenience
  */
-export function createClientSideStorefront() {
-  return createStorefrontClient({
-    baseUrl: process.env.NEXT_PUBLIC_FINQU_STOREFRONT_URL!,
-    token: process.env.NEXT_PUBLIC_FINQU_STOREFRONT_TOKEN,
-  });
+export type { FinquServerClient, ServerFetchOptions };
+
+/**
+ * Create a locale-aware query wrapper
+ *
+ * This utility helps with locale-specific caching by including
+ * the locale in the cache tags.
+ *
+ * @param locale - ISO language code
+ * @returns Cache options with locale-specific tags
+ */
+export function withLocale(
+  locale: string,
+  baseOptions: ServerFetchOptions = cachePresets.static
+): ServerFetchOptions {
+  const tags = [`locale:${locale}`];
+  if (baseOptions.next?.tags) {
+    tags.push(...baseOptions.next.tags);
+  }
+
+  return {
+    ...baseOptions,
+    next: {
+      ...baseOptions.next,
+      tags,
+    },
+  };
 }

@@ -1,8 +1,9 @@
 'use client';
 
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { useState, type ReactNode } from 'react';
+import { type ReactNode } from 'react';
+import { FinquProvider } from '@finqu/storefront-sdk/react';
 import { LocaleProvider } from '@/lib/locale-context';
+import { CartProvider } from '@/lib/cart-context';
 
 interface ProvidersProps {
   children: ReactNode;
@@ -14,31 +15,17 @@ interface ProvidersProps {
 
 /**
  * Application providers wrapper
- * Sets up React Query for data fetching/caching and locale context
+ * Sets up Finqu SDK provider, locale context, and cart state
  *
  * Note: AlternatesProvider is added by individual pages since alternates
  * are page-specific data from resourceByPath API.
  */
 export function Providers({ children, locale, defaultLocale }: ProvidersProps) {
-  // Create a new QueryClient for each session to avoid shared state
-  const [queryClient] = useState(
-    () =>
-      new QueryClient({
-        defaultOptions: {
-          queries: {
-            // Good defaults for a storefront
-            staleTime: 60 * 1000, // 1 minute
-            refetchOnWindowFocus: false,
-          },
-        },
-      })
-  );
-
   return (
-    <QueryClientProvider client={queryClient}>
+    <FinquProvider publicKey={process.env.NEXT_PUBLIC_FINQU_PUBLIC_KEY!}>
       <LocaleProvider locale={locale} defaultLocale={defaultLocale}>
-        {children}
+        <CartProvider>{children}</CartProvider>
       </LocaleProvider>
-    </QueryClientProvider>
+    </FinquProvider>
   );
 }

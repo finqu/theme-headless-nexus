@@ -15,8 +15,8 @@ A **Finqu headless e-commerce storefront** built with Next.js 16 and Puck visual
 
 ### Key Libraries
 
-- **@finqu/storefront-lib**: GraphQL client for Finqu API (server & client)
-- **@finqu/storefront-sdk**: Component types and SDK
+- **@finqu/storefront-sdk**: Server-side and React GraphQL client with hooks (server, react, graphql entry points)
+- **@finqu/storefront-types**: TypeScript types for Finqu API (Product, Cart, Category, etc.)
 - **@puckeditor/core**: Visual page builder with draft/publish workflow
 - **shadcn/ui + Radix**: UI components (config in [components.json](components.json))
 
@@ -60,18 +60,27 @@ export const config: ComponentConfig<Props> = {
 
 ## Storefront Client Usage
 
-**Do NOT create REST API endpoints to wrap GraphQL queries.** Use `@finqu/storefront-lib` directly on both server and client side.
+**Do NOT create REST API endpoints to wrap GraphQL queries.** Use `@finqu/storefront-sdk` directly.
 
 ```tsx
-// Server Components - use direct import
-import { storefrontServer, createServerClientWithLocale } from '@/lib/storefront';
+// Server Components - use singleton client from lib/storefront
+import { storefrontClient, cachePresets, withLocale } from '@/lib/storefront';
+import { getProduct, getProducts } from '@finqu/storefront-sdk/server';
 
-// For locale-aware fetching
-const client = createServerClientWithLocale('fi');
-const products = await products(client, { first: 10 });
+// Using SDK helpers
+const { product } = await getProduct(storefrontClient, { handle: 'my-product' });
+const { products } = await getProducts(storefrontClient, { first: 10 }, cachePresets.products);
 
-// Client Components - use hooks from @finqu/storefront-lib/client
-// Many queries and mutations are available client-side
+// Custom queries with locale-specific caching
+import { STORE_QUERY, type StoreQueryResponse } from '@/lib/queries';
+const data = await storefrontClient.query<StoreQueryResponse>(
+  STORE_QUERY,
+  undefined,
+  withLocale('fi', cachePresets.static)
+);
+
+// Client Components - use hooks from @finqu/storefront-sdk/react
+import { useProduct, useCart, useCreateCart } from '@finqu/storefront-sdk/react';
 ```
 
 ## Locale Handling

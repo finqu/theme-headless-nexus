@@ -1,4 +1,4 @@
-import type { Product } from '@finqu/storefront-lib/types';
+import type { Product } from '@finqu/storefront-types';
 
 export type ProductGridColumns = 2 | 3 | 4;
 
@@ -74,7 +74,7 @@ export function ProductGrid({
             const content = (
               <>
                 {/* Product Image */}
-                <div className="relative aspect-3/4 overflow-hidden bg-gray-50">
+                <div className="aspect-3/4 relative overflow-hidden bg-gray-50">
                   {image?.url ? (
                     <img
                       src={image.url}

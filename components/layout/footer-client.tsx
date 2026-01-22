@@ -3,11 +3,10 @@
 import Link from 'next/link';
 import { NewsletterForm } from './newsletter-form';
 import { LocaleSwitcher } from './locale-switcher';
-import type { MenuLink, MenuWithLinks } from '@/lib/menu-queries';
-import type { Locale } from '@/lib/store-cache';
+import type { Menu, Link as MenuLink, Locale } from '@finqu/storefront-types';
 
 interface FooterClientProps {
-  menu: MenuWithLinks | null;
+  menu: Menu | null;
   storeName?: string;
   logoUrl?: string;
   tagline: string;

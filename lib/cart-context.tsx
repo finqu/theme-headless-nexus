@@ -21,20 +21,18 @@ import type { Cart, CartLineItem } from '@finqu/storefront-types';
 const CART_ID_COOKIE = 'finqu_cart_id';
 
 /**
- * Get cart ID from cookies (returns number)
+ * Get cart ID from cookies (returns string hash)
  */
-function getCartIdFromCookie(): number | null {
+function getCartIdFromCookie(): string | null {
   if (typeof document === 'undefined') return null;
   const match = document.cookie.match(new RegExp(`(^| )${CART_ID_COOKIE}=([^;]+)`));
-  if (!match) return null;
-  const parsed = parseInt(match[2], 10);
-  return isNaN(parsed) ? null : parsed;
+  return match ? match[2] : null;
 }
 
 /**
  * Set cart ID in cookies (30 day expiry)
  */
-function setCartIdCookie(cartId: number) {
+function setCartIdCookie(cartId: string) {
   if (typeof document === 'undefined') return;
   const expires = new Date();
   expires.setDate(expires.getDate() + 30);
@@ -81,7 +79,7 @@ export interface CartContextValue {
 const CartContext = createContext<CartContextValue | null>(null);
 
 export function CartProvider({ children }: { children: ReactNode }) {
-  const [cartId, setCartId] = useState<number | null>(null);
+  const [cartId, setCartId] = useState<string | null>(null);
   const [isOpen, setIsOpen] = useState(false);
   const [isInitialized, setIsInitialized] = useState(false);
 
@@ -100,9 +98,9 @@ export function CartProvider({ children }: { children: ReactNode }) {
     loading: isCartLoading,
     refetch: refetchCart,
   } = useCartQuery<Cart>(
-    { cartId: cartId ?? 0 },
+    { id: cartId ?? '' },
     {
-      skip: cartId == null || !isInitialized,
+      skip: !cartId || !isInitialized,
       fetchPolicy: 'network-only',
     }
   );
@@ -148,13 +146,10 @@ export function CartProvider({ children }: { children: ReactNode }) {
           },
         });
 
-        const cartIdStr = data?.cartCreate.cart?.id;
-        if (cartIdStr) {
-          const newCartId = parseInt(cartIdStr, 10);
-          if (!isNaN(newCartId)) {
-            setCartId(newCartId);
-            setCartIdCookie(newCartId);
-          }
+        const newCartId = data?.cartCreate.cart?.id;
+        if (newCartId) {
+          setCartId(newCartId);
+          setCartIdCookie(newCartId);
         }
       } else {
         // Add to existing cart

@@ -1,46 +1,35 @@
 import Link from 'next/link';
-import { fetchMenuWithLinks, type MenuLink } from '@/lib/menu-queries';
-import { storefrontClient, cachePresets, withLocale } from '@/lib/storefront';
-import { STORE_QUERY, type StoreQueryResponse } from '@/lib/queries';
-import { getStoreInfo } from '@/lib/store-cache';
+import type { Menu, Link as MenuLink } from '@finqu/storefront-types';
+import type { StoreData } from '@/lib/store-context';
 import { NewsletterForm } from './newsletter-form';
 import { LocaleSwitcher } from './locale-switcher';
 
 interface FooterProps {
-  menuHandle: string;
+  menu: Menu | null;
+  storeData: StoreData;
   tagline: string;
   copyrightText: string;
   twitterUrl?: string;
   facebookUrl?: string;
   linkedinUrl?: string;
-  locale: string;
 }
 
 /**
- * Server component that fetches menu data and renders the footer
+ * Server component that renders the footer.
+ * Menu and store data are passed from SiteLayout (server-rendered for SEO).
  */
-export async function Footer({
-  menuHandle,
+export function Footer({
+  menu,
+  storeData,
   tagline,
   copyrightText,
   twitterUrl,
   facebookUrl,
   linkedinUrl,
-  locale,
 }: FooterProps) {
-  const cacheOptions = withLocale(locale, cachePresets.static);
-
-  // Fetch menu, store info, and store info with locales in parallel
-  const [menu, storeData, storeInfoWithLocales] = await Promise.all([
-    fetchMenuWithLinks(menuHandle, locale),
-    storefrontClient
-      .query<StoreQueryResponse>(STORE_QUERY, undefined, cacheOptions)
-      .catch(() => ({ store: null })),
-    getStoreInfo(),
-  ]);
-
-  const storeName = storeData.store?.name || 'Store';
-  const logoUrl = storeData.store?.logo;
+  const { store, locales } = storeData;
+  const storeName = store?.name || 'Store';
+  const logoUrl = store?.logo;
   const currentYear = new Date().getFullYear();
 
   // Parse copyright text with placeholders
@@ -49,7 +38,6 @@ export async function Footer({
     .replace('{storeName}', storeName);
 
   // Distribute menu links into 3 columns
-  // Each top-level link becomes a column with its children as items
   const menuLinks = menu?.links || [];
   const columns = distributeToColumns(menuLinks, 3);
 
@@ -122,7 +110,7 @@ export async function Footer({
 
           {/* Locale switcher and social icons */}
           <div className="flex items-center gap-4">
-            <LocaleSwitcher locales={storeInfoWithLocales.locales} />
+            <LocaleSwitcher locales={locales} />
             {twitterUrl && (
               <a
                 href={twitterUrl}

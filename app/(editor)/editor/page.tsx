@@ -233,19 +233,19 @@ function EditorContent() {
 
         if (layoutRes.ok) {
           const layoutData = await layoutRes.json();
-          const firstLocale = layoutData.locales?.[0];
+          const firstLocale = layoutData.storeData?.locales?.[0];
 
           setEditorMetadata({
             navbarMenu: layoutData.navbarMenu,
             footerMenu: layoutData.footerMenu,
-            storeInfo: layoutData.storeInfo,
+            storeData: layoutData.storeData,
             layoutSettings: layoutData.layoutSettings,
             locale: urlLocale || undefined,
           });
 
           // Set locales from API response
-          if (layoutData.locales) {
-            setLocales(layoutData.locales);
+          if (layoutData.storeData?.locales) {
+            setLocales(layoutData.storeData.locales);
             setDefaultLocale(firstLocale?.isoCode || 'en');
           }
         }

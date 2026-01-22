@@ -57,6 +57,7 @@ export const PRODUCTS_QUERY = /* GraphQL */ `
  */
 export function createClientForBrowser(): FinquClient {
   return createFinquClient({
+    endpoint: process.env.NEXT_PUBLIC_FINQU_STOREFRONT_URL!,
     publicKey: process.env.NEXT_PUBLIC_FINQU_PUBLIC_KEY!,
   });
 }

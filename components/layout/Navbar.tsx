@@ -1,46 +1,16 @@
-import { fetchMenuWithLinks } from '@/lib/menu-queries';
-import { storefrontClient, cachePresets, withLocale } from '@/lib/storefront';
-import {
-  STORE_QUERY,
-  CURRENCIES_QUERY,
-  STORE_ROUTES_QUERY,
-  type StoreQueryResponse,
-  type CurrenciesQueryResponse,
-  type StoreRoutesQueryResponse,
-} from '@/lib/queries';
+import type { Menu } from '@finqu/storefront-types';
+import type { StoreData } from '@/lib/store-context';
 import { NavbarClient } from './navbar-client';
 
 interface NavbarProps {
-  menuHandle: string;
-  locale: string;
+  menu: Menu | null;
+  storeData: StoreData;
 }
 
 /**
- * Server component that fetches menu data, store info, and currencies
+ * Server component wrapper for navbar.
+ * Store data and menu are passed from SiteLayout (server-rendered for SEO).
  */
-export async function Navbar({ menuHandle, locale }: NavbarProps) {
-  const cacheOptions = withLocale(locale, cachePresets.static);
-
-  // Fetch menu, store info, routes, and currencies in parallel
-  const [menu, storeData, routesData, currencyData] = await Promise.all([
-    fetchMenuWithLinks(menuHandle, locale),
-    storefrontClient
-      .query<StoreQueryResponse>(STORE_QUERY, undefined, cacheOptions)
-      .catch(() => ({ store: null })),
-    storefrontClient
-      .query<StoreRoutesQueryResponse>(STORE_ROUTES_QUERY, undefined, cacheOptions)
-      .catch(() => ({ storeRoutes: null })),
-    storefrontClient
-      .query<CurrenciesQueryResponse>(CURRENCIES_QUERY, undefined, cacheOptions)
-      .catch(() => ({ currencies: [] })),
-  ]);
-
-  return (
-    <NavbarClient
-      menu={menu}
-      storeInfo={storeData.store}
-      routes={routesData.storeRoutes}
-      currencies={currencyData.currencies}
-    />
-  );
+export function Navbar({ menu, storeData }: NavbarProps) {
+  return <NavbarClient menu={menu} storeData={storeData} />;
 }

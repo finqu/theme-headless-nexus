@@ -2,9 +2,9 @@
 
 import * as React from 'react';
 import Link from 'next/link';
-import { Menu, ChevronRight, ChevronLeft, User } from 'lucide-react';
-import type { MenuLink, MenuWithLinks } from '@/lib/menu-queries';
-import type { StoreInfo, Currency, Routes } from '@finqu/storefront-types';
+import { Menu as MenuIcon, ChevronRight, ChevronLeft, User } from 'lucide-react';
+import type { Menu, Currency, Link as MenuLink } from '@finqu/storefront-types';
+import type { StoreData } from '@/lib/store-context';
 import { Button } from '@/components/ui/button';
 import {
   Sheet,
@@ -29,22 +29,15 @@ import { CartIcon, CartDrawer } from '@/components/cart';
 import { cn } from '@/lib/utils';
 
 interface NavbarClientProps {
-  menu: MenuWithLinks | null;
-  storeInfo?: StoreInfo | null;
-  routes?: Routes | null;
-  currencies?: Currency[];
+  menu: Menu | null;
+  storeData: StoreData;
   isEditing?: boolean;
 }
 
 const MAX_VISIBLE_LINKS = 5;
 
-export function NavbarClient({
-  menu,
-  storeInfo,
-  routes,
-  currencies = [],
-  isEditing = false,
-}: NavbarClientProps) {
+export function NavbarClient({ menu, storeData, isEditing = false }: NavbarClientProps) {
+  const { store, routes, currencies } = storeData;
   const [mobileMenuOpen, setMobileMenuOpen] = React.useState(false);
   const [mobileSubmenu, setMobileSubmenu] = React.useState<MenuLink | null>(null);
   const [selectedCurrency, setSelectedCurrency] = React.useState<Currency | null>(
@@ -52,8 +45,8 @@ export function NavbarClient({
   );
 
   const allLinks = menu?.links || [];
-  const storeName = storeInfo?.name || 'Store';
-  const logoUrl = storeInfo?.logo;
+  const storeName = store?.name || 'Store';
+  const logoUrl = store?.logo;
 
   // Limit visible root-level links
   const visibleLinks = allLinks.slice(0, MAX_VISIBLE_LINKS);
@@ -87,7 +80,7 @@ export function NavbarClient({
               <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
                 <SheetTrigger asChild>
                   <Button variant="ghost" size="icon" className="lg:hidden" aria-label="Open menu">
-                    <Menu className="h-6 w-6" />
+                    <MenuIcon className="h-6 w-6" />
                   </Button>
                 </SheetTrigger>
                 <SheetContent side="left" className="w-full max-w-sm p-0">
@@ -135,7 +128,7 @@ export function NavbarClient({
                         })}
                       </div>
 
-                      {storeInfo?.customerAccountsEnabled && (
+                      {store?.customerAccountsEnabled && (
                         <>
                           <Separator />
                           <div className="py-4">
@@ -337,7 +330,7 @@ export function NavbarClient({
               {/* Right side actions */}
               <div className="ml-auto flex items-center gap-2">
                 {/* Account links - Desktop */}
-                {storeInfo?.customerAccountsEnabled && (
+                {store?.customerAccountsEnabled && (
                   <div className="hidden lg:flex lg:items-center lg:gap-4">
                     <Link
                       href={routes?.accountLoginUrl || '#'}

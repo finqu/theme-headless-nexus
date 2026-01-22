@@ -3,33 +3,33 @@
  *
  * Queries for store configuration, locales, and currencies.
  * These are typically fetched once and cached for long periods.
+ *
+ * Types are imported from @finqu/storefront-types.
  */
 
 import type { Locale, Currency, StoreInfo } from '@finqu/storefront-types';
 
 /**
- * Query for store information and available locales
+ * Query for store information
  */
 export const STORE_QUERY = /* GraphQL */ `
   query Store {
     store {
       name
-      description
-      email
-      phone
       logo
       favicon
-      address
-      city
-      zip
-      country
-      countryCode
+      customerAccountsEnabled
     }
   }
 `;
 
+/**
+ * Subset of StoreInfo containing only the fields we query
+ */
+export type StoreBasicInfo = Pick<StoreInfo, 'name' | 'logo' | 'favicon' | 'customerAccountsEnabled'>;
+
 export interface StoreQueryResponse {
-    store: StoreInfo | null;
+    store: StoreBasicInfo | null;
 }
 
 /**
@@ -60,10 +60,6 @@ export const CURRENCIES_QUERY = /* GraphQL */ `
       isoCode
       name
       symbol
-      symbolFirst
-      decimalMark
-      thousandsSeparator
-      active
     }
   }
 `;

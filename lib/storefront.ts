@@ -50,6 +50,7 @@ import {
  * - Type-safe GraphQL operations
  */
 export const storefrontClient: FinquServerClient = createFinquServerClient({
+  endpoint: process.env.FINQU_STOREFRONT_URL!,
   secretKey: process.env.FINQU_SECRET_KEY!,
 });
 

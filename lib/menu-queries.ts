@@ -1,20 +1,10 @@
-import { storefrontClient, cachePresets, withLocale } from './storefront';
-import {
-  MENU_QUERY,
-  type MenuQueryResponse,
-} from './queries';
-import type { Menu, Link } from '@finqu/storefront-types';
+import { storefrontClient, withLocale, cachePresets } from './storefront';
+import { GET_NAVIGATION_MENU } from '@finqu/storefront-sdk/graphql';
+import type { Menu } from '@finqu/storefront-types';
 
-// Re-export types for convenience
-export type { Menu, Link };
-
-// Backwards compatibility alias
-export type MenuLink = Link;
-
-/**
- * Menu with full link structure (alias for backwards compatibility)
- */
-export type MenuWithLinks = Menu;
+interface MenuQueryResponse {
+  menu: Menu | null;
+}
 
 /**
  * Fetch a menu with its full link structure
@@ -28,7 +18,7 @@ export async function fetchMenuWithLinks(
 ): Promise<Menu | null> {
   try {
     const result = await storefrontClient.query<MenuQueryResponse>(
-      MENU_QUERY,
+      GET_NAVIGATION_MENU,
       { handle },
       withLocale(locale, cachePresets.static)
     );

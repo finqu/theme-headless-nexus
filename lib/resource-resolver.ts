@@ -1,19 +1,23 @@
 import { unstable_cache } from 'next/cache';
-import type { ResourceType, Alternate } from '@finqu/storefront-types';
+import type { Alternate } from '@finqu/storefront-types';
 import { storefrontClient, cachePresets, withLocale } from './storefront';
 import {
   RESOURCE_BY_PATH_QUERY,
   type ResourceByPathResponse,
   type Resource,
+  type ResourceType,
 } from './queries';
 
 // Re-export types for convenience
 export type { Resource, ResourceType };
 
 /**
- * Extended resource with alternates for locale switching
+ * Extended resource with alternates for locale switching.
+ * This extends the base Resource type to ensure alternates is never null.
  */
-export interface ResourceWithAlternates extends Resource {
+export interface ResourceWithAlternates {
+  type: Resource['type'];
+  id?: string | null;
   alternates?: Alternate[];
 }
 
@@ -36,7 +40,15 @@ async function fetchResourceByPath(
       withLocale(locale, cachePresets.static)
     );
 
-    return response.resourceByPath;
+    const resource = response.resourceByPath;
+    if (!resource) return null;
+
+    // Normalize alternates: convert null to undefined for cleaner API
+    return {
+      type: resource.type,
+      id: resource.id,
+      alternates: resource.alternates ?? undefined,
+    };
   } catch (error) {
     console.error(`Failed to resolve resource for path "${path}":`, error);
     return null;

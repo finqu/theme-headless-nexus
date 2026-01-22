@@ -2,9 +2,22 @@
  * Content Queries
  *
  * Queries for pages, articles, and other CMS content.
+ *
+ * Types are imported from @finqu/storefront-types.
  */
 
-import type { Page, Article, Policy, PageConnection } from '@finqu/storefront-types';
+import type {
+  Page,
+  Article,
+  Policy,
+  PageConnection,
+  PageVariables,
+  PageByHandleVariables,
+  ArticleVariables,
+} from '@finqu/storefront-types';
+
+// Re-export types for convenience
+export type { PageVariables, PageByHandleVariables, ArticleVariables };
 
 /**
  * Query for all pages (paginated)
@@ -30,12 +43,12 @@ export const PAGES_QUERY = /* GraphQL */ `
 `;
 
 export interface PagesQueryVariables {
-    first?: number;
-    after?: string;
+  first?: number;
+  after?: string;
 }
 
 export interface PagesQueryResponse {
-    pages: PageConnection;
+  pages: PageConnection;
 }
 
 /**
@@ -56,12 +69,8 @@ export const PAGE_BY_ID_QUERY = /* GraphQL */ `
   }
 `;
 
-export interface PageByIdVariables {
-    id: string;
-}
-
 export interface PageByIdResponse {
-    page: Page | null;
+  page: Page | null;
 }
 
 /**
@@ -82,12 +91,8 @@ export const PAGE_BY_HANDLE_QUERY = /* GraphQL */ `
   }
 `;
 
-export interface PageByHandleVariables {
-    handle: string;
-}
-
 export interface PageByHandleResponse {
-    pageByHandle: Page | null;
+  pageByHandle: Page | null;
 }
 
 /**
@@ -111,12 +116,8 @@ export const ARTICLE_BY_ID_QUERY = /* GraphQL */ `
   }
 `;
 
-export interface ArticleByIdVariables {
-    id: string;
-}
-
 export interface ArticleByIdResponse {
-    article: Article | null;
+  article: Article | null;
 }
 
 /**
@@ -134,9 +135,9 @@ export const POLICY_QUERY = /* GraphQL */ `
 `;
 
 export interface PolicyQueryVariables {
-    type: string;
+  type: string;
 }
 
 export interface PolicyQueryResponse {
-    policy: Policy | null;
+  policy: Policy | null;
 }

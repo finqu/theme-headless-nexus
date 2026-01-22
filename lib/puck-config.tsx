@@ -1,9 +1,9 @@
 import type { Config, DefaultRootRenderProps, PuckContext } from '@puckeditor/core';
-import type { StoreInfo } from '@finqu/storefront-types';
+import type { Menu } from '@finqu/storefront-types';
+import type { StoreData, StoreBasicInfo } from '@/lib/store-context';
 import { config as baseConfig } from '@/.storefront/puck.render.config';
 import { NavbarClient } from '@/components/layout/navbar-client';
 import { FooterClient } from '@/components/layout/footer-client';
-import type { MenuWithLinks } from '@/lib/menu-queries';
 import type { LayoutSettings } from '@/lib/layout-settings';
 import type { ReactNode } from 'react';
 
@@ -11,9 +11,9 @@ import type { ReactNode } from 'react';
  * Metadata passed to the Puck editor containing layout data
  */
 export interface EditorMetadata {
-  navbarMenu: MenuWithLinks | null;
-  footerMenu: MenuWithLinks | null;
-  storeInfo: StoreInfo | null;
+  navbarMenu: Menu | null;
+  footerMenu: Menu | null;
+  storeData: StoreData;
   layoutSettings: LayoutSettings;
   /** Current locale/language code (e.g., 'fi', 'en') for fetching localized content */
   locale?: string;
@@ -36,12 +36,12 @@ export const editorConfig: Config = {
         return <>{children}</>;
       }
 
-      const { navbarMenu, footerMenu, storeInfo, layoutSettings } = metadata;
+      const { navbarMenu, footerMenu, storeData, layoutSettings } = metadata;
 
       return (
         <div className="flex min-h-screen flex-col">
           {/* Header */}
-          <NavbarClient menu={navbarMenu} storeInfo={storeInfo} isEditing={isEditing} />
+          <NavbarClient menu={navbarMenu} storeData={storeData} isEditing={isEditing} />
 
           {/* Main content area - where Puck components are rendered */}
           <main className="flex-1">{children}</main>
@@ -49,13 +49,14 @@ export const editorConfig: Config = {
           {/* Footer */}
           <FooterClient
             menu={footerMenu}
-            storeName={storeInfo?.name ?? undefined}
-            logoUrl={storeInfo?.logo ?? undefined}
+            storeName={storeData.store?.name ?? undefined}
+            logoUrl={storeData.store?.logo ?? undefined}
             tagline={layoutSettings.footer.tagline}
             copyrightText={layoutSettings.footer.copyrightText}
             twitterUrl={layoutSettings.footer.twitterUrl}
             facebookUrl={layoutSettings.footer.facebookUrl}
             linkedinUrl={layoutSettings.footer.linkedinUrl}
+            locales={storeData.locales}
             isEditing={isEditing}
           />
         </div>

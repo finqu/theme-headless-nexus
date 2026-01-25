@@ -12,7 +12,7 @@
     "format:check": "prettier --check ."
   },
   "dependencies": {
-    "@finqu/storefront-sdk": "file:/Users/miikka/Finqu/storefront-sdk/packages/sdk",
+    "@finqu/storefront-sdk": "0.2.0-alpha.8",
     "@finqu/storefront-types": "^2.1.1",
     "@formatjs/intl-localematcher": "^0.8.0",
     "@puckeditor/core": "^0.21.0",

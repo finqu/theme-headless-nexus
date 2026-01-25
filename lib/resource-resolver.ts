@@ -1,4 +1,4 @@
-import { unstable_cache } from 'next/cache';
+import { cache } from 'react';
 import type { Alternate } from '@finqu/storefront-types';
 import { storefrontClient, cachePresets, withLocale } from './storefront';
 import {
@@ -56,15 +56,14 @@ async function fetchResourceByPath(
 }
 
 /**
- * Get resource information for a URL path with aggressive caching.
+ * Get resource information for a URL path with request-level caching.
  *
  * This is the primary function for URL routing. It resolves any URL path
  * to a resource type (product, category, page, etc.), optional ID, and alternates.
  *
  * Caching strategy:
- * - Results are cached for 1 hour (3600 seconds)
- * - Cache is keyed by path + locale combination
- * - Can be invalidated via 'resource-paths' tag
+ * - Results are deduplicated per request using React.cache
+ * - HTTP-level caching is handled by storefrontClient via cachePresets
  *
  * @param path - URL path without locale prefix (e.g., "/products/my-product")
  * @param locale - ISO language code for localized path resolution
@@ -82,13 +81,8 @@ async function fetchResourceByPath(
  * // cart = { type: 'CART', id: null, alternates: [...] }
  * ```
  */
-export const getResourceByPath = unstable_cache(
+export const getResourceByPath = cache(
   async (path: string, locale: string): Promise<ResourceWithAlternates | null> => {
     return fetchResourceByPath(path, locale);
-  },
-  ['resource-by-path'],
-  {
-    revalidate: 3600, // 1 hour - URL paths rarely change
-    tags: ['resource-paths'],
   }
 );

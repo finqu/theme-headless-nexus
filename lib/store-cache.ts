@@ -1,4 +1,4 @@
-import { unstable_cache } from 'next/cache';
+import { cache } from 'react';
 import { storefrontClient, cachePresets, withLocale } from './storefront';
 import {
   STORE_QUERY,
@@ -29,7 +29,7 @@ export interface StoreInfo {
 
 /**
  * Fetch store information including available locales.
- * Results are cached for 5 minutes (300 seconds) using Next.js unstable_cache.
+ * Results are deduplicated per request using React.cache.
  *
  * This is the SINGLE SOURCE OF TRUTH for store/locale information.
  * The first available locale is used as the default (NOT the "primary" flag).
@@ -41,31 +41,27 @@ export interface StoreInfo {
  * console.log(storeInfo.locales); // [{ isoCode: 'fi', ... }, { isoCode: 'en', ... }]
  * ```
  */
-export const getStoreInfo = unstable_cache(
-  async (): Promise<StoreInfo> => {
-    const [storeData, localesData] = await Promise.all([
-      storefrontClient
-        .query<StoreQueryResponse>(STORE_QUERY, undefined, cachePresets.static)
-        .catch(() => ({ store: null })),
-      storefrontClient
-        .query<LocalesQueryResponse>(LOCALES_QUERY, undefined, cachePresets.static)
-        .catch(() => ({ locales: [] })),
-    ]);
+export const getStoreInfo = cache(async (): Promise<StoreInfo> => {
+  const [storeData, localesData] = await Promise.all([
+    storefrontClient
+      .query<StoreQueryResponse>(STORE_QUERY, undefined, cachePresets.static)
+      .catch(() => ({ store: null })),
+    storefrontClient
+      .query<LocalesQueryResponse>(LOCALES_QUERY, undefined, cachePresets.static)
+      .catch(() => ({ locales: [] })),
+  ]);
 
-    const locales = localesData?.locales || [];
-    // First available locale is the default (not "primary")
-    const defaultLocale = locales[0]?.isoCode || 'en';
+  const locales = localesData?.locales || [];
+  // First available locale is the default (not "primary")
+  const defaultLocale = locales[0]?.isoCode || 'en';
 
-    return {
-      locales,
-      defaultLocale,
-      storeName: storeData?.store?.name || 'Store',
-      logoUrl: storeData?.store?.logo || undefined,
-    };
-  },
-  ['store-info'],
-  { revalidate: 300, tags: ['store-info'] }
-);
+  return {
+    locales,
+    defaultLocale,
+    storeName: storeData?.store?.name || 'Store',
+    logoUrl: storeData?.store?.logo || undefined,
+  };
+});
 
 /**
  * Fetch complete store data for the StoreProvider.

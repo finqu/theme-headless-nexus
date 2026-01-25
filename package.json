@@ -12,6 +12,7 @@
     "format:check": "prettier --check ."
   },
   "dependencies": {
+    "@finqu/cli": "1.3.0-alpha.1",
     "@finqu/storefront-sdk": "0.2.0-alpha.8",
     "@finqu/storefront-types": "^2.1.1",
     "@formatjs/intl-localematcher": "^0.8.0",

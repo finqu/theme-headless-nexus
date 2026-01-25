@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { getProducts } from '@finqu/storefront-sdk/server';
+import { getCatalogProducts } from '@finqu/storefront-sdk/server';
 import type { Product } from '@finqu/storefront-types';
 import { storefrontClient } from '@/lib/storefront';
 import {
@@ -20,9 +20,9 @@ import {
   BreadcrumbSeparator,
 } from '@/components/ui/breadcrumb';
 import { ChevronRight, Home } from 'lucide-react';
-import { ProductsCatalogClient } from './products-page-client';
+import { ProductsCatalogClient } from './products-template-client';
 
-interface ProductsPageProps {
+interface ProductsTemplateProps {
   locale: string;
   /** Optional category/product group handle for filtered results */
   categoryHandle?: string;
@@ -51,15 +51,15 @@ const SORT_OPTIONS: SortOption[] = [
 const PRODUCTS_PER_PAGE = 12;
 
 /**
- * Products catalog page component.
+ * Products catalog template component.
  * Fetches products from Finqu API with optional category filtering and sorting.
  */
-export async function ProductsPage({
+export async function ProductsTemplate({
   locale,
   categoryHandle,
   categoryTitle,
   searchParams,
-}: ProductsPageProps) {
+}: ProductsTemplateProps) {
   // Fetch initial products
   let productList: Product[] = [];
   let totalCount = 0;
@@ -75,16 +75,15 @@ export async function ProductsPage({
   void page;
 
   try {
-    const result = await getProducts(storefrontClient, {
+    const result = await getCatalogProducts(storefrontClient, {
       first: PRODUCTS_PER_PAGE,
       query: categoryHandle ? `productGroup:${categoryHandle}` : undefined,
     });
 
-    productList = (result.products?.nodes ?? []) as Product[];
-    hasNextPage = result.products?.pageInfo?.hasNextPage ?? false;
-    endCursor = result.products?.pageInfo?.endCursor ?? undefined;
-    // totalCount not available in SDK response, estimate from list
-    totalCount = productList.length;
+    productList = (result.catalog.products.nodes ?? []) as Product[];
+    hasNextPage = result.catalog.products.pageInfo?.hasNextPage ?? false;
+    endCursor = result.catalog.products.pageInfo?.endCursor ?? undefined;
+    totalCount = result.catalog.products.totalCount ?? productList.length;
   } catch (error) {
     console.error('Failed to fetch products:', error);
   }

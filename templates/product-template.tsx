@@ -3,17 +3,17 @@ import { storefrontClient } from '@/lib/storefront';
 import { ProductCard } from '@/components/product';
 import { Skeleton } from '@/components/ui/skeleton';
 
-interface ProductPageProps {
+interface ProductTemplateProps {
   /** Product ID from URL */
   id: number;
   locale: string;
 }
 
 /**
- * Server component for rendering product detail pages.
+ * Server component for rendering product detail templates.
  * Fetches product data from the Finqu API and renders the ProductCard client component.
  */
-export async function ProductPage({ id, locale }: ProductPageProps) {
+export async function ProductTemplate({ id, locale }: ProductTemplateProps) {
   try {
     const { product } = await getProduct(storefrontClient, { id });
 

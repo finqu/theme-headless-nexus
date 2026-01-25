@@ -3,10 +3,10 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { Search, Loader2, ChevronRight, Home } from 'lucide-react';
-import type { Product } from '@finqu/storefront-types';
-import { useLocale } from '@/lib/locale-context';
-import { ProductGrid } from '@/components/product-grid';
+import { Search, ChevronRight, Home } from 'lucide-react';
+import type { ProductListItem } from '@/lib/types';
+import { useLocale } from '@/lib/context-providers/locale-context';
+import { ProductGrid } from '@/components/product/product-grid';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -20,15 +20,15 @@ import {
 } from '@/components/ui/breadcrumb';
 import { fetchProducts } from '@/blocks/product-grid/shared';
 
-interface SearchPageProps {
+interface SearchTemplateProps {
   locale: string;
 }
 
 /**
- * Search page component.
+ * Search template component.
  * Fetches and displays search results based on URL query parameter.
  */
-export function SearchPage({ locale: serverLocale }: SearchPageProps) {
+export function SearchTemplate({ locale: serverLocale }: SearchTemplateProps) {
   const searchParams = useSearchParams();
   const router = useRouter();
   const { locale } = useLocale();
@@ -36,7 +36,7 @@ export function SearchPage({ locale: serverLocale }: SearchPageProps) {
 
   const queryParam = searchParams.get('q') || '';
   const [searchQuery, setSearchQuery] = useState(queryParam);
-  const [results, setResults] = useState<Product[]>([]);
+  const [results, setResults] = useState<ProductListItem[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [hasSearched, setHasSearched] = useState(false);
   const [totalCount, setTotalCount] = useState(0);
@@ -87,11 +87,6 @@ export function SearchPage({ locale: serverLocale }: SearchPageProps) {
     [searchQuery, router]
   );
 
-  const hrefForProduct = useCallback(
-    (product: Product) => (product.handle ? `/products/${product.handle}` : undefined),
-    []
-  );
-
   return (
     <div className="min-h-[60vh] py-8">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -130,16 +125,16 @@ export function SearchPage({ locale: serverLocale }: SearchPageProps) {
         {/* Search form */}
         <form onSubmit={handleSubmit} className="mb-10">
           <div className="relative mx-auto max-w-xl">
-            <Search className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-gray-400" />
+            <Search className="absolute top-1/2 left-4 h-5 w-5 -translate-y-1/2 text-gray-400" />
             <Input
               type="search"
               name="q"
               placeholder="Search products..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="py-6 pl-12 pr-24 text-base"
+              className="py-6 pr-24 pl-12 text-base"
             />
-            <Button type="submit" className="absolute right-2 top-1/2 -translate-y-1/2" size="sm">
+            <Button type="submit" className="absolute top-1/2 right-2 -translate-y-1/2" size="sm">
               Search
             </Button>
           </div>
@@ -167,13 +162,7 @@ export function SearchPage({ locale: serverLocale }: SearchPageProps) {
             </p>
           </div>
         ) : results.length > 0 ? (
-          <ProductGrid
-            products={results}
-            columns={4}
-            showPrice
-            showDescription={false}
-            hrefForProduct={hrefForProduct}
-          />
+          <ProductGrid products={results} columns={4} showPrice showDescription={false} />
         ) : (
           <div className="rounded-lg border-2 border-dashed border-gray-300 p-12 text-center">
             <Search className="mx-auto h-12 w-12 text-gray-300" />

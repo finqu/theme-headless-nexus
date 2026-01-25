@@ -1,13 +1,13 @@
-interface AccountPageProps {
+interface AccountTemplateProps {
   locale: string;
   section: 'dashboard' | 'edit' | 'orders' | 'wishlist';
 }
 
 /**
- * Account page component with multiple sections.
+ * Account template component with multiple sections.
  * TODO: Implement full account functionality with Finqu customer API.
  */
-export function AccountPage({ locale, section }: AccountPageProps) {
+export function AccountTemplate({ locale, section }: AccountTemplateProps) {
   return (
     <div className="min-h-[60vh] py-12">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">

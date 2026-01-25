@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import Image from 'next/image';
 import { cn } from '@/lib/utils';
+import { ImagePlaceholder } from '@/components/shared';
 
 interface ProductImage {
   url: string;
@@ -21,9 +22,7 @@ export function ProductGallery({ images, productTitle }: ProductGalleryProps) {
   if (!images || images.length === 0) {
     return (
       <div className="aspect-square w-full overflow-hidden rounded-lg bg-gray-100">
-        <div className="flex h-full items-center justify-center">
-          <span className="text-gray-400">No image available</span>
-        </div>
+        <ImagePlaceholder text="No image available" />
       </div>
     );
   }

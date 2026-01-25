@@ -2,8 +2,8 @@
 
 import { type ReactNode } from 'react';
 import { FinquProvider } from '@finqu/storefront-sdk/react';
-import { LocaleProvider } from '@/lib/locale-context';
-import { CartProvider } from '@/lib/cart-context';
+import { LocaleProvider } from '@/lib/context-providers/locale-context';
+import { CartProvider } from '@/lib/context-providers/cart-context';
 
 interface ProvidersProps {
   children: ReactNode;

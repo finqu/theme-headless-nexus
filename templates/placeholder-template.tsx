@@ -1,6 +1,6 @@
 import type { ResourceType } from '@/lib/resource-resolver';
 
-interface PlaceholderPageProps {
+interface PlaceholderTemplateProps {
   type: ResourceType;
   id?: number;
   title?: string;
@@ -10,17 +10,17 @@ interface PlaceholderPageProps {
 }
 
 /**
- * Generic placeholder page for system pages that haven't been fully implemented yet.
+ * Generic placeholder template for pages that haven't been fully implemented yet.
  * Shows the page type and provides helpful information for development.
  */
-export function PlaceholderPage({
+export function PlaceholderTemplate({
   type,
   id,
   title,
   message,
   templateType,
   showEditorLink,
-}: PlaceholderPageProps) {
+}: PlaceholderTemplateProps) {
   const displayTitle = title || formatResourceType(type);
 
   return (

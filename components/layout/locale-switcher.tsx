@@ -1,6 +1,6 @@
 'use client';
 
-import { useLocale } from '@/lib/locale-context';
+import { useLocale } from '@/lib/context-providers/locale-context';
 import { useAlternates } from '@/lib/alternates-context';
 import type { Locale } from '@/lib/store-cache';
 

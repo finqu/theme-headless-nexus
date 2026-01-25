@@ -4,7 +4,7 @@ import * as React from 'react';
 import Link from 'next/link';
 import { Menu as MenuIcon, ChevronRight, ChevronLeft, User } from 'lucide-react';
 import type { Menu, Currency, Link as MenuLink } from '@finqu/storefront-types';
-import type { StoreData } from '@/lib/store-context';
+import type { StoreData } from '@/lib/context-providers/store-context';
 import { Button } from '@/components/ui/button';
 import {
   Sheet,

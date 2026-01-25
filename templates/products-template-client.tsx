@@ -1,9 +1,8 @@
 'use client';
 
 import { useState, useCallback } from 'react';
-import type { Product } from '@finqu/storefront-types';
-import { Loader2 } from 'lucide-react';
-import { ProductGrid } from '@/components/product-grid';
+import type { ProductListItem } from '@/lib/types';
+import { ProductGrid } from '@/components/product/product-grid';
 import {
   Select,
   SelectContent,
@@ -11,7 +10,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { fetchProducts } from '@/blocks/product-grid/shared';
 
@@ -23,7 +21,7 @@ interface SortOption {
 }
 
 interface ProductsCatalogClientProps {
-  initialProducts: Product[];
+  initialProducts: ProductListItem[];
   totalCount: number;
   hasNextPage: boolean;
   endCursor?: string;
@@ -45,7 +43,7 @@ export function ProductsCatalogClient({
   productsPerPage,
   locale,
 }: ProductsCatalogClientProps) {
-  const [products, setProducts] = useState<Product[]>(initialProducts);
+  const [products, setProducts] = useState<ProductListItem[]>(initialProducts);
   const [hasNextPage, setHasNextPage] = useState(initialHasNextPage);
   const [endCursor, setEndCursor] = useState(initialEndCursor);
   const [sortValue, setSortValue] = useState('featured');
@@ -104,9 +102,6 @@ export function ProductsCatalogClient({
     }
   }, [hasNextPage, isLoadingMore, productsPerPage, locale, products]);
 
-  // Build product link
-  const hrefForProduct = useCallback((product: Product) => '#', []);
-
   return (
     <>
       {/* Header with title and sort */}
@@ -146,15 +141,7 @@ export function ProductsCatalogClient({
           <p className="text-gray-500">No products found.</p>
         </div>
       ) : (
-        <>
-          <ProductGrid
-            products={products}
-            columns={4}
-            showPrice
-            showDescription={false}
-            hrefForProduct={hrefForProduct}
-          />
-        </>
+        <ProductGrid products={products} columns={4} showPrice showDescription={false} />
       )}
     </>
   );

@@ -1,10 +1,10 @@
 import type { ComponentConfig } from '@puckeditor/core';
-import type { Product } from '@finqu/storefront-types';
+import type { ProductListItem } from '@/lib/types';
 import {
   ProductGrid,
   productGridDefaultProps,
   type ProductGridViewProps,
-} from '@/components/product-grid';
+} from '@/components/product/product-grid';
 import { fetchProductsByIds } from './shared';
 
 /**
@@ -15,7 +15,7 @@ interface ProductGridProps extends Omit<ProductGridViewProps, 'products'> {
   /** Product IDs stored in Puck data (lightweight) */
   selectedProductIds?: number[];
   /** Full product objects resolved from IDs (populated by resolveData) */
-  selectedProducts?: Product[];
+  selectedProducts?: ProductListItem[];
 }
 
 /**
@@ -64,7 +64,6 @@ export const config: ComponentConfig<ProductGridProps> = {
       columns={columns}
       showPrice={showPrice}
       showDescription={showDescription}
-      hrefForProduct={(product) => (product.handle ? `/product/${product.handle}` : undefined)}
     />
   ),
 };

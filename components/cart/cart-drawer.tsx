@@ -2,7 +2,7 @@
 
 import { ShoppingBag, X } from 'lucide-react';
 import Link from 'next/link';
-import { useCart } from '@/lib/cart-context';
+import { useCart } from '@/lib/context-providers/cart-context';
 import { Button } from '@/components/ui/button';
 import {
   Sheet,
@@ -14,13 +14,7 @@ import {
 } from '@/components/ui/sheet';
 import { Separator } from '@/components/ui/separator';
 import { CartLineItem, CartLineItemSkeleton } from './cart-line-item';
-
-function formatPrice(value: number, currency = 'EUR') {
-  return new Intl.NumberFormat('en-US', {
-    style: 'currency',
-    currency,
-  }).format(value);
-}
+import { formatPrice, EmptyState } from '@/components/shared';
 
 interface CartDrawerProps {
   /** Optional cart page URL for "View cart" link */
@@ -66,18 +60,18 @@ export function CartDrawer({ cartUrl = '/cart' }: CartDrawerProps) {
               <CartLineItemSkeleton />
             </div>
           ) : items.length === 0 ? (
-            <div className="flex h-full flex-col items-center justify-center text-center">
-              <ShoppingBag className="h-12 w-12 text-gray-300" />
-              <h3 className="mt-4 text-lg font-medium text-gray-900">Your cart is empty</h3>
-              <p className="mt-2 text-sm text-gray-500">
-                Looks like you haven&apos;t added anything yet.
-              </p>
-              <SheetClose asChild>
-                <Button asChild className="mt-6">
-                  <Link href="/">Continue Shopping</Link>
-                </Button>
-              </SheetClose>
-            </div>
+            <EmptyState
+              icon={<ShoppingBag className="h-12 w-12 text-gray-300" />}
+              title="Your cart is empty"
+              description="Looks like you haven't added anything yet."
+              action={
+                <SheetClose asChild>
+                  <Button asChild>
+                    <Link href="/">Continue Shopping</Link>
+                  </Button>
+                </SheetClose>
+              }
+            />
           ) : (
             <div className="divide-y divide-gray-200">
               {items.map((item) => (

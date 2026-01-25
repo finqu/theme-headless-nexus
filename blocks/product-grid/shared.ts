@@ -1,53 +1,7 @@
 import type { Product } from '@finqu/storefront-types';
 import { createFinquClient, type FinquClient } from '@finqu/storefront-sdk/graphql';
-
-/**
- * GraphQL query for fetching products with all fields needed for ProductGrid rendering.
- * Shared between edit and render Puck components.
- */
-export const PRODUCTS_QUERY = /* GraphQL */ `
-  query Products($query: String, $limit: Int, $offset: Int, $sort: String, $productGroup: String, $priceMin: Float, $priceMax: Float, $onlyDiscounted: Boolean, $onlyNew: Boolean, $first: Int, $after: String, $last: Int, $before: String, $sortKey: String, $reverse: Boolean) {
-    products(query: $query, limit: $limit, offset: $offset, sort: $sort, productGroup: $productGroup, priceMin: $priceMin, priceMax: $priceMax, onlyDiscounted: $onlyDiscounted, onlyNew: $onlyNew, first: $first, after: $after, last: $last, before: $before, sortKey: $sortKey, reverse: $reverse) {
-      edges {
-        node {
-          handle
-          id
-          title
-          shortDescription
-          isAvailable
-          defaultOrSelectedVariant {
-            id
-            title
-            sku
-            price
-            originalPrice
-            url
-            featuredImage {
-              url
-              alt
-            }
-            image {
-              url
-              alt
-            }
-          },
-          variants {
-            id,
-            url
-          }
-        }
-        cursor
-      }
-      pageInfo {
-        hasNextPage
-        hasPreviousPage
-        startCursor
-        endCursor
-      }
-      totalCount
-    }
-  }
-`;
+import { getProductImageUrl as getSharedProductImageUrl } from '@/components/shared';
+import { CATALOG_PRODUCTS_QUERY, PRODUCT_BY_ID_QUERY } from '@/lib/queries/catalog';
 
 /**
  * Create a client-side Storefront client.
@@ -68,21 +22,25 @@ export interface FetchProductsOptions {
   productIds?: (number | null | undefined)[];
 }
 
-interface ProductsQueryResult {
-  products: {
-    edges: Array<{ node: Product; cursor: string }>;
-    pageInfo: {
-      hasNextPage: boolean;
-      hasPreviousPage: boolean;
-      startCursor: string;
-      endCursor: string;
+interface CatalogProductsQueryResult {
+  catalog: {
+    productsCount: number | null;
+    products: {
+      pageInfo: {
+        hasNextPage: boolean;
+        hasPreviousPage: boolean;
+        startCursor: string | null;
+        endCursor: string | null;
+      };
+      totalCount: number | null;
+      nodes: Product[];
     };
-    totalCount: number;
   };
 }
 
 /**
  * Fetches products from the storefront API (client-side).
+ * Uses the catalog entry point for product listings.
  * Can optionally filter by product IDs after fetching.
  */
 export async function fetchProducts(options: FetchProductsOptions = {}): Promise<Product[]> {
@@ -91,12 +49,12 @@ export async function fetchProducts(options: FetchProductsOptions = {}): Promise
   const client = createClientForBrowser();
 
   try {
-    const result = await client.query<ProductsQueryResult>(PRODUCTS_QUERY, {
+    const result = await client.query<CatalogProductsQueryResult>(CATALOG_PRODUCTS_QUERY, {
       query: searchQuery || undefined,
       first,
     });
 
-    let productList = (result.products.edges?.map((edge: { node: Product }) => edge.node).filter(Boolean) || []) as Product[];
+    let productList = (result.catalog.products.nodes ?? []) as Product[];
 
     // If specific product IDs are requested, filter and maintain order
     if (productIds && productIds.length > 0) {
@@ -117,7 +75,30 @@ export async function fetchProducts(options: FetchProductsOptions = {}): Promise
 }
 
 /**
+ * Fetches a single product by ID.
+ * Used internally by fetchProductsByIds for efficient individual fetching.
+ */
+async function fetchProductById(
+  client: FinquClient,
+  productId: number
+): Promise<Product | null> {
+  try {
+    const result = await client.query<{
+      product: Product | null;
+    }>(PRODUCT_BY_ID_QUERY, {
+      id: productId.toString(),
+    });
+
+    return result.product;
+  } catch (error) {
+    console.error(`Failed to fetch product ${productId}:`, error);
+    return null;
+  }
+}
+
+/**
  * Fetches products by their IDs.
+ * Fetches each product individually for efficiency.
  * Useful for rendering saved ProductGrid components with fresh data.
  *
  * @param productIds - Array of product IDs to fetch
@@ -129,8 +110,26 @@ export async function fetchProductsByIds(
     return [];
   }
 
-  // Fetch a larger set to ensure we get all requested products
-  return fetchProducts({ first: 100, productIds });
+  // Filter out null/undefined IDs
+  const validIds = productIds.filter((id): id is number => id != null);
+  if (validIds.length === 0) {
+    return [];
+  }
+
+  const client = createClientForBrowser();
+
+  // Fetch products individually in parallel
+  const productPromises = validIds.map((id) => fetchProductById(client, id));
+  const products = await Promise.all(productPromises);
+
+  // Filter out null results and maintain order
+  const validProducts = products.filter((p): p is Product => p != null);
+
+  // Maintain the order of requested IDs
+  const productMap = new Map(validProducts.map((p) => [p.id, p]));
+  return validIds
+    .map((id) => productMap.get(id))
+    .filter((p): p is Product => p != null);
 }
 
 /**
@@ -146,9 +145,8 @@ export function extractProductIds(productList: Product[] | undefined): number[] 
 
 /**
  * Gets the product image URL from a product.
+ * Re-exports the shared utility for backward compatibility.
  */
 export function getProductImageUrl(product: Product): string | undefined {
-  const variant = product.defaultOrSelectedVariant;
-  const url = variant?.featuredImage?.url || variant?.image?.url;
-  return url || undefined;
+  return getSharedProductImageUrl(product);
 }

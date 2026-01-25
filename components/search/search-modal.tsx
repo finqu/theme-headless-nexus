@@ -6,19 +6,19 @@ import { Search, X, Loader2 } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import type { Product } from '@finqu/storefront-types';
-import { useLocale } from '@/lib/locale-context';
+import { useLocale } from '@/lib/context-providers/locale-context';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
-import { fetchProducts, getProductImageUrl } from '@/blocks/product-grid/shared';
-
-function formatPrice(value: number, currency = 'EUR') {
-  return new Intl.NumberFormat('en-US', {
-    style: 'currency',
-    currency,
-  }).format(value);
-}
+import { fetchProducts } from '@/blocks/product-grid/shared';
+import {
+  formatPrice,
+  getProductImageUrl,
+  isOnSale,
+  PriceDisplay,
+  ImagePlaceholder,
+} from '@/components/shared';
 
 interface SearchModalProps {
   open: boolean;
@@ -97,13 +97,13 @@ export function SearchModal({ open, onOpenChange, searchPageUrl = '/search' }: S
         {/* Search Input */}
         <form onSubmit={handleSubmit} className="border-b p-4">
           <div className="relative">
-            <Search className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-gray-400" />
+            <Search className="absolute top-1/2 left-3 h-5 w-5 -translate-y-1/2 text-gray-400" />
             <Input
               type="search"
               placeholder="Search products..."
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              className="pl-10 pr-10"
+              className="pr-10 pl-10"
               autoFocus
             />
             {query && (
@@ -111,7 +111,7 @@ export function SearchModal({ open, onOpenChange, searchPageUrl = '/search' }: S
                 type="button"
                 variant="ghost"
                 size="icon"
-                className="absolute right-1 top-1/2 h-8 w-8 -translate-y-1/2"
+                className="absolute top-1/2 right-1 h-8 w-8 -translate-y-1/2"
                 onClick={() => setQuery('')}
               >
                 <X className="h-4 w-4" />
@@ -156,7 +156,7 @@ export function SearchModal({ open, onOpenChange, searchPageUrl = '/search' }: S
                   const variant = product.defaultOrSelectedVariant;
                   const price = variant?.price;
                   const originalPrice = variant?.originalPrice;
-                  const isOnSale = originalPrice && price && originalPrice > price;
+                  const productOnSale = isOnSale(originalPrice, price);
 
                   return (
                     <Link
@@ -175,23 +175,19 @@ export function SearchModal({ open, onOpenChange, searchPageUrl = '/search' }: S
                             sizes="64px"
                           />
                         ) : (
-                          <div className="flex h-full w-full items-center justify-center">
-                            <span className="text-xs text-gray-400">No image</span>
-                          </div>
+                          <ImagePlaceholder size="sm" text="No image" />
                         )}
                       </div>
                       <div className="flex flex-1 flex-col justify-center">
                         <h4 className="text-sm font-medium text-gray-900">{product.title}</h4>
                         {price != null && (
-                          <div className="mt-1 flex items-center gap-2">
-                            <span className={isOnSale ? 'text-red-600' : 'text-gray-600'}>
-                              {formatPrice(price)}
-                            </span>
-                            {isOnSale && (
-                              <span className="text-sm text-gray-400 line-through">
-                                {formatPrice(originalPrice)}
-                              </span>
-                            )}
+                          <div className="mt-1">
+                            <PriceDisplay
+                              price={price}
+                              originalPrice={originalPrice}
+                              size="sm"
+                              className="gap-1"
+                            />
                           </div>
                         )}
                       </div>

@@ -1,9 +1,10 @@
 import { Render } from '@puckeditor/core';
 import { config } from '@/.storefront/puck.render.config';
-import { getPageConfig } from '@/lib/puck-storage';
+import { getPageConfig } from '@/lib/puck/storage';
 import { getResourceByPath } from '@/lib/resource-resolver';
 import { getLocale, getPathname } from '@/lib/locale';
 import { SiteLayout } from '@/components/layout';
+import { redirect } from 'next/navigation';
 
 /**
  * Home page - renders the published "home" page config
@@ -29,6 +30,12 @@ export default async function HomePage() {
       `Root path "/" resolved to "${resource.type}" instead of "HOME". ` +
         'This may indicate a routing configuration issue.'
     );
+  } else if (resource && resource.type === 'HOME' && !resource.id) {
+    // Redirect to hreflang alternate
+    const alternate = resource.alternates?.find((alt) => alt.hreflang === locale);
+    if (alternate) {
+      redirect(alternate.url);
+    }
   }
 
   const data = await getPageConfig('home', 'published');

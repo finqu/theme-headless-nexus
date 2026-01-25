@@ -6,6 +6,8 @@ import type { CartLineItem as CartLineItemType } from '@finqu/storefront-types';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { cn } from '@/lib/utils';
+import { formatPrice } from '@/components/shared';
+import { ImagePlaceholder } from '@/components/shared';
 
 interface CartLineItemProps {
   item: CartLineItemType;
@@ -13,13 +15,6 @@ interface CartLineItemProps {
   onRemove: (lineId: number) => void;
   isUpdating?: boolean;
   currency?: string;
-}
-
-function formatPrice(value: number, currency = 'EUR') {
-  return new Intl.NumberFormat('en-US', {
-    style: 'currency',
-    currency,
-  }).format(value);
 }
 
 export function CartLineItem({
@@ -53,9 +48,7 @@ export function CartLineItem({
             sizes="80px"
           />
         ) : (
-          <div className="flex h-full w-full items-center justify-center">
-            <span className="text-xs text-gray-400">No image</span>
-          </div>
+          <ImagePlaceholder size="sm" text="No image" />
         )}
       </div>
 

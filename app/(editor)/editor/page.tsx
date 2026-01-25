@@ -6,11 +6,11 @@ import { Puck, createUsePuck, type Data } from '@puckeditor/core';
 
 // Create usePuck hook with selector support to avoid unnecessary re-renders
 const usePuck = createUsePuck();
-import { editorConfig, type EditorMetadata } from '@/lib/puck-config';
+import { editorConfig, type EditorMetadata } from '@/lib/puck/config';
 import '@puckeditor/core/puck.css';
 import { isValidTemplateType, type TemplateType } from '@/lib/template-types';
 import { EditorToolbar, type Page } from '@/components/editor/editor-toolbar';
-import { LocaleProvider } from '@/lib/locale-context';
+import { LocaleProvider } from '@/lib/context-providers/locale-context';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import type { Locale } from '@/lib/store-cache';
 

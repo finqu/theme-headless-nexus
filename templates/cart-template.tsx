@@ -1,12 +1,12 @@
-interface CartPageProps {
+interface CartTemplateProps {
   locale: string;
 }
 
 /**
- * Shopping cart page component.
+ * Shopping cart template component.
  * TODO: Implement full cart functionality with Finqu cart API.
  */
-export function CartPage({ locale }: CartPageProps) {
+export function CartTemplate({ locale }: CartTemplateProps) {
   return (
     <div className="min-h-[60vh] py-12">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">

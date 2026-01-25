@@ -9,13 +9,13 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from '@/components/ui/accordion';
-
-function formatPrice(value: number, currency = 'EUR') {
-  return new Intl.NumberFormat('en-US', {
-    style: 'currency',
-    currency,
-  }).format(value);
-}
+import {
+  formatPrice,
+  calculateDiscountPercent,
+  isOnSale,
+  PriceDisplay,
+  AvailabilityBadge,
+} from '@/components/shared';
 
 interface ProductInfoProps {
   product: Product;
@@ -27,9 +27,9 @@ export function ProductInfo({ product, selectedVariant, currency = 'EUR' }: Prod
   const variant = selectedVariant || product.defaultOrSelectedVariant;
   const price = variant?.price;
   const originalPrice = variant?.originalPrice;
-  const isOnSale = originalPrice && price && originalPrice > price;
-  const discountPercent = isOnSale
-    ? Math.round(((originalPrice - price) / originalPrice) * 100)
+  const productOnSale = isOnSale(originalPrice, price);
+  const discountPercent = productOnSale && originalPrice && price
+    ? calculateDiscountPercent(originalPrice, price)
     : 0;
 
   return (
@@ -37,7 +37,7 @@ export function ProductInfo({ product, selectedVariant, currency = 'EUR' }: Prod
       {/* Title and badges */}
       <div>
         <div className="mb-2 flex flex-wrap items-center gap-2">
-          {isOnSale && (
+          {productOnSale && (
             <Badge variant="destructive" className="uppercase">
               Sale {discountPercent}% off
             </Badge>
@@ -50,18 +50,12 @@ export function ProductInfo({ product, selectedVariant, currency = 'EUR' }: Prod
       </div>
 
       {/* Price */}
-      {price != null && (
-        <div className="flex items-baseline gap-3">
-          <span className={`text-2xl font-semibold ${isOnSale ? 'text-red-600' : 'text-gray-900'}`}>
-            {formatPrice(price, currency)}
-          </span>
-          {isOnSale && (
-            <span className="text-lg text-gray-500 line-through">
-              {formatPrice(originalPrice, currency)}
-            </span>
-          )}
-        </div>
-      )}
+      <PriceDisplay
+        price={price}
+        originalPrice={originalPrice}
+        currency={currency}
+        size="lg"
+      />
 
       {/* SKU */}
       {variant?.sku && (
@@ -76,19 +70,7 @@ export function ProductInfo({ product, selectedVariant, currency = 'EUR' }: Prod
       )}
 
       {/* Availability */}
-      <div className="flex items-center gap-2">
-        {product.isAvailable ? (
-          <>
-            <span className="h-2 w-2 rounded-full bg-green-500" />
-            <span className="text-sm text-gray-600">In stock</span>
-          </>
-        ) : (
-          <>
-            <span className="h-2 w-2 rounded-full bg-red-500" />
-            <span className="text-sm text-gray-600">Out of stock</span>
-          </>
-        )}
-      </div>
+      <AvailabilityBadge isAvailable={product.isAvailable ?? false} />
     </div>
   );
 }

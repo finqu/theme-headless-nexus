@@ -1,7 +1,7 @@
 import { Navbar, Footer } from '@/components/layout';
 import { getLayoutSettings } from '@/lib/layout-settings';
 import { AlternatesProvider, type Alternate } from '@/lib/alternates-context';
-import { StoreProvider } from '@/lib/store-context';
+import { StoreProvider } from '@/lib/context-providers/store-context';
 import { getStoreData } from '@/lib/store-cache';
 import { fetchMenuWithLinks } from '@/lib/menu-queries';
 

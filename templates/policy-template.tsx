@@ -1,9 +1,9 @@
-interface PolicyPageProps {
+interface PolicyTemplateProps {
   type: 'privacy' | 'shipping' | 'refund' | 'terms';
   locale: string;
 }
 
-const policyTitles: Record<PolicyPageProps['type'], string> = {
+const policyTitles: Record<PolicyTemplateProps['type'], string> = {
   privacy: 'Privacy Policy',
   shipping: 'Shipping Policy',
   refund: 'Refund Policy',
@@ -11,10 +11,10 @@ const policyTitles: Record<PolicyPageProps['type'], string> = {
 };
 
 /**
- * Policy page component.
+ * Policy template component.
  * TODO: Fetch actual policy content from Finqu policies API.
  */
-export function PolicyPage({ type, locale }: PolicyPageProps) {
+export function PolicyTemplate({ type, locale }: PolicyTemplateProps) {
   const title = policyTitles[type];
 
   return (

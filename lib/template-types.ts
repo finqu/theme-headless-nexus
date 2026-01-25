@@ -72,6 +72,7 @@ export const RESOURCE_TYPE_TO_TEMPLATE: Record<string, TemplateType> = {
   PAGE: TemplateType.PAGE,
   ARTICLE: TemplateType.ARTICLE,
   MANUFACTURER: TemplateType.MANUFACTURER,
+  HOME: TemplateType.PAGE,
 
   // System pages that can have templates
   BLOG: TemplateType.BLOG,

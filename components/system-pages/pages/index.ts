@@ -1,9 +1,0 @@
-export { PlaceholderPage } from './placeholder-page';
-export { LoginPage } from './login-page';
-export { RegisterPage } from './register-page';
-export { AccountPage } from './account-page';
-export { CartPage } from './cart-page';
-export { SearchPage } from './search-page';
-export { ProductsPage } from './products-page';
-export { PolicyPage } from './policy-page';
-export { ProductPage } from './product-page';

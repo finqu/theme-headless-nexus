@@ -1,4 +1,5 @@
 export { ProductCard } from './product-card';
+export { ProductListCard, type ProductListCardProps } from './product-list-card';
 export { ProductGallery } from './product-gallery';
 export { ProductInfo, ProductDetails } from './product-info';
 export { VariantSelector } from './variant-selector';

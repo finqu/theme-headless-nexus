@@ -1,5 +1,5 @@
 import type { Menu } from '@finqu/storefront-types';
-import type { StoreData } from '@/lib/store-context';
+import type { StoreData } from '@/lib/context-providers/store-context';
 import { NavbarClient } from './navbar-client';
 
 interface NavbarProps {

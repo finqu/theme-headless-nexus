@@ -1,12 +1,12 @@
-interface RegisterPageProps {
+interface RegisterTemplateProps {
   locale: string;
 }
 
 /**
- * Registration page component.
+ * Registration template component.
  * TODO: Implement full registration functionality with Finqu customer creation.
  */
-export function RegisterPage({ locale }: RegisterPageProps) {
+export function RegisterTemplate({ locale }: RegisterTemplateProps) {
   return (
     <div className="flex min-h-[60vh] items-center justify-center">
       <div className="w-full max-w-md space-y-8 p-8">

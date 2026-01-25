@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { Minus, Plus, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { useCart } from '@/lib/cart-context';
+import { useCart } from '@/lib/context-providers/cart-context';
 import { cn } from '@/lib/utils';
 
 interface AddToCartProps {

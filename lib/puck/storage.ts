@@ -1,6 +1,6 @@
 import type { Data } from '@puckeditor/core';
-import { getStorage } from './storage';
-import { TemplateType, isValidTemplateType } from './template-types';
+import { getStorage } from '@/lib/storage';
+import { TemplateType } from '@/lib/template-types';
 
 /**
  * Version type for Puck configs

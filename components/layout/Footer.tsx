@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import type { Menu, Link as MenuLink } from '@finqu/storefront-types';
-import type { StoreData } from '@/lib/store-context';
+import type { StoreData } from '@/lib/context-providers/store-context';
 import { NewsletterForm } from './newsletter-form';
 import { LocaleSwitcher } from './locale-switcher';
 

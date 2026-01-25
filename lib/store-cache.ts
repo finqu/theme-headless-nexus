@@ -11,7 +11,7 @@ import {
   type StoreRoutesQueryResponse,
 } from './queries';
 import type { Locale, Routes } from '@finqu/storefront-types';
-import type { StoreData, StoreBasicInfo } from './store-context';
+import type { StoreData, StoreBasicInfo } from './context-providers/store-context';
 
 // Re-export types for convenience
 export type { Locale, StoreData, StoreBasicInfo };

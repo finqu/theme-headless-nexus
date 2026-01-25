@@ -65,11 +65,16 @@ export const config: ComponentConfig<Props> = {
 ```tsx
 // Server Components - use singleton client from lib/storefront
 import { storefrontClient, cachePresets, withLocale } from '@/lib/storefront';
-import { getProduct, getProducts } from '@finqu/storefront-sdk/server';
+import { getProduct, getCatalogProducts } from '@finqu/storefront-sdk/server';
 
 // Using SDK helpers
 const { product } = await getProduct(storefrontClient, { handle: 'my-product' });
-const { products } = await getProducts(storefrontClient, { first: 10 }, cachePresets.products);
+
+// Fetch products from the catalog (supports filtering, sorting, pagination)
+const result = await getCatalogProducts(storefrontClient, { first: 10, query: 'search term' });
+const products = result.catalog.products.nodes;
+const totalCount = result.catalog.products.totalCount;
+const filters = result.catalog.products.filters;
 
 // Custom queries with locale-specific caching
 import { STORE_QUERY, type StoreQueryResponse } from '@/lib/queries';
@@ -80,7 +85,7 @@ const data = await storefrontClient.query<StoreQueryResponse>(
 );
 
 // Client Components - use hooks from @finqu/storefront-sdk/react
-import { useProduct, useCart, useCreateCart } from '@finqu/storefront-sdk/react';
+import { useProduct, useCatalogProducts, useCart, useCreateCart } from '@finqu/storefront-sdk/react';
 ```
 
 ## Locale Handling

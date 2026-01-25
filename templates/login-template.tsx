@@ -1,12 +1,12 @@
-interface LoginPageProps {
+interface LoginTemplateProps {
   locale: string;
 }
 
 /**
- * Login page component.
+ * Login template component.
  * TODO: Implement full login functionality with Finqu customer authentication.
  */
-export function LoginPage({ locale }: LoginPageProps) {
+export function LoginTemplate({ locale }: LoginTemplateProps) {
   return (
     <div className="flex min-h-[60vh] items-center justify-center">
       <div className="w-full max-w-md space-y-8 p-8">

@@ -1,7 +1,7 @@
-import type { ResourceType } from '@/lib/resource-resolver';
+import type { ResourceKind } from '@/lib/resource-resolver';
 
 interface PlaceholderTemplateProps {
-  type: ResourceType;
+  type: ResourceKind;
   id?: number;
   title?: string;
   message?: string;
@@ -21,7 +21,7 @@ export function PlaceholderTemplate({
   templateType,
   showEditorLink,
 }: PlaceholderTemplateProps) {
-  const displayTitle = title || formatResourceType(type);
+  const displayTitle = title || formatResourceKind(type);
 
   return (
     <div className="flex min-h-[60vh] items-center justify-center bg-gray-50">
@@ -57,7 +57,7 @@ export function PlaceholderTemplate({
 /**
  * Format resource type for display
  */
-function formatResourceType(type: ResourceType): string {
+function formatResourceKind(type: ResourceKind): string {
   return type
     .toLowerCase()
     .split('_')
@@ -68,8 +68,8 @@ function formatResourceType(type: ResourceType): string {
 /**
  * Get an emoji icon for the resource type
  */
-function getIconForType(type: ResourceType): string {
-  const icons: Partial<Record<ResourceType, string>> = {
+function getIconForType(type: ResourceKind): string {
+  const icons: Partial<Record<ResourceKind, string>> = {
     LOGIN: '🔐',
     LOGOUT: '👋',
     REGISTER: '📝',

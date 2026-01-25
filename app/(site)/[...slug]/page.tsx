@@ -2,7 +2,7 @@ import { notFound } from 'next/navigation';
 import { Render } from '@puckeditor/core';
 import { config } from '@/.storefront/puck.render.config';
 import { getPageConfig, getTemplateConfig } from '@/lib/puck/storage';
-import { getResourceByPath, type ResourceType } from '@/lib/resource-resolver';
+import { getResourceByPath, type ResourceKind } from '@/lib/resource-resolver';
 import { getTemplateTypeForResource } from '@/lib/template-types';
 import { getLocale, getPathname } from '@/lib/locale';
 import { SiteLayout } from '@/components/layout';
@@ -139,8 +139,8 @@ export async function generateMetadata() {
 /**
  * Generate a default page title based on resource type
  */
-function getPageTitle(type: ResourceType, path: string): string {
-  const titles: Partial<Record<ResourceType, string>> = {
+function getPageTitle(type: ResourceKind, path: string): string {
+  const titles: Partial<Record<ResourceKind, string>> = {
     LOGIN: 'Login',
     LOGOUT: 'Logout',
     REGISTER: 'Register',

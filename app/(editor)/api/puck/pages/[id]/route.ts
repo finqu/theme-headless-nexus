@@ -6,7 +6,7 @@ import {
   publishPage,
   deletePage,
   hasPageUnpublishedChanges,
-} from '@/lib/puck-storage';
+} from '@/lib/puck/storage';
 
 interface RouteParams {
   params: Promise<{ id: string }>;

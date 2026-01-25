@@ -5,7 +5,6 @@ export type { ProductGridViewProps, ProductGridColumns } from '@/components/prod
 
 // Shared utilities for product fetching
 export {
-  PRODUCTS_QUERY,
   fetchProducts,
   fetchProductsByIds,
   extractProductIds,

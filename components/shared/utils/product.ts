@@ -27,7 +27,9 @@ export function getProductImage(
   product: Product | ProductListItem
 ): { url: string; alt?: string | null } | undefined {
   const variant = product.defaultOrSelectedVariant;
-  return variant?.featuredImage || variant?.image || undefined;
+  const image = variant?.featuredImage || variant?.image;
+  if (!image?.url) return undefined;
+  return { url: image.url, alt: image.alt };
 }
 
 /**
@@ -39,5 +41,7 @@ export function getVariantImage(
   variant: ProductVariant | null | undefined
 ): { url: string; alt?: string | null } | undefined {
   if (!variant) return undefined;
-  return variant.featuredImage || variant.image || undefined;
+  const image = variant.featuredImage || variant.image;
+  if (!image?.url) return undefined;
+  return { url: image.url, alt: image.alt };
 }

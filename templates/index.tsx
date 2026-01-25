@@ -1,4 +1,4 @@
-import type { ResourceType } from '@/lib/resource-resolver';
+import type { ResourceKind } from '@/lib/resource-resolver';
 import { PlaceholderTemplate } from './placeholder-template';
 import { LoginTemplate } from './login-template';
 import { RegisterTemplate } from './register-template';
@@ -33,19 +33,17 @@ export interface TemplateProps {
 type TemplateRenderer = (props: TemplateProps) => React.ReactNode;
 
 /**
- * Registry mapping ResourceType to template renderers.
+ * Registry mapping ResourceKind to template renderers.
  *
  * Each renderer receives common TemplateProps and returns the appropriate
  * template component with the props it needs.
  */
-const templateRegistry: Partial<Record<ResourceType, TemplateRenderer>> = {
+const templateRegistry: Partial<Record<ResourceKind, TemplateRenderer>> = {
   // Authentication templates
   LOGIN: ({ locale }) => <LoginTemplate locale={locale} />,
   LOGOUT: () => <PlaceholderTemplate type="LOGOUT" message="Logging out..." />,
   REGISTER: ({ locale }) => <RegisterTemplate locale={locale} />,
-  RECOVER_PASSWORD: () => (
-    <PlaceholderTemplate type="RECOVER_PASSWORD" title="Recover Password" />
-  ),
+  RECOVER_PASSWORD: () => <PlaceholderTemplate type="RECOVER_PASSWORD" title="Recover Password" />,
   RESET_PASSWORD: () => <PlaceholderTemplate type="RESET_PASSWORD" title="Reset Password" />,
   CHANGE_PASSWORD: () => <PlaceholderTemplate type="CHANGE_PASSWORD" title="Change Password" />,
 
@@ -132,7 +130,7 @@ const templateRegistry: Partial<Record<ResourceType, TemplateRenderer>> = {
  * @param props - Common props passed to all templates
  * @returns The rendered template, or a placeholder for unknown types
  */
-export function renderTemplate(type: ResourceType, props: TemplateProps): React.ReactNode {
+export function renderTemplate(type: ResourceKind, props: TemplateProps): React.ReactNode {
   const renderer = templateRegistry[type];
   if (renderer) {
     return renderer(props);

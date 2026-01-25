@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { listPageIds } from '@/lib/puck-storage';
+import { listPageIds } from '@/lib/puck/storage';
 import { storefrontClient, cachePresets, withLocale } from '@/lib/storefront';
 import { PAGES_QUERY, type PagesQueryResponse } from '@/lib/queries';
 

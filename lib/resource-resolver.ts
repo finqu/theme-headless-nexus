@@ -5,11 +5,11 @@ import {
   RESOURCE_BY_PATH_QUERY,
   type ResourceByPathResponse,
   type Resource,
-  type ResourceType,
+  type ResourceKind,
 } from './queries';
 
 // Re-export types for convenience
-export type { Resource, ResourceType };
+export type { Resource, ResourceKind };
 
 /**
  * Extended resource with alternates for locale switching.

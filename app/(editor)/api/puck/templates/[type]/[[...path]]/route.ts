@@ -9,7 +9,7 @@ import {
   resetTemplateOverride,
   listTemplateOverrides,
   hasUnpublishedChanges,
-} from '@/lib/puck-storage';
+} from '@/lib/puck/storage';
 
 interface RouteParams {
   params: Promise<{ type: string; path?: string[] }>;

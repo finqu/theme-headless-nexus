@@ -57,7 +57,7 @@ export const TEMPLATE_TYPE_LABELS: Record<TemplateType, string> = {
 };
 
 /**
- * Map Finqu API ResourceType to internal TemplateType.
+ * Map Finqu API ResourceKind to internal TemplateType.
  *
  * This mapping is used to determine which Puck template to use
  * when rendering a resource resolved by resourceByPath.
@@ -82,9 +82,9 @@ export const RESOURCE_TYPE_TO_TEMPLATE: Record<string, TemplateType> = {
 };
 
 /**
- * Get the TemplateType for a given ResourceType.
+ * Get the TemplateType for a given ResourceKind.
  *
- * @param resourceType - The API ResourceType (e.g., 'PRODUCT', 'PRODUCT_GROUP')
+ * @param ResourceKind - The API ResourceKind (e.g., 'PRODUCT', 'PRODUCT_GROUP')
  * @returns The corresponding TemplateType, or undefined if not templatable
  *
  * @example
@@ -94,6 +94,6 @@ export const RESOURCE_TYPE_TO_TEMPLATE: Record<string, TemplateType> = {
  * getTemplateTypeForResource('LOGIN'); // undefined (system page)
  * ```
  */
-export function getTemplateTypeForResource(resourceType: string): TemplateType | undefined {
-  return RESOURCE_TYPE_TO_TEMPLATE[resourceType];
+export function getTemplateTypeForResource(ResourceKind: string): TemplateType | undefined {
+  return RESOURCE_TYPE_TO_TEMPLATE[ResourceKind];
 }

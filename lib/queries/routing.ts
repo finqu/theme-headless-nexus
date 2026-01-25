@@ -8,14 +8,14 @@
  */
 
 import type {
-    Resource,
-    ResourceType,
-    Routes,
-    ResourceByPathVariables,
+  Resource,
+  ResourceKind,
+  Routes,
+  ResourceByPathVariables,
 } from '@finqu/storefront-types';
 
 // Re-export types for convenience
-export type { Resource, ResourceType, ResourceByPathVariables };
+export type { Resource, ResourceKind, ResourceByPathVariables };
 
 /**
  * Query to resolve a URL path to a resource type, ID, and alternates.
@@ -36,7 +36,7 @@ export const RESOURCE_BY_PATH_QUERY = /* GraphQL */ `
 `;
 
 export interface ResourceByPathResponse {
-    resourceByPath: Resource | null;
+  resourceByPath: Resource | null;
 }
 
 /**
@@ -62,5 +62,5 @@ export const STORE_ROUTES_QUERY = /* GraphQL */ `
 `;
 
 export interface StoreRoutesQueryResponse {
-    routes: Routes;
+  routes: Routes;
 }

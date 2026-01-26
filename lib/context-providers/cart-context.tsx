@@ -130,7 +130,6 @@ export function CartProvider({ children }: { children: ReactNode }) {
   // Add item to cart
   const addItem = useCallback(
     async (productId: number, quantity = 1) => {
-      console.log('addItem called with', { productId, quantity }); // --- IGNORE ---
       const merchandiseId = productId;
       if (merchandiseId == null) {
         console.error('Invalid product ID:', productId);

@@ -167,7 +167,7 @@ function EditorContent() {
         if (!res.ok) throw new Error('Failed to fetch store info');
 
         const data = await res.json();
-        const firstLocale = data.locales?.[0]?.isoCode;
+        const firstLocale = data.storeData.locales?.[0]?.isoCode;
 
         if (firstLocale) {
           // Redirect to same URL with locale param
@@ -253,10 +253,11 @@ function EditorContent() {
         if (pagesRes.ok) {
           const pagesData = await pagesRes.json();
           setPages(pagesData.pages || []);
-
+          console.log('pagesData', pagesData);
           // Handle page mode without URL ID - load homepage by default
           if (mode === 'page' && !urlPageId) {
             const homepage = pagesData.pages?.find((p: { slug: string }) => p.slug === 'home');
+            console.log('homepage', homepage);
             if (homepage?.id) {
               setResolvedPageId(homepage.id);
             } else {

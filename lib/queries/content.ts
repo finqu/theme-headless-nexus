@@ -25,13 +25,10 @@ export type { PageVariables, PageByHandleVariables, ArticleVariables };
 export const PAGES_QUERY = /* GraphQL */ `
   query Pages($first: Int, $after: String) {
     pages(first: $first, after: $after) {
-      edges {
-        node {
-          id
-          title
-          handle
-        }
-        cursor
+      nodes {
+        id
+        title
+        handle
       }
       pageInfo {
         hasNextPage

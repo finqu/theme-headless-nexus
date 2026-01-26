@@ -13,7 +13,6 @@ interface AddToCartProps {
 }
 
 export function AddToCart({ productId, isAvailable = true, className }: AddToCartProps) {
-  console.log('AddToCart rendered with', { productId, isAvailable }); // --- IGNORE ---
   const { addItem, isUpdating } = useCart();
   const [quantity, setQuantity] = useState(1);
   const [isAdding, setIsAdding] = useState(false);

@@ -39,11 +39,13 @@ export async function GET(request: Request) {
     // Fetch local page IDs and storefront pages in parallel
     const [localPageIds, storefrontPagesResult] = await Promise.all([
       listPageIds(),
-      storefrontClient.query<PagesQueryResponse>(PAGES_QUERY, { first: 100 }, cacheOptions).catch((err) => {
+      storefrontClient.query<PagesQueryResponse>(PAGES_QUERY, { first: 50 }, cacheOptions).catch((err) => {
         console.error('Failed to fetch storefront pages:', err);
         return null;
       }),
     ]);
+
+    console.log('storefrontPagesResult', storefrontPagesResult);
 
     // Create a set of local page IDs for quick lookup
     const localPageIdSet = new Set(localPageIds);
@@ -52,26 +54,22 @@ export async function GET(request: Request) {
     const storefrontPages: PageItem[] = [];
     const storefrontPageIdSet = new Set<string>();
 
-    if (storefrontPagesResult?.pages?.edges) {
-      for (const edge of storefrontPagesResult.pages.edges) {
-        const page = edge?.node;
+    if (storefrontPagesResult?.pages?.nodes) {
+      for (const page of storefrontPagesResult.pages.nodes) {
+        // Convert numeric ID to string for consistent storage key usage
+        const pageId = String(page.id);
+        storefrontPageIdSet.add(pageId);
 
-        if (page?.id && page?.handle) {
-          // Convert numeric ID to string for consistent storage key usage
-          const pageId = String(page.id);
-          storefrontPageIdSet.add(pageId);
+        // Determine if this page has a local Puck config
+        const hasLocalConfig = localPageIdSet.has(pageId);
 
-          // Determine if this page has a local Puck config
-          const hasLocalConfig = localPageIdSet.has(pageId);
-
-          storefrontPages.push({
-            id: pageId,
-            slug: page.handle,
-            title: page.title || page.handle.charAt(0).toUpperCase() + page.handle.slice(1),
-            editUrl: `/editor?mode=page&id=${pageId}`,
-            source: hasLocalConfig ? 'local' : 'storefront',
-          });
-        }
+        storefrontPages.push({
+          id: pageId,
+          slug: page.handle!,
+          title: page.title || page.handle!.charAt(0).toUpperCase() + page.handle!.slice(1),
+          editUrl: `/editor?mode=page&id=${pageId}`,
+          source: hasLocalConfig ? 'local' : 'storefront',
+        });
       }
     }
 

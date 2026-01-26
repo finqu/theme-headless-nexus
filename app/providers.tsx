@@ -22,7 +22,10 @@ interface ProvidersProps {
  */
 export function Providers({ children, locale, defaultLocale }: ProvidersProps) {
   return (
-    <FinquProvider publicKey={process.env.NEXT_PUBLIC_FINQU_PUBLIC_KEY!}>
+    <FinquProvider
+      publicKey={process.env.NEXT_PUBLIC_FINQU_PUBLIC_KEY!}
+      endpoint={process.env.NEXT_PUBLIC_FINQU_STOREFRONT_URL!}
+    >
       <LocaleProvider locale={locale} defaultLocale={defaultLocale}>
         <CartProvider>{children}</CartProvider>
       </LocaleProvider>

@@ -98,7 +98,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
     loading: isCartLoading,
     refetch: refetchCart,
   } = useCartQuery<Cart>(
-    { id: cartId ?? '' },
+    { cartId: cartId ?? '' },
     {
       skip: !cartId || !isInitialized,
       fetchPolicy: 'network-only',
@@ -129,10 +129,11 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
   // Add item to cart
   const addItem = useCallback(
-    async (variantId: number, quantity = 1) => {
-      const merchandiseId = variantId;
+    async (productId: number, quantity = 1) => {
+      console.log('addItem called with', { productId, quantity }); // --- IGNORE ---
+      const merchandiseId = productId;
       if (merchandiseId == null) {
-        console.error('Invalid variant ID:', variantId);
+        console.error('Invalid product ID:', productId);
         return;
       }
 

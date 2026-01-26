@@ -1,21 +1,20 @@
+import { Suspense } from 'react';
 import type { ComponentConfig } from '@puckeditor/core';
-import type { ProductListItem } from '@/lib/types';
 import {
-  ProductGrid,
   productGridDefaultProps,
   type ProductGridViewProps,
+  type ProductGridColumns,
 } from '@/components/product/product-grid';
-import { fetchProductsByIds } from './shared';
+import { ProductGridAsync } from './product-grid-async';
+import { ProductGridSkeleton } from './product-grid-skeleton';
 
 /**
  * Props for the ProductGrid Puck component.
- * Stores product IDs for persistence; full products are resolved at render time.
+ * Stores product IDs for persistence; products are fetched at render time via Suspense.
  */
 interface ProductGridProps extends Omit<ProductGridViewProps, 'products'> {
   /** Product IDs stored in Puck data (lightweight) */
   selectedProductIds?: number[];
-  /** Full product objects resolved from IDs (populated by resolveData) */
-  selectedProducts?: ProductListItem[];
 }
 
 /**
@@ -25,7 +24,7 @@ export const category = 'E-commerce';
 
 /**
  * Puck component configuration (render-only version).
- * Uses resolveData to fetch fresh product data from the API at render time.
+ * Uses Suspense to stream product data, allowing the page to respond faster.
  */
 export const config: ComponentConfig<ProductGridProps> = {
   label: 'Product Grid',
@@ -33,37 +32,26 @@ export const config: ComponentConfig<ProductGridProps> = {
     ...productGridDefaultProps,
     selectedProductIds: [],
   },
-  resolveData: async ({ props }) => {
-    const { selectedProductIds, selectedProducts, ...rest } = props;
-
-    // If we already have products (e.g., from edit mode), extract IDs and re-fetch fresh data
-    const ids =
-      selectedProductIds && selectedProductIds.length > 0
-        ? selectedProductIds
-        : selectedProducts?.map((p) => p.id).filter((id): id is number => id != null) || [];
-
-    if (ids.length === 0) {
-      return { props: { ...rest, selectedProductIds: [], selectedProducts: [] } };
+  render: ({ title, selectedProductIds, columns, showPrice, showDescription }) => {
+    // No products selected - render empty state immediately
+    if (!selectedProductIds || selectedProductIds.length === 0) {
+      return <ProductGridSkeleton title={title} columns={columns} isEmpty />;
     }
 
-    // Fetch fresh product data from the API
-    const freshProducts = await fetchProductsByIds(ids);
-
-    return {
-      props: {
-        ...rest,
-        selectedProductIds: ids,
-        selectedProducts: freshProducts,
-      },
-    };
+    return (
+      <Suspense
+        fallback={
+          <ProductGridSkeleton title={title} columns={columns} count={selectedProductIds.length} />
+        }
+      >
+        <ProductGridAsync
+          title={title}
+          productIds={selectedProductIds}
+          columns={columns}
+          showPrice={showPrice}
+          showDescription={showDescription}
+        />
+      </Suspense>
+    );
   },
-  render: ({ title, selectedProducts, columns, showPrice, showDescription }) => (
-    <ProductGrid
-      title={title}
-      products={selectedProducts}
-      columns={columns}
-      showPrice={showPrice}
-      showDescription={showDescription}
-    />
-  ),
 };

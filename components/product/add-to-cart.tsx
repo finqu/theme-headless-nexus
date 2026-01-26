@@ -7,22 +7,23 @@ import { useCart } from '@/lib/context-providers/cart-context';
 import { cn } from '@/lib/utils';
 
 interface AddToCartProps {
-  variantId?: number;
+  productId?: number;
   isAvailable?: boolean;
   className?: string;
 }
 
-export function AddToCart({ variantId, isAvailable = true, className }: AddToCartProps) {
+export function AddToCart({ productId, isAvailable = true, className }: AddToCartProps) {
+  console.log('AddToCart rendered with', { productId, isAvailable }); // --- IGNORE ---
   const { addItem, isUpdating } = useCart();
   const [quantity, setQuantity] = useState(1);
   const [isAdding, setIsAdding] = useState(false);
 
   const handleAddToCart = async () => {
-    if (variantId == null || !isAvailable) return;
+    if (productId == null || !isAvailable) return;
 
     setIsAdding(true);
     try {
-      await addItem(variantId, quantity);
+      await addItem(productId, quantity);
       // Reset quantity after successful add
       setQuantity(1);
     } catch (error) {
@@ -43,7 +44,7 @@ export function AddToCart({ variantId, isAvailable = true, className }: AddToCar
   };
 
   const isLoading = isAdding || isUpdating;
-  const isDisabled = variantId == null || !isAvailable || isLoading;
+  const isDisabled = productId == null || !isAvailable || isLoading;
 
   return (
     <div className={cn('flex flex-col gap-4 sm:flex-row', className)}>

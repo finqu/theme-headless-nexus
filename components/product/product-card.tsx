@@ -140,7 +140,12 @@ export function ProductCard({ product, currency = 'EUR' }: ProductCardProps) {
             )}
 
             {/* Add to Cart */}
-            <AddToCart variantId={selectedVariantId} isAvailable={isAvailable} />
+            <AddToCart
+              productId={
+                selectedVariant?.productId ? parseInt(selectedVariant.productId, 10) : undefined
+              }
+              isAvailable={isAvailable}
+            />
 
             <Separator className="my-8" />
 

@@ -16,8 +16,6 @@ export function ProductListCard({
   const image = getProductImage(product);
   const href = variant?.url;
 
-  console.log('variant', variant);
-
   const content = (
     <>
       {/* Product Image */}

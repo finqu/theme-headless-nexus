@@ -34,7 +34,7 @@ interface NavbarClientProps {
   isEditing?: boolean;
 }
 
-const MAX_VISIBLE_LINKS = 5;
+const MAX_VISIBLE_LINKS = 4;
 
 export function NavbarClient({ menu, storeData, isEditing = false }: NavbarClientProps) {
   const { store, routes, currencies } = storeData;
@@ -66,15 +66,15 @@ export function NavbarClient({ menu, storeData, isEditing = false }: NavbarClien
   }, []);
 
   return (
-    <div className="bg-white">
+    <div>
       {/* Announcement Bar */}
-      <p className="flex h-10 items-center justify-center bg-indigo-600 px-4 text-sm font-medium text-white sm:px-6 lg:px-8">
+      <div className="flex h-10 items-center justify-center border-b text-sm sm:px-6 lg:px-8">
         Get free delivery on orders over $100
-      </p>
+      </div>
 
-      <header className="relative bg-white">
-        <nav aria-label="Top" className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="border-b border-gray-200">
+      <header className="sticky top-10 bg-white">
+        <nav aria-label="Top" className="x-4 border-b sm:px-6 lg:px-8">
+          <div className="">
             <div className="flex h-16 items-center">
               {/* Mobile menu button */}
               <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>

@@ -108,21 +108,21 @@ export function ProductCard({ product, currency = 'EUR' }: ProductCardProps) {
 
   return (
     <div className="bg-white">
-      <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+      <div className="">
         {/* Breadcrumb */}
-        <div className="mb-8">
+        <div className="border-b px-4 py-4 sm:px-6">
           <ProductBreadcrumb items={breadcrumbItems} currentPage={product.title || 'Product'} />
         </div>
 
         {/* Main Product Section */}
-        <div className="lg:grid lg:grid-cols-2 lg:items-start lg:gap-x-12">
+        <div className="lg:grid lg:grid-cols-2 lg:items-start">
           {/* Gallery */}
-          <div className="lg:sticky lg:top-4">
+          <div className="px-4 py-8 sm:px-6 lg:sticky lg:top-4">
             <ProductGallery images={images} productTitle={product.title ?? undefined} />
           </div>
 
           {/* Product Info */}
-          <div className="mt-10 lg:mt-0">
+          <div className="mt-10 border-l px-4 py-8 sm:px-6 lg:mt-0">
             <ProductInfo product={product} selectedVariant={selectedVariant} currency={currency} />
 
             <Separator className="my-6" />

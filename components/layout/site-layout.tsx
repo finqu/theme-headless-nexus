@@ -35,7 +35,7 @@ export async function SiteLayout({ children, locale, alternates = [] }: SiteLayo
   return (
     <StoreProvider value={storeData}>
       <AlternatesProvider alternates={alternates}>
-        <div className="flex min-h-screen flex-col">
+        <div className="container mx-auto grid min-h-dvh max-w-6xl grid-rows-[auto_1fr_auto] border-r border-l">
           <Navbar menu={navbarMenu} storeData={storeData} />
           <main className="flex-1">{children}</main>
           <Footer

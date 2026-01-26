@@ -12,6 +12,7 @@ interface FooterProps {
   twitterUrl?: string;
   facebookUrl?: string;
   linkedinUrl?: string;
+  isEditing?: boolean;
 }
 
 /**
@@ -26,6 +27,7 @@ export function Footer({
   twitterUrl,
   facebookUrl,
   linkedinUrl,
+  isEditing = false,
 }: FooterProps) {
   const { store, locales } = storeData;
   const storeName = store?.name || 'Store';
@@ -42,11 +44,11 @@ export function Footer({
   const columns = distributeToColumns(menuLinks, 3);
 
   return (
-    <footer className="bg-background border-t px-4">
-      <div className="container mx-auto px-4 py-12 md:py-16">
-        <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-5">
+    <footer className="bg-background border-t">
+      <div className="px-4 sm:px-6">
+        <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-5 lg:divide-x">
           {/* Left section: Logo, tagline, newsletter */}
-          <div className="space-y-4 lg:col-span-2">
+          <div className="space-y-4 py-6 lg:col-span-2">
             {/* Logo */}
             <Link href="/" className="inline-block">
               {logoUrl ? (
@@ -57,7 +59,7 @@ export function Footer({
             </Link>
 
             {/* Tagline */}
-            <p className="text-muted-foreground max-w-sm">{tagline}</p>
+            <p className="text-muted-foreground max-w-sm text-sm">{tagline}</p>
 
             {/* Newsletter */}
             <NewsletterForm />
@@ -65,11 +67,11 @@ export function Footer({
 
           {/* Menu columns */}
           {columns.map((column, colIndex) => (
-            <div key={colIndex} className="space-y-4">
+            <div key={colIndex} className="space-y-4 py-6">
               {column.map((link, linkIndex) => (
                 <div key={`${link.title}-${linkIndex}`} className="space-y-3">
                   {/* Column header (top-level link title) */}
-                  <h3 className="text-foreground font-semibold">{link.title}</h3>
+                  <h3 className="text-foreground text-sm font-semibold">{link.title}</h3>
                   {/* Child links */}
                   {link.links && link.links.length > 0 && (
                     <ul className="space-y-2">
@@ -78,7 +80,7 @@ export function Footer({
                           <Link
                             href={child.url || '#'}
                             target={child.target || undefined}
-                            className="text-muted-foreground hover:text-foreground transition-colors"
+                            className="text-muted-foreground hover:text-foreground text-sm transition-colors"
                           >
                             {child.title}
                           </Link>
@@ -91,7 +93,7 @@ export function Footer({
                     <Link
                       href={link.url}
                       target={link.target || undefined}
-                      className="text-muted-foreground hover:text-foreground block transition-colors"
+                      className="text-muted-foreground hover:text-foreground block text-sm transition-colors"
                     >
                       View all →
                     </Link>
@@ -105,12 +107,12 @@ export function Footer({
 
       {/* Bottom bar */}
       <div className="border-t">
-        <div className="container flex flex-col items-center justify-between gap-4 py-6 sm:flex-row">
+        <div className="flex flex-col items-center justify-between gap-4 px-4 py-6 sm:flex-row sm:px-6">
           <p className="text-muted-foreground text-sm">{parsedCopyright}</p>
 
           {/* Locale switcher and social icons */}
           <div className="flex items-center gap-4">
-            <LocaleSwitcher locales={locales} />
+            <LocaleSwitcher locales={locales} isEditing={isEditing} />
             {twitterUrl && (
               <a
                 href={twitterUrl}

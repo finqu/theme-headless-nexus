@@ -3,7 +3,7 @@ import type { Menu } from '@finqu/storefront-types';
 import type { StoreData, StoreBasicInfo } from '@/lib/context-providers/store-context';
 import { config as baseConfig } from '@/.storefront/puck.render.config';
 import { NavbarClient } from '@/components/layout/navbar-client';
-import { FooterClient } from '@/components/layout/footer-client';
+import { Footer } from '@/components/layout/footer';
 import type { LayoutSettings } from '@/lib/layout-settings';
 import type { ReactNode } from 'react';
 
@@ -38,6 +38,15 @@ export const editorConfig: Config = {
 
       const { navbarMenu, footerMenu, storeData, layoutSettings } = metadata;
 
+      // Wrap footer in a handler to capture clicks when editing
+      // This prevents navigation when clicking footer links in the editor
+      const handleFooterClick = (e: React.MouseEvent) => {
+        if (isEditing) {
+          e.preventDefault();
+          e.stopPropagation();
+        }
+      };
+
       return (
         <div className="flex min-h-screen flex-col">
           {/* Header */}
@@ -47,18 +56,18 @@ export const editorConfig: Config = {
           <main className="flex-1">{children}</main>
 
           {/* Footer */}
-          <FooterClient
-            menu={footerMenu}
-            storeName={storeData.store?.name ?? undefined}
-            logoUrl={storeData.store?.logo ?? undefined}
-            tagline={layoutSettings.footer.tagline}
-            copyrightText={layoutSettings.footer.copyrightText}
-            twitterUrl={layoutSettings.footer.twitterUrl}
-            facebookUrl={layoutSettings.footer.facebookUrl}
-            linkedinUrl={layoutSettings.footer.linkedinUrl}
-            locales={storeData.locales}
-            isEditing={isEditing}
-          />
+          <div onClickCapture={handleFooterClick}>
+            <Footer
+              menu={footerMenu}
+              storeData={storeData}
+              tagline={layoutSettings.footer.tagline}
+              copyrightText={layoutSettings.footer.copyrightText}
+              twitterUrl={layoutSettings.footer.twitterUrl}
+              facebookUrl={layoutSettings.footer.facebookUrl}
+              linkedinUrl={layoutSettings.footer.linkedinUrl}
+              isEditing={isEditing}
+            />
+          </div>
         </div>
       );
     },

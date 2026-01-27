@@ -27,7 +27,7 @@ export function getProductImage(
   product: Product | ProductListItem
 ): { url: string; alt?: string | null } | undefined {
   const variant = product.defaultOrSelectedVariant;
-  const image = variant?.featuredImage || variant?.image;
+  const image = variant?.featuredImage || product.featuredImage;
   if (!image?.url) return undefined;
   return { url: image.url, alt: image.alt };
 }

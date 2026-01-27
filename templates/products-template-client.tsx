@@ -74,38 +74,10 @@ export function ProductsCatalogClient({
     [productsPerPage]
   );
 
-  // Handle load more
-  const handleLoadMore = useCallback(async () => {
-    if (!hasNextPage || isLoadingMore) return;
-
-    setIsLoadingMore(true);
-    try {
-      // Fetch next page - in a real implementation you'd use cursor pagination
-      const moreProducts = await fetchProducts({
-        first: productsPerPage,
-      });
-
-      // Filter out already loaded products and append new ones
-      const existingIds = new Set(products.map((p) => p.id));
-      const newProducts = moreProducts.filter((p) => !existingIds.has(p.id));
-
-      if (newProducts.length > 0) {
-        setProducts((prev) => [...prev, ...newProducts]);
-      }
-
-      // For demo, disable load more after one additional fetch
-      setHasNextPage(false);
-    } catch (error) {
-      console.error('Failed to load more products:', error);
-    } finally {
-      setIsLoadingMore(false);
-    }
-  }, [hasNextPage, isLoadingMore, productsPerPage, locale, products]);
-
   return (
     <>
       {/* Header with title and sort */}
-      <div className="border-b px-4 py-6 @sm:px-6">
+      <div className="px-4 py-6 @sm:px-6">
         <div className="flex flex-col gap-4 @sm:flex-row @sm:items-center @sm:justify-between">
           <div>
             <h1 className="text-2xl font-bold tracking-tight text-gray-900 @sm:text-3xl">
@@ -137,11 +109,11 @@ export function ProductsCatalogClient({
 
       {/* Products grid */}
       {isLoading ? (
-        <div className="border-b">
+        <div>
           <ProductGridSkeleton count={productsPerPage} />
         </div>
       ) : products.length === 0 ? (
-        <div className="border-b p-12">
+        <div className="p-12">
           <div className="rounded-lg border-2 border-dashed border-gray-300 p-12 text-center">
             <p className="text-gray-500">No products found.</p>
           </div>

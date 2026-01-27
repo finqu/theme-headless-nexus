@@ -36,14 +36,14 @@ export function ProductGallery({ images, productTitle }: ProductGalleryProps) {
   const selectedImage = images[selectedIndex];
 
   return (
-    <div className="d-grid relative h-full place-content-center">
+    <div className="relative h-full">
       {/* Sketchy lines background pattern - extends full width/height */}
       <SketchyLines angle={45} spacing={10} thickness={1} color="rgba(0, 0, 0, 0.06)" />
 
       {/* Gallery content with padding */}
-      <div className="relative z-10 flex flex-col gap-4 px-4 py-8 sm:px-6">
+      <div className="relative z-10 space-y-4 px-4 py-8 sm:px-6">
         {/* Main Image */}
-        <div className="aspect-square w-full overflow-hidden border bg-gray-100 lg:aspect-3/4">
+        <div className="border bg-gray-100 lg:aspect-3/4">
           <Image
             src={selectedImage.url}
             alt={selectedImage.alt || productTitle || 'Product image'}

@@ -21,6 +21,7 @@ import {
 } from '@/components/ui/breadcrumb';
 import { ChevronRight, Home } from 'lucide-react';
 import { ProductsCatalogClient } from './products-template-client';
+import { GradientBorder } from '@/components/shared';
 
 interface ProductsTemplateProps {
   locale: string;
@@ -92,9 +93,10 @@ export async function ProductsTemplate({
   const totalPages = Math.max(1, Math.ceil((totalCount ?? 0) / PRODUCTS_PER_PAGE));
 
   return (
-    <div className="@container min-h-[60vh] w-full">
+    <div className="@container relative min-h-[60vh] w-full">
       {/* Breadcrumb */}
-      <div className="border-b px-4 py-4 @sm:px-6">
+      <div className="relative px-4 py-4 @sm:px-6">
+        <GradientBorder position="top" />
         <Breadcrumb>
           <BreadcrumbList>
             <BreadcrumbItem>
@@ -134,6 +136,7 @@ export async function ProductsTemplate({
             )}
           </BreadcrumbList>
         </Breadcrumb>
+        <GradientBorder position="bottom" />
       </div>
 
       {/* Client component for interactive sorting and loading more */}
@@ -151,7 +154,8 @@ export async function ProductsTemplate({
 
       {/* Pagination */}
       {totalPages > 1 && (
-        <div className="border-t px-4 py-6 @sm:px-6">
+        <div className="relative px-4 py-3 @sm:px-6">
+          <GradientBorder position="top" />
           <Pagination aria-label="Pagination Navigation">
             <PaginationContent>
               {page > 1 && (

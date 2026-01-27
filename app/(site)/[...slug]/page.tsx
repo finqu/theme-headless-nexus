@@ -36,8 +36,18 @@ export default async function DynamicPage({ params, searchParams }: PageProps) {
   // Get locale and original path from middleware headers
   const [locale, path] = await Promise.all([getLocale(), getPathname()]);
 
+  // Extract variant query parameter and append to path for resource lookup
+  const resolvedSearchParams = searchParams ? await searchParams : undefined;
+  const variantParam = resolvedSearchParams?.v;
+  const pathWithVariant =
+    variantParam && typeof variantParam === 'string'
+      ? `${slug}?v=${variantParam}`
+      : variantParam && Array.isArray(variantParam) && variantParam[0]
+      ? `${slug}?v=${variantParam[0]}`
+      : slug;
+
   // Resolve path to resource type, ID, and alternates
-  const resource = await getResourceByPath(slug, locale);
+  const resource = await getResourceByPath(pathWithVariant, locale);
 
   // Handle not found or failed resolution
   if (!resource || resource.type === 'NOT_FOUND') {
@@ -74,7 +84,6 @@ export default async function DynamicPage({ params, searchParams }: PageProps) {
   // Or templatable resource without custom template yet
   // Parse ID to number if present (API returns IDs as strings, SDK expects numbers)
   const numericId = resource.id ? parseInt(resource.id, 10) : undefined;
-  const resolvedSearchParams = searchParams ? await searchParams : undefined;
 
   return (
     <SiteLayout locale={locale} alternates={resource.alternates}>

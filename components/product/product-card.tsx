@@ -60,7 +60,7 @@ export function ProductCard({ product, currency = 'EUR' }: ProductCardProps) {
   }, [product.optionsWithValues, product.combinedListing?.optionsWithValues]);
 
   return (
-    <div className="relative">
+    <>
       {/* Breadcrumb */}
       <div className="relative px-4 py-4 sm:px-6">
         <GradientBorder position="top" />
@@ -71,7 +71,7 @@ export function ProductCard({ product, currency = 'EUR' }: ProductCardProps) {
       {/* Main Product Section */}
       <div className="h-full lg:grid lg:grid-cols-2 lg:items-start">
         {/* Gallery */}
-        <div className="max-h-[70vh] overflow-hidden lg:sticky lg:top-4 lg:h-full lg:max-h-none">
+        <div className="max-h-[70vh] w-full lg:sticky lg:top-4 lg:h-full lg:max-h-none">
           <ProductGallery images={images} productTitle={product.title ?? undefined} />
         </div>
 
@@ -101,6 +101,6 @@ export function ProductCard({ product, currency = 'EUR' }: ProductCardProps) {
           <ProductDetails product={product} />
         </div>
       </div>
-    </div>
+    </>
   );
 }

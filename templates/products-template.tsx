@@ -61,7 +61,7 @@ export async function ProductsTemplate({
   categoryTitle,
   searchParams,
 }: ProductsTemplateProps) {
-  // Fetch initial products
+  // Fetch products for the requested page
   let productList: Product[] = [];
   let totalCount = 0;
   let hasNextPage = false;
@@ -71,20 +71,34 @@ export async function ProductsTemplate({
     ? parseInt(currentPageParam[0] ?? '1', 10)
     : parseInt((currentPageParam as string) ?? '1', 10);
   const page = Number.isNaN(currentPage) || currentPage < 1 ? 1 : currentPage;
-  // Note: SDK uses cursor-based pagination, not offset
-  // For offset, we'd need a custom query
-  void page;
 
   try {
-    const result = await getCatalogProducts(storefrontClient, {
-      first: PRODUCTS_PER_PAGE,
-      query: categoryHandle ? `productGroup:${categoryHandle}` : undefined,
-    });
+    // SDK uses cursor-based pagination, so we need to iterate through pages
+    // to reach the requested page number
+    let cursor: string | undefined;
+    let currentPageProducts: Product[] = [];
 
-    productList = (result.catalog.products.nodes ?? []) as Product[];
-    hasNextPage = result.catalog.products.pageInfo?.hasNextPage ?? false;
-    endCursor = result.catalog.products.pageInfo?.endCursor ?? undefined;
-    totalCount = result.catalog.products.totalCount ?? productList.length;
+    for (let i = 1; i <= page; i++) {
+      const result = await getCatalogProducts(storefrontClient, {
+        first: PRODUCTS_PER_PAGE,
+        after: cursor,
+        query: categoryHandle ? `productGroup:${categoryHandle}` : undefined,
+      });
+
+      currentPageProducts = (result.catalog.products.nodes ?? []) as Product[];
+      hasNextPage = result.catalog.products.pageInfo?.hasNextPage ?? false;
+      endCursor = result.catalog.products.pageInfo?.endCursor ?? undefined;
+      totalCount = result.catalog.products.totalCount ?? currentPageProducts.length;
+      cursor = endCursor;
+
+      // If there's no next page and we haven't reached the requested page,
+      // use the last available page's products
+      if (!hasNextPage && i < page) {
+        break;
+      }
+    }
+
+    productList = currentPageProducts;
   } catch (error) {
     console.error('Failed to fetch products:', error);
   }

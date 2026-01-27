@@ -8,9 +8,15 @@ const nextConfig: NextConfig = {
       {
         protocol: 'https',
         hostname: '**.finqu.dev',
-        port: '',
-        search: '',
       },
+      {
+        protocol: 'https',
+        hostname: '**.finqu.com',
+      },
+      {
+        protocol: 'https',
+        hostname: 'images.unsplash.com',
+      }
     ],
   }
 };

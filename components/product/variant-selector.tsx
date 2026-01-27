@@ -32,7 +32,6 @@ interface OptionSelectorProps {
 }
 
 function OptionSelector({ option }: OptionSelectorProps) {
-  console.log(option);
   // Filter to only include option values that have a variant with a URL
   const optionValues = (option.values ?? []).filter(
     (value): value is ProductOptionValue => !!value?.variant?.url

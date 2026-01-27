@@ -17,13 +17,11 @@ interface ProductCardProps {
 
 export function ProductCard({ product, currency = 'EUR' }: ProductCardProps) {
   const { routes } = useStore();
-  console.log(product);
   // Use the default/selected variant for display
   const selectedVariant = product.defaultOrSelectedVariant;
 
   // Use product images directly
   const images = useMemo(() => {
-    console.log(product.images);
     return (product.images ?? [])
       .filter((img) => img?.url)
       .map((img) => ({ url: img.url!, alt: img.alt }));

@@ -1,13 +1,14 @@
 'use client';
 
-import { useState, useMemo } from 'react';
-import type { Product, ProductVariant } from '@finqu/storefront-types';
+import { useMemo } from 'react';
+import type { Product } from '@finqu/storefront-types';
 import { ProductGallery } from './product-gallery';
 import { ProductInfo, ProductDetails } from './product-info';
 import { VariantSelector } from './variant-selector';
 import { AddToCart } from './add-to-cart';
 import { ProductBreadcrumb } from './product-breadcrumb';
-import { Separator } from '@/components/ui/separator';
+import { GradientBorder } from '../shared';
+import { useStore } from '@/lib/context-providers/store-context';
 
 interface ProductCardProps {
   product: Product;
@@ -15,79 +16,23 @@ interface ProductCardProps {
 }
 
 export function ProductCard({ product, currency = 'EUR' }: ProductCardProps) {
-  // Get initial variant - prefer default variant or first available
-  const initialVariant = useMemo(() => {
-    const defaultVariant = product.defaultOrSelectedVariant;
-    if (defaultVariant?.id) {
-      return defaultVariant;
-    }
-    // Fallback to first variant
-    return product.variants?.[0];
-  }, [product]);
+  const { routes } = useStore();
+  console.log(product);
+  // Use the default/selected variant for display
+  const selectedVariant = product.defaultOrSelectedVariant;
 
-  const [selectedVariantId, setSelectedVariantId] = useState<number | undefined>(() => {
-    const id = initialVariant?.id;
-    return id ? parseInt(id, 10) : undefined;
-  });
-
-  // Find the currently selected variant
-  const selectedVariant = useMemo(() => {
-    if (selectedVariantId == null || !product.variants) {
-      return initialVariant;
-    }
-    return (
-      product.variants.find((v) => v.id && parseInt(v.id, 10) === selectedVariantId) ||
-      initialVariant
-    );
-  }, [selectedVariantId, product.variants, initialVariant]);
-
-  // Collect all product images from variants
+  // Use product images directly
   const images = useMemo(() => {
-    const imgs: { url: string; alt?: string | null }[] = [];
-
-    // Add selected variant image first
-    if (selectedVariant?.image?.url) {
-      imgs.push({ url: selectedVariant.image.url, alt: selectedVariant.image.alt });
-    }
-
-    // Add featured image
-    if (selectedVariant?.featuredImage?.url) {
-      const exists = imgs.some((img) => img.url === selectedVariant.featuredImage?.url);
-      if (!exists) {
-        imgs.push({
-          url: selectedVariant.featuredImage.url,
-          alt: selectedVariant.featuredImage.alt,
-        });
-      }
-    }
-
-    // Add variant images from all variants
-    if (product.variants) {
-      for (const variant of product.variants) {
-        if (variant?.image?.url) {
-          const exists = imgs.some((i) => i.url === variant.image?.url);
-          if (!exists) {
-            imgs.push({ url: variant.image.url, alt: variant.image.alt });
-          }
-        }
-        if (variant?.featuredImage?.url) {
-          const exists = imgs.some((i) => i.url === variant.featuredImage?.url);
-          if (!exists) {
-            imgs.push({ url: variant.featuredImage.url, alt: variant.featuredImage.alt });
-          }
-        }
-      }
-    }
-
-    return imgs;
-  }, [product, selectedVariant]);
+    console.log(product.images);
+    return (product.images ?? [])
+      .filter((img) => img?.url)
+      .map((img) => ({ url: img.url!, alt: img.alt }));
+  }, [product.images]);
 
   // Build breadcrumb items from product categories
   const breadcrumbItems = useMemo(() => {
     const items: { label: string; href?: string }[] = [];
-
-    // Add "Products" as base
-    items.push({ label: 'Products', href: '/products' });
+    const catalogUrl = routes?.catalogUrl;
 
     // Add category if available
     if (product.productGroups && product.productGroups.length > 0) {
@@ -95,63 +40,65 @@ export function ProductCard({ product, currency = 'EUR' }: ProductCardProps) {
       if (category?.title && category?.handle) {
         items.push({
           label: category.title,
-          href: `/collections/${category.handle}`,
+          href: category.url!,
         });
       }
+    } else if (catalogUrl) {
+      items.push({ label: 'Products', href: catalogUrl });
     }
 
     return items;
-  }, [product.productGroups]);
+  }, [product.productGroups, routes]);
 
-  const variants = product.variants ?? [];
   const isAvailable = selectedVariant?.isAvailable ?? product.isAvailable ?? true;
 
+  // Merge regular options and combinedListing options (combinedListing first)
+  const allOptions = useMemo(() => {
+    const regularOptions = product.optionsWithValues ?? [];
+    const combinedOptions = product.combinedListing?.optionsWithValues ?? [];
+    return [...combinedOptions, ...regularOptions];
+  }, [product.optionsWithValues, product.combinedListing?.optionsWithValues]);
+
   return (
-    <div className="bg-white">
-      <div className="">
-        {/* Breadcrumb */}
-        <div className="border-b px-4 py-4 sm:px-6">
-          <ProductBreadcrumb items={breadcrumbItems} currentPage={product.title || 'Product'} />
+    <div className="relative">
+      {/* Breadcrumb */}
+      <div className="relative px-4 py-4 sm:px-6">
+        <GradientBorder position="top" />
+        <ProductBreadcrumb items={breadcrumbItems} currentPage={product.title || 'Product'} />
+        <GradientBorder position="bottom" />
+      </div>
+
+      {/* Main Product Section */}
+      <div className="h-full lg:grid lg:grid-cols-2 lg:items-start">
+        {/* Gallery */}
+        <div className="max-h-[70vh] overflow-hidden lg:sticky lg:top-4 lg:h-full lg:max-h-none">
+          <ProductGallery images={images} productTitle={product.title ?? undefined} />
         </div>
 
-        {/* Main Product Section */}
-        <div className="lg:grid lg:grid-cols-2 lg:items-start">
-          {/* Gallery */}
-          <div className="px-4 py-8 sm:px-6 lg:sticky lg:top-4">
-            <ProductGallery images={images} productTitle={product.title ?? undefined} />
-          </div>
+        {/* Product Info */}
+        <div className="h-full border-l bg-white">
+          <ProductInfo
+            product={product}
+            selectedVariant={selectedVariant ?? undefined}
+            currency={currency}
+          />
 
-          {/* Product Info */}
-          <div className="mt-10 border-l px-4 py-8 sm:px-6 lg:mt-0">
-            <ProductInfo product={product} selectedVariant={selectedVariant} currency={currency} />
+          {/* Variant Selector - renders options that link to variant URLs */}
+          {allOptions.length > 0 && (
+            <div className="border-t">
+              <VariantSelector options={allOptions} />
+            </div>
+          )}
 
-            <Separator className="my-6" />
+          {/* Add to Cart */}
+          <AddToCart
+            className="border-t p-4 sm:p-6"
+            productId={product.defaultOrSelectedVariant!.productId}
+            isAvailable={isAvailable}
+          />
 
-            {/* Variant Selector */}
-            {variants.length > 1 && (
-              <div className="mb-6">
-                <VariantSelector
-                  variants={variants}
-                  options={product.optionsWithValues ?? undefined}
-                  selectedVariantId={selectedVariantId}
-                  onVariantChange={setSelectedVariantId}
-                />
-              </div>
-            )}
-
-            {/* Add to Cart */}
-            <AddToCart
-              productId={
-                selectedVariant?.productId ? parseInt(selectedVariant.productId, 10) : undefined
-              }
-              isAvailable={isAvailable}
-            />
-
-            <Separator className="my-8" />
-
-            {/* Product Details (Description, Specs, Shipping) */}
-            <ProductDetails product={product} />
-          </div>
+          {/* Product Details (Description, Specs, Shipping) */}
+          <ProductDetails product={product} />
         </div>
       </div>
     </div>

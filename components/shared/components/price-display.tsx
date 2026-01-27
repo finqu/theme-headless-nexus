@@ -38,9 +38,8 @@ export function PriceDisplay({
   if (price == null) return null;
 
   const onSale = isOnSale(originalPrice, price);
-  const discountPercent = onSale && originalPrice
-    ? calculateDiscountPercent(originalPrice, price)
-    : 0;
+  const discountPercent =
+    onSale && originalPrice ? calculateDiscountPercent(originalPrice, price) : 0;
 
   return (
     <div className={cn('flex items-baseline gap-3', className)}>
@@ -49,7 +48,7 @@ export function PriceDisplay({
           Sale {discountPercent}% off
         </Badge>
       )}
-      <div className="flex items-baseline gap-3">
+      <div className="flex items-baseline gap-3 font-mono">
         <span
           className={cn(
             'font-semibold',
@@ -60,7 +59,9 @@ export function PriceDisplay({
           {formatPrice(price, currency)}
         </span>
         {onSale && originalPrice && (
-          <span className={cn('text-gray-500 line-through', size === 'lg' ? 'text-lg' : 'text-base')}>
+          <span
+            className={cn('text-gray-500 line-through', size === 'lg' ? 'text-lg' : 'text-base')}
+          >
             {formatPrice(originalPrice, currency)}
           </span>
         )}

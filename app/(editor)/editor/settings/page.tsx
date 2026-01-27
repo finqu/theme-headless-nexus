@@ -99,7 +99,7 @@ export default function SettingsEditorPage() {
 
       {message && (
         <div
-          className={`mb-6 rounded-md p-4 ${
+          className={`mb-6 rounded-sm p-4 ${
             message.type === 'success'
               ? 'border border-green-200 bg-green-50 text-green-800'
               : 'border border-red-200 bg-red-50 text-red-800'
@@ -124,7 +124,7 @@ export default function SettingsEditorPage() {
                   navbar: { ...settings.navbar, menuHandle: e.target.value },
                 })
               }
-              className="border-input bg-background w-full rounded-md border px-3 py-2 text-sm"
+              className="border-input bg-background w-full rounded-sm border px-3 py-2 text-sm"
             >
               <option value="">Select a menu...</option>
               {menus.map((menu) => (
@@ -153,7 +153,7 @@ export default function SettingsEditorPage() {
                   footer: { ...settings.footer, menuHandle: e.target.value },
                 })
               }
-              className="border-input bg-background w-full rounded-md border px-3 py-2 text-sm"
+              className="border-input bg-background w-full rounded-sm border px-3 py-2 text-sm"
             >
               <option value="">Select a menu...</option>
               {menus.map((menu) => (

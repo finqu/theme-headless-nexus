@@ -19,11 +19,11 @@ export function CartIcon({ className, showLabel }: CartIconProps) {
     <Button
       variant="ghost"
       size={showLabel ? 'default' : 'icon'}
-      className={cn('relative', className)}
+      className={cn('relative h-full cursor-pointer', className)}
       onClick={openCart}
       aria-label={`Cart with ${itemCount} items`}
     >
-      <ShoppingBag className="h-5 w-5" />
+      <ShoppingBag className="h-5 w-5" strokeWidth={1.5} />
       {showLabel && <span className="ml-2">Cart</span>}
       {!isLoading && itemCount > 0 && (
         <Badge

@@ -126,7 +126,7 @@ export function SearchModal({ open, onOpenChange, searchPageUrl = '/search' }: S
             <div className="space-y-4">
               {[1, 2, 3].map((i) => (
                 <div key={i} className="flex gap-4">
-                  <Skeleton className="h-16 w-16 flex-shrink-0 rounded" />
+                  <Skeleton className="h-16 w-16 flex-shrink-0 rounded-sm" />
                   <div className="flex-1 space-y-2">
                     <Skeleton className="h-4 w-3/4" />
                     <Skeleton className="h-4 w-1/4" />
@@ -165,7 +165,7 @@ export function SearchModal({ open, onOpenChange, searchPageUrl = '/search' }: S
                       onClick={handleProductClick}
                       className="flex gap-4 rounded-lg p-2 transition-colors hover:bg-gray-50"
                     >
-                      <div className="relative h-16 w-16 flex-shrink-0 overflow-hidden rounded bg-gray-100">
+                      <div className="relative h-16 w-16 flex-shrink-0 overflow-hidden rounded-sm bg-gray-100">
                         {imageUrl ? (
                           <Image
                             src={imageUrl}

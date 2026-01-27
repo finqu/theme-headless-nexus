@@ -38,7 +38,7 @@ export function CartLineItem({
       )}
     >
       {/* Product Image */}
-      <div className="relative h-24 w-20 flex-shrink-0 overflow-hidden rounded-md border border-gray-200 bg-gray-50">
+      <div className="relative h-24 w-20 flex-shrink-0 overflow-hidden rounded-sm border border-gray-200 bg-gray-50">
         {item.image ? (
           <Image
             src={item.image}
@@ -112,7 +112,7 @@ export function CartLineItem({
 export function CartLineItemSkeleton() {
   return (
     <div className="flex gap-4 py-4">
-      <Skeleton className="h-24 w-20 flex-shrink-0 rounded-md" />
+      <Skeleton className="h-24 w-20 flex-shrink-0 rounded-sm" />
       <div className="flex flex-1 flex-col justify-between">
         <div>
           <Skeleton className="h-4 w-32" />

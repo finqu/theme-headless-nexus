@@ -3,6 +3,7 @@ import type { Menu, Link as MenuLink } from '@finqu/storefront-types';
 import type { StoreData } from '@/lib/context-providers/store-context';
 import { NewsletterForm } from './newsletter-form';
 import { LocaleSwitcher } from './locale-switcher';
+import { GradientBorder } from '../shared';
 
 interface FooterProps {
   menu: Menu | null;
@@ -44,7 +45,8 @@ export function Footer({
   const columns = distributeToColumns(menuLinks, 3);
 
   return (
-    <footer className="bg-background border-t">
+    <footer className="bg-background relative">
+      <GradientBorder position="top" />
       <div className="px-4 sm:px-6">
         <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-5 lg:divide-x">
           {/* Left section: Logo, tagline, newsletter */}

@@ -10,16 +10,27 @@ import {
 } from '@/components/product/product-grid';
 import { fetchProducts, getProductImageUrl } from './shared';
 import { useLocaleOptional } from '@/lib/context-providers/locale-context';
+import { Button } from '@/components/ui/button';
 
 /**
  * Props for the ProductGrid Puck component.
  * Stores product IDs for persistence; full products are kept for preview in editor.
  */
-interface ProductGridProps extends Omit<ProductGridViewProps, 'products'> {
+interface ProductGridProps extends Omit<ProductGridViewProps, 'products' | 'headerLink'> {
   /** Product IDs stored in Puck data (lightweight) */
   selectedProductIds?: number[];
   /** Full product objects for editor preview (populated by field) */
   selectedProducts?: Product[];
+  /** Header link href (for editor) */
+  headerLinkHref?: string;
+  /** Header link label (for editor) */
+  headerLinkLabel?: string;
+  /** Show gradient border at the top */
+  gradientBorderTop?: boolean;
+  /** Show gradient border after the header */
+  gradientBorderAfterHeader?: boolean;
+  /** Show gradient border at the bottom */
+  gradientBorderBottom?: boolean;
 }
 
 /**
@@ -92,16 +103,16 @@ function ProductPickerField({
               return (
                 <div
                   key={product.id}
-                  className="flex items-center gap-2 rounded-md border bg-white p-2"
+                  className="flex items-center gap-2 rounded-sm border bg-white p-2"
                 >
                   {imageUrl ? (
                     <img
                       src={imageUrl}
                       alt={product.title || ''}
-                      className="h-10 w-10 rounded object-cover"
+                      className="h-10 w-10 rounded-sm object-cover"
                     />
                   ) : (
-                    <div className="flex h-10 w-10 items-center justify-center rounded bg-gray-100">
+                    <div className="flex h-10 w-10 items-center justify-center rounded-sm bg-gray-100">
                       <span className="text-xs text-gray-400">No img</span>
                     </div>
                   )}
@@ -111,7 +122,7 @@ function ProductPickerField({
                   <button
                     type="button"
                     onClick={() => removeProduct(product.id)}
-                    className="rounded p-1 text-gray-400 hover:bg-red-50 hover:text-red-500"
+                    className="rounded-sm p-1 text-gray-400 hover:bg-red-50 hover:text-red-500"
                     title="Remove"
                   >
                     <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -134,7 +145,7 @@ function ProductPickerField({
       <button
         type="button"
         onClick={() => setIsOpen(true)}
-        className="flex w-full items-center justify-center gap-2 rounded-md border-2 border-dashed border-gray-300 px-4 py-3 text-sm text-gray-600 hover:border-gray-400 hover:text-gray-700"
+        className="flex w-full items-center justify-center gap-2 rounded-sm border-2 border-dashed border-gray-300 px-4 py-3 text-sm text-gray-600 hover:border-gray-400 hover:text-gray-700"
       >
         <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path
@@ -157,7 +168,7 @@ function ProductPickerField({
               <button
                 type="button"
                 onClick={() => setIsOpen(false)}
-                className="rounded p-1 hover:bg-gray-100"
+                className="rounded-sm p-1 hover:bg-gray-100"
                 title="Close"
               >
                 <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -178,7 +189,7 @@ function ProductPickerField({
                 placeholder="Search products..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full rounded-md border px-3 py-2 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus:outline-none"
+                className="w-full rounded-sm border px-3 py-2 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus:outline-none"
               />
             </div>
 
@@ -231,19 +242,17 @@ function ProductPickerField({
                           )}
 
                           {/* Add/Remove Button */}
-                          <button
+                          <Button
                             type="button"
+                            variant="secondary"
+                            size="sm"
                             onClick={() =>
                               isSelected ? removeProduct(product.id) : addProduct(product)
                             }
-                            className={`mt-2 w-full rounded-md px-3 py-1.5 text-sm font-medium transition-colors ${
-                              isSelected
-                                ? 'bg-red-100 text-red-700 hover:bg-red-200'
-                                : 'bg-blue-500 text-white hover:bg-blue-600'
-                            }`}
+                            className="mt-2 w-full"
                           >
                             {isSelected ? 'Remove' : 'Add'}
-                          </button>
+                          </Button>
                         </div>
                       </div>
                     );
@@ -257,13 +266,9 @@ function ProductPickerField({
               <span className="text-sm text-gray-500">
                 {selectedProducts.length} product{selectedProducts.length !== 1 ? 's' : ''} selected
               </span>
-              <button
-                type="button"
-                onClick={() => setIsOpen(false)}
-                className="rounded-md bg-blue-500 px-4 py-2 text-sm font-medium text-white hover:bg-blue-600"
-              >
+              <Button type="button" variant="default" onClick={() => setIsOpen(false)}>
                 Done
-              </button>
+              </Button>
             </div>
           </div>
         </div>
@@ -281,6 +286,14 @@ export const config: ComponentConfig<ProductGridProps> = {
     title: {
       type: 'text',
       label: 'Section Title',
+    },
+    headerLinkHref: {
+      type: 'text',
+      label: 'Header Link URL (optional)',
+    },
+    headerLinkLabel: {
+      type: 'text',
+      label: 'Header Link Label (optional)',
     },
     selectedProducts: {
       type: 'custom',
@@ -314,10 +327,37 @@ export const config: ComponentConfig<ProductGridProps> = {
         { label: 'No', value: false },
       ],
     },
+    gradientBorderTop: {
+      type: 'radio',
+      label: 'Gradient Border Top',
+      options: [
+        { label: 'Yes', value: true },
+        { label: 'No', value: false },
+      ],
+    },
+    gradientBorderAfterHeader: {
+      type: 'radio',
+      label: 'Gradient Border After Header',
+      options: [
+        { label: 'Yes', value: true },
+        { label: 'No', value: false },
+      ],
+    },
+    gradientBorderBottom: {
+      type: 'radio',
+      label: 'Gradient Border Bottom',
+      options: [
+        { label: 'Yes', value: true },
+        { label: 'No', value: false },
+      ],
+    },
   },
   defaultProps: {
     ...productGridDefaultProps,
     selectedProductIds: [],
+    gradientBorderTop: false,
+    gradientBorderAfterHeader: false,
+    gradientBorderBottom: false,
   },
   // Extract product IDs for lightweight persistence while keeping full products for preview
   resolveData: async ({ props }) => {
@@ -334,13 +374,32 @@ export const config: ComponentConfig<ProductGridProps> = {
       },
     };
   },
-  render: ({ title, selectedProducts, columns, showPrice, showDescription }) => (
+  render: ({
+    title,
+    headerLinkHref,
+    headerLinkLabel,
+    selectedProducts,
+    columns,
+    showPrice,
+    showDescription,
+    gradientBorderTop,
+    gradientBorderAfterHeader,
+    gradientBorderBottom,
+  }) => (
     <ProductGrid
       title={title}
+      headerLink={
+        headerLinkHref && headerLinkLabel
+          ? { href: headerLinkHref, label: headerLinkLabel }
+          : undefined
+      }
       products={selectedProducts}
       columns={columns}
       showPrice={showPrice}
       showDescription={showDescription}
+      gradientBorderTop={gradientBorderTop}
+      gradientBorderAfterHeader={gradientBorderAfterHeader}
+      gradientBorderBottom={gradientBorderBottom}
     />
   ),
 };

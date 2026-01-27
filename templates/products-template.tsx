@@ -92,10 +92,10 @@ export async function ProductsTemplate({
   const totalPages = Math.max(1, Math.ceil((totalCount ?? 0) / PRODUCTS_PER_PAGE));
 
   return (
-    <div className="min-h-[60vh] py-8">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        {/* Breadcrumb */}
-        <Breadcrumb className="mb-6">
+    <div className="@container min-h-[60vh] w-full">
+      {/* Breadcrumb */}
+      <div className="border-b px-4 py-4 @sm:px-6">
+        <Breadcrumb>
           <BreadcrumbList>
             <BreadcrumbItem>
               <BreadcrumbLink asChild>
@@ -134,76 +134,76 @@ export async function ProductsTemplate({
             )}
           </BreadcrumbList>
         </Breadcrumb>
+      </div>
 
-        {/* Client component for interactive sorting and loading more */}
-        <ProductsCatalogClient
-          initialProducts={productList}
-          totalCount={totalCount}
-          hasNextPage={hasNextPage}
-          endCursor={endCursor}
-          sortOptions={SORT_OPTIONS}
-          pageTitle={pageTitle}
-          categoryHandle={categoryHandle}
-          productsPerPage={PRODUCTS_PER_PAGE}
-          locale={locale}
-        />
+      {/* Client component for interactive sorting and loading more */}
+      <ProductsCatalogClient
+        initialProducts={productList}
+        totalCount={totalCount}
+        hasNextPage={hasNextPage}
+        endCursor={endCursor}
+        sortOptions={SORT_OPTIONS}
+        pageTitle={pageTitle}
+        categoryHandle={categoryHandle}
+        productsPerPage={PRODUCTS_PER_PAGE}
+        locale={locale}
+      />
 
-        {/* Pagination */}
-        {totalPages > 1 && (
-          <div className="mt-12">
-            <Pagination aria-label="Pagination Navigation">
-              <PaginationContent>
-                {page > 1 && (
-                  <PaginationItem>
-                    <PaginationPrevious href={`?page=${page - 1}`} />
-                  </PaginationItem>
-                )}
+      {/* Pagination */}
+      {totalPages > 1 && (
+        <div className="border-t px-4 py-6 @sm:px-6">
+          <Pagination aria-label="Pagination Navigation">
+            <PaginationContent>
+              {page > 1 && (
+                <PaginationItem>
+                  <PaginationPrevious href={`?page=${page - 1}`} />
+                </PaginationItem>
+              )}
 
-                {/* Page numbers with ellipsis */}
-                {(() => {
-                  const pages: number[] = [];
-                  const add = (n: number) => {
-                    if (n >= 1 && n <= totalPages && !pages.includes(n)) pages.push(n);
-                  };
-                  add(1);
-                  add(page - 1);
-                  add(page);
-                  add(page + 1);
-                  add(totalPages);
-                  pages.sort((a, b) => a - b);
+              {/* Page numbers with ellipsis */}
+              {(() => {
+                const pages: number[] = [];
+                const add = (n: number) => {
+                  if (n >= 1 && n <= totalPages && !pages.includes(n)) pages.push(n);
+                };
+                add(1);
+                add(page - 1);
+                add(page);
+                add(page + 1);
+                add(totalPages);
+                pages.sort((a, b) => a - b);
 
-                  const items: React.ReactNode[] = [];
-                  for (let i = 0; i < pages.length; i++) {
-                    const n = pages[i];
-                    const prev = pages[i - 1];
-                    if (prev && n - prev > 1) {
-                      items.push(
-                        <PaginationItem key={`ellipsis-${prev}-${n}`}>
-                          <PaginationEllipsis />
-                        </PaginationItem>
-                      );
-                    }
+                const items: React.ReactNode[] = [];
+                for (let i = 0; i < pages.length; i++) {
+                  const n = pages[i];
+                  const prev = pages[i - 1];
+                  if (prev && n - prev > 1) {
                     items.push(
-                      <PaginationItem key={`page-${n}`}>
-                        <PaginationLink href={`?page=${n}`} isActive={n === page}>
-                          {n}
-                        </PaginationLink>
+                      <PaginationItem key={`ellipsis-${prev}-${n}`}>
+                        <PaginationEllipsis />
                       </PaginationItem>
                     );
                   }
-                  return items;
-                })()}
+                  items.push(
+                    <PaginationItem key={`page-${n}`}>
+                      <PaginationLink href={`?page=${n}`} isActive={n === page}>
+                        {n}
+                      </PaginationLink>
+                    </PaginationItem>
+                  );
+                }
+                return items;
+              })()}
 
-                {page < totalPages && (
-                  <PaginationItem>
-                    <PaginationNext href={`?page=${page + 1}`} />
-                  </PaginationItem>
-                )}
-              </PaginationContent>
-            </Pagination>
-          </div>
-        )}
-      </div>
+              {page < totalPages && (
+                <PaginationItem>
+                  <PaginationNext href={`?page=${page + 1}`} />
+                </PaginationItem>
+              )}
+            </PaginationContent>
+          </Pagination>
+        </div>
+      )}
     </div>
   );
 }

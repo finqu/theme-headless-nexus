@@ -105,9 +105,7 @@ export function EditorHeader({
                   disabled
                   className="text-xs focus:bg-zinc-800 focus:text-white"
                 >
-                  <span className="flex items-center gap-2 text-zinc-500">
-                    No pages available
-                  </span>
+                  <span className="flex items-center gap-2 text-zinc-500">No pages available</span>
                 </SelectItem>
               ) : (
                 pages.map((page) => (
@@ -146,14 +144,14 @@ export function EditorHeader({
 
         {/* Override indicator */}
         {mode === 'template' && slug && hasOverride && (
-          <span className="rounded bg-blue-600 px-2 py-0.5 text-xs font-medium">
+          <span className="rounded-sm bg-blue-600 px-2 py-0.5 text-xs font-medium">
             Override: {slug}
           </span>
         )}
 
         {/* Inheritance indicator */}
         {mode === 'template' && isInherited && (
-          <span className="rounded bg-zinc-700 px-2 py-0.5 text-xs">Using default</span>
+          <span className="rounded-sm bg-zinc-700 px-2 py-0.5 text-xs">Using default</span>
         )}
 
         {/* Settings dialog */}
@@ -181,7 +179,7 @@ export function EditorHeader({
 
         {/* Unpublished changes badge */}
         {hasUnpublishedChanges && (
-          <span className="inline-flex items-center rounded-md bg-yellow-400/10 px-2 py-1 text-xs font-medium text-yellow-500 inset-ring inset-ring-yellow-400/20">
+          <span className="inline-flex items-center rounded-sm bg-yellow-400/10 px-2 py-1 text-xs font-medium text-yellow-500 inset-ring inset-ring-yellow-400/20">
             Unpublished changes
           </span>
         )}

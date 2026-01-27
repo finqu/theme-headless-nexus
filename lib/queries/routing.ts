@@ -47,6 +47,7 @@ export const STORE_ROUTES_QUERY = /* GraphQL */ `
     routes {
       rootUrl
       cartUrl
+      catalogUrl
       accountUrl
       accountEditUrl
       accountLoginUrl

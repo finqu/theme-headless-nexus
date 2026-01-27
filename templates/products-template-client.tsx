@@ -105,40 +105,46 @@ export function ProductsCatalogClient({
   return (
     <>
       {/* Header with title and sort */}
-      <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <h1 className="text-2xl font-bold tracking-tight text-gray-900 sm:text-3xl">
-            {pageTitle}
-          </h1>
-          <p className="mt-1 text-sm text-gray-500">
-            {totalCount} {totalCount === 1 ? 'product' : 'products'}
-          </p>
-        </div>
-        <div className="flex items-center gap-2">
-          <label htmlFor="sort" className="text-sm font-medium text-gray-700">
-            Sort by
-          </label>
-          <Select value={sortValue} onValueChange={handleSortChange}>
-            <SelectTrigger id="sort" className="w-[180px]">
-              <SelectValue placeholder="Sort by" />
-            </SelectTrigger>
-            <SelectContent>
-              {sortOptions.map((option) => (
-                <SelectItem key={option.value} value={option.value}>
-                  {option.label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+      <div className="border-b px-4 py-6 @sm:px-6">
+        <div className="flex flex-col gap-4 @sm:flex-row @sm:items-center @sm:justify-between">
+          <div>
+            <h1 className="text-2xl font-bold tracking-tight text-gray-900 @sm:text-3xl">
+              {pageTitle}
+            </h1>
+            <p className="mt-1 text-sm text-gray-500">
+              {totalCount} {totalCount === 1 ? 'product' : 'products'}
+            </p>
+          </div>
+          <div className="flex items-center gap-2">
+            <label htmlFor="sort" className="text-sm font-medium text-gray-700">
+              Sort by
+            </label>
+            <Select value={sortValue} onValueChange={handleSortChange}>
+              <SelectTrigger id="sort" className="w-[180px]">
+                <SelectValue placeholder="Sort by" />
+              </SelectTrigger>
+              <SelectContent>
+                {sortOptions.map((option) => (
+                  <SelectItem key={option.value} value={option.value}>
+                    {option.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
         </div>
       </div>
 
       {/* Products grid */}
       {isLoading ? (
-        <ProductGridSkeleton count={productsPerPage} />
+        <div className="border-b">
+          <ProductGridSkeleton count={productsPerPage} />
+        </div>
       ) : products.length === 0 ? (
-        <div className="rounded-lg border-2 border-dashed border-gray-300 p-12 text-center">
-          <p className="text-gray-500">No products found.</p>
+        <div className="border-b p-12">
+          <div className="rounded-lg border-2 border-dashed border-gray-300 p-12 text-center">
+            <p className="text-gray-500">No products found.</p>
+          </div>
         </div>
       ) : (
         <ProductGrid products={products} columns={4} showPrice showDescription={false} />

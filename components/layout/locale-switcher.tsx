@@ -70,7 +70,7 @@ export function LocaleSwitcher({ locales, isEditing = false }: LocaleSwitcherPro
         value={normalizedCurrentLocale}
         onChange={(e) => handleLocaleChange(e.target.value)}
         disabled={isEditing}
-        className="text-muted-foreground border-muted-foreground/20 hover:border-muted-foreground/40 cursor-pointer rounded border bg-transparent px-2 py-1 text-sm transition-colors disabled:cursor-not-allowed disabled:opacity-50"
+        className="text-muted-foreground border-muted-foreground/20 hover:border-muted-foreground/40 cursor-pointer rounded-sm border bg-transparent px-2 py-1 text-sm transition-colors disabled:cursor-not-allowed disabled:opacity-50"
         aria-label="Select language"
       >
         {locales

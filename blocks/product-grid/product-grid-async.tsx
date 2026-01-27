@@ -3,10 +3,17 @@ import { fetchProductsByIds } from './shared';
 
 interface ProductGridAsyncProps {
   title?: string;
+  headerLink?: {
+    href: string;
+    label: string;
+  };
   productIds: number[];
   columns?: ProductGridColumns;
   showPrice?: boolean;
   showDescription?: boolean;
+  gradientBorderTop?: boolean;
+  gradientBorderAfterHeader?: boolean;
+  gradientBorderBottom?: boolean;
 }
 
 /**
@@ -16,20 +23,28 @@ interface ProductGridAsyncProps {
  */
 export async function ProductGridAsync({
   title,
+  headerLink,
   productIds,
   columns,
   showPrice,
   showDescription,
+  gradientBorderTop,
+  gradientBorderAfterHeader,
+  gradientBorderBottom,
 }: ProductGridAsyncProps) {
   const products = await fetchProductsByIds(productIds);
 
   return (
     <ProductGrid
       title={title}
+      headerLink={headerLink}
       products={products}
       columns={columns}
       showPrice={showPrice}
       showDescription={showDescription}
+      gradientBorderTop={gradientBorderTop}
+      gradientBorderAfterHeader={gradientBorderAfterHeader}
+      gradientBorderBottom={gradientBorderBottom}
     />
   );
 }

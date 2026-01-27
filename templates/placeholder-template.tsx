@@ -36,7 +36,7 @@ export function PlaceholderTemplate({
         {showEditorLink && templateType && (
           <a
             href={`/editor?mode=template&type=${templateType}${id ? `&slug=${id}` : ''}`}
-            className="bg-primary text-primary-foreground inline-block rounded-md px-6 py-3 hover:opacity-90"
+            className="bg-primary text-primary-foreground inline-block rounded-sm px-6 py-3 hover:opacity-90"
           >
             Create Template
           </a>
@@ -44,7 +44,7 @@ export function PlaceholderTemplate({
         {showEditorLink && !templateType && type && (
           <a
             href={`/editor?mode=template&type=${type.toLowerCase().replace('_', '-')}${id ? `&slug=${id}` : ''}`}
-            className="bg-primary text-primary-foreground inline-block rounded-md px-6 py-3 hover:opacity-90"
+            className="bg-primary text-primary-foreground inline-block rounded-sm px-6 py-3 hover:opacity-90"
           >
             Create Template
           </a>

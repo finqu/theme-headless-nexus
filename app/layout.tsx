@@ -1,7 +1,12 @@
 import type { Metadata } from 'next';
 import { getLocaleInfo } from '@/lib/locale';
 import { Providers } from './providers';
+import { Outfit, Geist, Geist_Mono } from 'next/font/google';
 import './globals.css';
+
+const outfit = Outfit({ subsets: ['latin'], variable: '--font-outfit' });
+const geistSans = Geist({ subsets: ['latin'], variable: '--font-geist-sans' });
+const geistMono = Geist_Mono({ subsets: ['latin'], variable: '--font-geist-mono' });
 
 export const metadata: Metadata = {
   title: 'theme-headless-horizon',
@@ -13,7 +18,10 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   const { locale, defaultLocale } = await getLocaleInfo();
 
   return (
-    <html lang={locale}>
+    <html
+      lang={locale}
+      className={`${outfit.variable} ${geistSans.variable} ${geistMono.variable}`}
+    >
       <body>
         <Providers locale={locale} defaultLocale={defaultLocale}>
           {children}

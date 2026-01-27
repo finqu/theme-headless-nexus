@@ -55,7 +55,7 @@ export function AddToCart({ productId, isAvailable = true, className }: AddToCar
           size="icon"
           onClick={decreaseQuantity}
           disabled={quantity <= 1 || isLoading}
-          className="rounded-r-none"
+          className="h-10 w-10 rounded-l rounded-r-none"
           aria-label="Decrease quantity"
         >
           <Minus className="h-4 w-4" />
@@ -69,7 +69,7 @@ export function AddToCart({ productId, isAvailable = true, className }: AddToCar
           size="icon"
           onClick={increaseQuantity}
           disabled={isLoading}
-          className="rounded-l-none"
+          className="h-10 w-10 rounded-l-none rounded-r"
           aria-label="Increase quantity"
         >
           <Plus className="h-4 w-4" />

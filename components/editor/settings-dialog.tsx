@@ -99,7 +99,6 @@ export function SettingsDialog() {
         >
           <Settings className="h-4 w-4" />
           Settings
-
         </Button>
       </DialogTrigger>
       <DialogContent className="max-h-[85vh] overflow-y-auto sm:max-w-[550px]">
@@ -112,7 +111,7 @@ export function SettingsDialog() {
 
         {loading ? (
           <div className="flex items-center justify-center py-8">
-            <div className="animate-pulse text-sm text-muted-foreground">Loading settings...</div>
+            <div className="text-muted-foreground animate-pulse text-sm">Loading settings...</div>
           </div>
         ) : !settings ? (
           <div className="py-8 text-center text-sm text-red-500">Failed to load settings</div>
@@ -120,7 +119,7 @@ export function SettingsDialog() {
           <>
             {message && (
               <div
-                className={`rounded-md p-3 text-sm ${
+                className={`rounded-sm p-3 text-sm ${
                   message.type === 'success'
                     ? 'border border-green-200 bg-green-50 text-green-800 dark:border-green-800 dark:bg-green-950 dark:text-green-200'
                     : 'border border-red-200 bg-red-50 text-red-800 dark:border-red-800 dark:bg-red-950 dark:text-red-200'
@@ -139,7 +138,9 @@ export function SettingsDialog() {
               {/* Navigation Tab */}
               <TabsContent value="navbar" className="space-y-4 pt-4">
                 <div className="space-y-2">
-                  <label htmlFor="navbar-menu" className="text-sm font-medium">Menu</label>
+                  <label htmlFor="navbar-menu" className="text-sm font-medium">
+                    Menu
+                  </label>
                   <select
                     id="navbar-menu"
                     value={settings.navbar.menuHandle}
@@ -149,7 +150,7 @@ export function SettingsDialog() {
                         navbar: { ...settings.navbar, menuHandle: e.target.value },
                       })
                     }
-                    className="border-input bg-background w-full rounded-md border px-3 py-2 text-sm"
+                    className="border-input bg-background w-full rounded-sm border px-3 py-2 text-sm"
                   >
                     <option value="">Select a menu...</option>
                     {menus.map((menu) => (
@@ -158,7 +159,7 @@ export function SettingsDialog() {
                       </option>
                     ))}
                   </select>
-                  <p className="text-xs text-muted-foreground">
+                  <p className="text-muted-foreground text-xs">
                     Select which menu to display in the navigation bar
                   </p>
                 </div>
@@ -167,7 +168,9 @@ export function SettingsDialog() {
               {/* Footer Tab */}
               <TabsContent value="footer" className="space-y-4 pt-4">
                 <div className="space-y-2">
-                  <label htmlFor="footer-menu" className="text-sm font-medium">Menu</label>
+                  <label htmlFor="footer-menu" className="text-sm font-medium">
+                    Menu
+                  </label>
                   <select
                     id="footer-menu"
                     value={settings.footer.menuHandle}
@@ -177,7 +180,7 @@ export function SettingsDialog() {
                         footer: { ...settings.footer, menuHandle: e.target.value },
                       })
                     }
-                    className="border-input bg-background w-full rounded-md border px-3 py-2 text-sm"
+                    className="border-input bg-background w-full rounded-sm border px-3 py-2 text-sm"
                   >
                     <option value="">Select a menu...</option>
                     {menus.map((menu) => (
@@ -186,7 +189,7 @@ export function SettingsDialog() {
                       </option>
                     ))}
                   </select>
-                  <p className="text-xs text-muted-foreground">
+                  <p className="text-muted-foreground text-xs">
                     Select which menu to display in the footer columns
                   </p>
                 </div>
@@ -217,7 +220,7 @@ export function SettingsDialog() {
                     }
                     placeholder="© {year} {storeName}. All rights reserved."
                   />
-                  <p className="text-xs text-muted-foreground">
+                  <p className="text-muted-foreground text-xs">
                     Use {'{year}'} for current year and {'{storeName}'} for store name
                   </p>
                 </div>
@@ -226,7 +229,7 @@ export function SettingsDialog() {
                   <label className="text-sm font-medium">Social Links</label>
                   <div className="space-y-3">
                     <div className="space-y-1">
-                      <label className="text-xs text-muted-foreground">Twitter/X</label>
+                      <label className="text-muted-foreground text-xs">Twitter/X</label>
                       <Input
                         value={settings.footer.twitterUrl}
                         onChange={(e) =>
@@ -240,7 +243,7 @@ export function SettingsDialog() {
                     </div>
 
                     <div className="space-y-1">
-                      <label className="text-xs text-muted-foreground">Facebook</label>
+                      <label className="text-muted-foreground text-xs">Facebook</label>
                       <Input
                         value={settings.footer.facebookUrl}
                         onChange={(e) =>
@@ -254,7 +257,7 @@ export function SettingsDialog() {
                     </div>
 
                     <div className="space-y-1">
-                      <label className="text-xs text-muted-foreground">LinkedIn</label>
+                      <label className="text-muted-foreground text-xs">LinkedIn</label>
                       <Input
                         value={settings.footer.linkedinUrl}
                         onChange={(e) =>

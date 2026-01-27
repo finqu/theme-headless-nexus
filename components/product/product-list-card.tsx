@@ -19,7 +19,7 @@ export function ProductListCard({
   const content = (
     <>
       {/* Product Image */}
-      <div className="relative aspect-3/4 overflow-hidden bg-gray-50">
+      <div className="relative aspect-square overflow-hidden bg-gray-50 @xl:aspect-3/4">
         {image?.url ? (
           <img
             src={image.url}
@@ -65,7 +65,7 @@ export function ProductListCard({
   );
 
   return (
-    <article className="group overflow-hidden rounded-lg border border-gray-200 bg-white">
+    <article className="group h-full">
       {href ? (
         <a href={href} className="grid h-full grid-rows-[auto_1fr]">
           {content}

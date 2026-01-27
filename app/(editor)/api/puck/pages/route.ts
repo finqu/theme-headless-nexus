@@ -45,8 +45,6 @@ export async function GET(request: Request) {
       }),
     ]);
 
-    console.log('storefrontPagesResult', storefrontPagesResult);
-
     // Create a set of local page IDs for quick lookup
     const localPageIdSet = new Set(localPageIds);
 

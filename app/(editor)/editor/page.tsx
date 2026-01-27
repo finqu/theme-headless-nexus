@@ -3,6 +3,7 @@
 import { Suspense, useCallback, useEffect, useRef, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { Puck, createUsePuck, type Data } from '@puckeditor/core';
+import { toast } from 'sonner';
 
 // Create usePuck hook with selector support to avoid unnecessary re-renders
 const usePuck = createUsePuck();
@@ -12,6 +13,7 @@ import { isValidTemplateType, type TemplateType } from '@/lib/template-types';
 import { EditorToolbar, type Page } from '@/components/editor/editor-toolbar';
 import { LocaleProvider } from '@/lib/context-providers/locale-context';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
+import { Toaster } from '@/components/ui/sonner';
 import type { Locale } from '@/lib/store-cache';
 
 /**
@@ -253,11 +255,9 @@ function EditorContent() {
         if (pagesRes.ok) {
           const pagesData = await pagesRes.json();
           setPages(pagesData.pages || []);
-          console.log('pagesData', pagesData);
           // Handle page mode without URL ID - load homepage by default
           if (mode === 'page' && !urlPageId) {
             const homepage = pagesData.pages?.find((p: { slug: string }) => p.slug === 'home');
-            console.log('homepage', homepage);
             if (homepage?.id) {
               setResolvedPageId(homepage.id);
             } else {
@@ -409,10 +409,10 @@ function EditorContent() {
         }
 
         setHasUnpublishedChanges(false);
-        alert('Published successfully!');
+        toast.success('Published successfully!');
       } catch (err) {
         console.error('Failed to publish:', err);
-        alert('Failed to publish. Please try again.');
+        toast.error('Failed to publish. Please try again.');
       }
     },
     [getApiUrl]
@@ -456,7 +456,7 @@ function EditorContent() {
       window.location.reload();
     } catch (err) {
       console.error('Failed to reset:', err);
-      alert('Failed to reset template. Please try again.');
+      toast.error('Failed to reset template. Please try again.');
     }
   }, [mode, slug, getApiUrl]);
 
@@ -503,7 +503,7 @@ function EditorContent() {
           {firstLocale && firstLocale.isoCode && firstLocale.isoCode !== urlLocale && (
             <button
               onClick={() => handleLocaleChange(firstLocale.isoCode!)}
-              className="rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
+              className="rounded-sm bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
             >
               Switch to {firstLocale.endonymName}
             </button>
@@ -569,10 +569,12 @@ function EditorContent() {
               pages={pages}
               onResetToDefault={handleResetToDefault}
               onLanguageChange={handleLocaleChange}
+              onPublishData={handlePublish}
             />
           </Puck>
         </div>
       </div>
+      <Toaster position="bottom-right" />
     </LocaleProvider>
   );
 }
@@ -594,6 +596,7 @@ interface EditorLayoutProps {
   pages: Page[];
   onResetToDefault: () => void;
   onLanguageChange: (locale: string) => void;
+  onPublishData: (data: Data) => Promise<void>;
 }
 
 function EditorLayout({
@@ -610,23 +613,15 @@ function EditorLayout({
   pages,
   onResetToDefault,
   onLanguageChange,
+  onPublishData,
 }: EditorLayoutProps) {
   // Use selector to only subscribe to data changes (for publish)
   const data = usePuck((s) => s.appState?.data);
 
-  // Get publish function from Puck's onPublish
+  // Handle publish by calling the parent's publish function with current data
   const handlePublish = () => {
-    // Trigger the native Puck publish which calls our onPublish handler
-    const publishButton = document.querySelector(
-      '[data-puck-action="publish"]'
-    ) as HTMLButtonElement;
-    if (publishButton) {
-      publishButton.click();
-    } else {
-      // Fallback: dispatch publish action manually
-      // The onPublish callback receives the current data
-      const event = new CustomEvent('puck-publish', { detail: data });
-      window.dispatchEvent(event);
+    if (data) {
+      onPublishData(data);
     }
   };
 
@@ -654,7 +649,7 @@ function EditorLayout({
         <div className="flex items-center justify-end border-b bg-white px-4 py-1.5">
           <button
             onClick={onResetToDefault}
-            className="rounded border border-gray-300 px-3 py-1 text-xs hover:bg-gray-50"
+            className="rounded-sm border border-gray-300 px-3 py-1 text-xs hover:bg-gray-50"
           >
             Reset to Default
           </button>

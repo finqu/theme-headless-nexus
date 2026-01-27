@@ -2,7 +2,7 @@
 
 import * as React from 'react';
 import Link from 'next/link';
-import { Menu as MenuIcon, ChevronRight, ChevronLeft, User } from 'lucide-react';
+import { Menu as MenuIcon, ChevronRight, ChevronLeft, User, LogIn } from 'lucide-react';
 import type { Menu, Currency, Link as MenuLink } from '@finqu/storefront-types';
 import type { StoreData } from '@/lib/context-providers/store-context';
 import { Button } from '@/components/ui/button';
@@ -66,14 +66,14 @@ export function NavbarClient({ menu, storeData, isEditing = false }: NavbarClien
   }, []);
 
   return (
-    <div>
+    <>
       {/* Announcement Bar */}
-      <div className="flex h-10 items-center justify-center border-b text-sm sm:px-6 lg:px-8">
+      <div className="flex h-10 items-center justify-center border-b text-sm sm:px-4 lg:px-6">
         Get free delivery on orders over $100
       </div>
 
-      <header className="sticky top-10 bg-white">
-        <nav aria-label="Top" className="x-4 border-b sm:px-6 lg:px-8">
+      <header className="sticky top-0 z-10 bg-white/80 backdrop-blur-md">
+        <nav aria-label="Top" className="x-4 border-b sm:pl-4 lg:pl-6">
           <div className="">
             <div className="flex h-16 items-center">
               {/* Mobile menu button */}
@@ -137,30 +137,10 @@ export function NavbarClient({ menu, storeData, isEditing = false }: NavbarClien
                                 href={routes?.accountLoginUrl || '#'}
                                 className="flex items-center gap-3 px-6 py-3 text-base font-medium text-gray-900 hover:bg-gray-50"
                               >
-                                <User className="h-5 w-5" />
+                                <LogIn className="h-5 w-5" strokeWidth={1} />
                                 Sign in
                               </Link>
                             </SheetClose>
-                            <SheetClose asChild>
-                              <Link
-                                href={routes?.accountRegisterUrl || '#'}
-                                className="block px-6 py-3 text-base font-medium text-gray-900 hover:bg-gray-50"
-                              >
-                                Create account
-                              </Link>
-                            </SheetClose>
-                          </div>
-                        </>
-                      )}
-
-                      {currencies.length > 1 && selectedCurrency && (
-                        <>
-                          <Separator />
-                          <div className="px-6 py-4">
-                            <span className="text-sm text-gray-500">Currency</span>
-                            <p className="mt-1 font-medium text-gray-900">
-                              {selectedCurrency.name} ({selectedCurrency.isoCode})
-                            </p>
                           </div>
                         </>
                       )}
@@ -241,7 +221,7 @@ export function NavbarClient({ menu, storeData, isEditing = false }: NavbarClien
               </div>
 
               {/* Desktop Navigation */}
-              <NavigationMenu className="ml-8 hidden lg:flex">
+              <NavigationMenu className="relative ml-8 hidden lg:flex">
                 <NavigationMenuList>
                   {visibleLinks.map((link, index) => {
                     const hasChildren = link.links && link.links.length > 0;
@@ -249,40 +229,26 @@ export function NavbarClient({ menu, storeData, isEditing = false }: NavbarClien
                     if (hasChildren) {
                       return (
                         <NavigationMenuItem key={`nav-${index}`}>
-                          <NavigationMenuTrigger>{link.title}</NavigationMenuTrigger>
-                          <NavigationMenuContent>
-                            <div className="grid w-[600px] gap-3 p-6 md:w-[800px] md:grid-cols-3">
+                          <NavigationMenuTrigger className="font-heading bg-transparent font-normal text-gray-500 hover:bg-transparent data-[state=open]:bg-transparent">
+                            {link.title}
+                          </NavigationMenuTrigger>
+                          <NavigationMenuContent className="p-0">
+                            <div className="w-[300px] p-0">
                               {link.links?.map((section, sectionIndex) => (
-                                <div key={`section-${index}-${sectionIndex}`}>
+                                <div
+                                  key={`section-${index}-${sectionIndex}`}
+                                  className="font-heading border-b px-4 py-4 last:mb-0 last:border-b-0"
+                                >
                                   {section.url ? (
                                     <Link
                                       href={section.url}
                                       target={section.target || undefined}
-                                      className="mb-3 block text-sm font-semibold text-gray-900 hover:text-indigo-600"
+                                      className="block text-sm text-gray-500 hover:text-gray-900"
                                     >
                                       {section.title}
                                     </Link>
                                   ) : (
-                                    <p className="mb-3 text-sm font-semibold text-gray-900">
-                                      {section.title}
-                                    </p>
-                                  )}
-                                  {section.links && section.links.length > 0 && (
-                                    <ul className="space-y-2">
-                                      {section.links.map((item, itemIndex) => (
-                                        <li key={`item-${index}-${sectionIndex}-${itemIndex}`}>
-                                          <NavigationMenuLink asChild>
-                                            <Link
-                                              href={item.url || '#'}
-                                              target={item.target || undefined}
-                                              className="block text-sm text-gray-600 hover:text-gray-900"
-                                            >
-                                              {item.title}
-                                            </Link>
-                                          </NavigationMenuLink>
-                                        </li>
-                                      ))}
-                                    </ul>
+                                    <p className="text-sm text-gray-500">{section.title}</p>
                                   )}
                                 </div>
                               ))}
@@ -294,75 +260,48 @@ export function NavbarClient({ menu, storeData, isEditing = false }: NavbarClien
 
                     return (
                       <NavigationMenuItem key={`nav-${index}`}>
-                        <NavigationMenuLink asChild className={navigationMenuTriggerStyle()}>
+                        <NavigationMenuLink
+                          asChild
+                          className={cn(
+                            navigationMenuTriggerStyle(),
+                            'font-heading bg-transparent font-normal text-gray-500 hover:bg-transparent'
+                          )}
+                        >
                           <Link href={link.url || '#'}>{link.title}</Link>
                         </NavigationMenuLink>
                       </NavigationMenuItem>
                     );
                   })}
-
-                  {/* Overflow "More" dropdown */}
-                  {overflowLinks.length > 0 && (
-                    <NavigationMenuItem>
-                      <NavigationMenuTrigger>More</NavigationMenuTrigger>
-                      <NavigationMenuContent>
-                        <ul className="w-48 p-2">
-                          {overflowLinks.map((link, index) => (
-                            <li key={`overflow-${index}`}>
-                              <NavigationMenuLink asChild>
-                                <Link
-                                  href={link.url || '#'}
-                                  target={link.target || undefined}
-                                  className="block rounded-md px-3 py-2 text-sm hover:bg-gray-100"
-                                >
-                                  {link.title}
-                                </Link>
-                              </NavigationMenuLink>
-                            </li>
-                          ))}
-                        </ul>
-                      </NavigationMenuContent>
-                    </NavigationMenuItem>
-                  )}
                 </NavigationMenuList>
               </NavigationMenu>
 
               {/* Right side actions */}
-              <div className="ml-auto flex items-center gap-2">
-                {/* Account links - Desktop */}
+              <div className="ml-auto flex h-full items-center">
+                {/* Account link - Desktop */}
                 {store?.customerAccountsEnabled && (
-                  <div className="hidden lg:flex lg:items-center lg:gap-4">
-                    <Link
-                      href={routes?.accountLoginUrl || '#'}
-                      className="text-sm font-medium text-gray-700 hover:text-gray-900"
+                  <div className="hidden h-full items-center border-l border-gray-200 lg:flex">
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      asChild
+                      className="h-full w-14 rounded-none text-gray-900 hover:bg-gray-50"
                     >
-                      Sign in
-                    </Link>
-                    <span aria-hidden="true" className="h-5 w-px bg-gray-200" />
-                    <Link
-                      href={routes?.accountRegisterUrl || '#'}
-                      className="text-sm font-medium text-gray-700 hover:text-gray-900"
-                    >
-                      Create account
-                    </Link>
-                    <span aria-hidden="true" className="h-5 w-px bg-gray-200" />
-                  </div>
-                )}
-
-                {/* Currency selector - Desktop */}
-                {currencies.length > 1 && selectedCurrency && (
-                  <div className="hidden lg:block">
-                    <Button variant="ghost" size="sm" className="text-gray-700">
-                      {selectedCurrency.isoCode}
+                      <Link href={routes?.accountLoginUrl || '#'} aria-label="Sign in">
+                        <LogIn className="h-5 w-5" strokeWidth={1.5} />
+                      </Link>
                     </Button>
                   </div>
                 )}
 
                 {/* Search */}
-                <SearchIcon />
+                <div className="flex h-full items-center border-l border-gray-200">
+                  <SearchIcon className="w-14 rounded-none text-gray-900 hover:bg-gray-50" />
+                </div>
 
                 {/* Cart */}
-                <CartIcon />
+                <div className="flex h-full items-center border-l border-gray-200">
+                  <CartIcon className="w-14 rounded-none text-gray-900" />
+                </div>
               </div>
             </div>
           </div>
@@ -371,6 +310,6 @@ export function NavbarClient({ menu, storeData, isEditing = false }: NavbarClien
 
       {/* Cart Drawer - rendered once, controlled by cart context */}
       <CartDrawer cartUrl={routes?.cartUrl ?? undefined} />
-    </div>
+    </>
   );
 }

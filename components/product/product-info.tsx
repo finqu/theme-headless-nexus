@@ -2,7 +2,6 @@
 
 import type { Product, ProductVariant, CustomField } from '@finqu/storefront-types';
 import { Badge } from '@/components/ui/badge';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
   Accordion,
   AccordionContent,
@@ -28,12 +27,11 @@ export function ProductInfo({ product, selectedVariant, currency = 'EUR' }: Prod
   const price = variant?.price;
   const originalPrice = variant?.originalPrice;
   const productOnSale = isOnSale(originalPrice, price);
-  const discountPercent = productOnSale && originalPrice && price
-    ? calculateDiscountPercent(originalPrice, price)
-    : 0;
+  const discountPercent =
+    productOnSale && originalPrice && price ? calculateDiscountPercent(originalPrice, price) : 0;
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 p-4 sm:p-6">
       {/* Title and badges */}
       <div>
         <div className="mb-2 flex flex-wrap items-center gap-2">
@@ -50,12 +48,7 @@ export function ProductInfo({ product, selectedVariant, currency = 'EUR' }: Prod
       </div>
 
       {/* Price */}
-      <PriceDisplay
-        price={price}
-        originalPrice={originalPrice}
-        currency={currency}
-        size="lg"
-      />
+      <PriceDisplay price={price} originalPrice={originalPrice} currency={currency} size="lg" />
 
       {/* SKU */}
       {variant?.sku && (
@@ -87,91 +80,38 @@ export function ProductDetails({ product }: ProductDetailsProps) {
     return null;
   }
 
-  // Use accordion on mobile, tabs on desktop
   return (
-    <>
-      {/* Desktop: Tabs */}
-      <div className="hidden sm:block">
-        <Tabs defaultValue="description" className="w-full">
-          <TabsList className="w-full justify-start border-b bg-transparent p-0">
-            {hasDescription && (
-              <TabsTrigger
-                value="description"
-                className="rounded-none border-b-2 border-transparent px-4 py-2 data-[state=active]:border-indigo-600 data-[state=active]:shadow-none"
-              >
-                Description
-              </TabsTrigger>
-            )}
-            {hasSpecifications && (
-              <TabsTrigger
-                value="specifications"
-                className="rounded-none border-b-2 border-transparent px-4 py-2 data-[state=active]:border-indigo-600 data-[state=active]:shadow-none"
-              >
-                Specifications
-              </TabsTrigger>
-            )}
-            <TabsTrigger
-              value="shipping"
-              className="rounded-none border-b-2 border-transparent px-4 py-2 data-[state=active]:border-indigo-600 data-[state=active]:shadow-none"
-            >
-              Shipping & Returns
-            </TabsTrigger>
-          </TabsList>
-
-          {hasDescription && (
-            <TabsContent value="description" className="pt-4">
+    <div className="border-t">
+      <Accordion type="single" collapsible className="w-full">
+        {hasDescription && (
+          <AccordionItem value="description">
+            <AccordionTrigger>Description</AccordionTrigger>
+            <AccordionContent>
               <div
-                className="prose prose-gray max-w-none"
+                className="prose prose-sm prose-gray max-w-none"
                 dangerouslySetInnerHTML={{ __html: product.description || '' }}
               />
-            </TabsContent>
-          )}
-
-          {hasSpecifications && (
-            <TabsContent value="specifications" className="pt-4">
-              <SpecificationsTable customFields={product.customFields} />
-            </TabsContent>
-          )}
-
-          <TabsContent value="shipping" className="pt-4">
-            <ShippingInfo />
-          </TabsContent>
-        </Tabs>
-      </div>
-
-      {/* Mobile: Accordion */}
-      <div className="sm:hidden">
-        <Accordion type="single" collapsible className="w-full">
-          {hasDescription && (
-            <AccordionItem value="description">
-              <AccordionTrigger>Description</AccordionTrigger>
-              <AccordionContent>
-                <div
-                  className="prose prose-sm prose-gray max-w-none"
-                  dangerouslySetInnerHTML={{ __html: product.description || '' }}
-                />
-              </AccordionContent>
-            </AccordionItem>
-          )}
-
-          {hasSpecifications && (
-            <AccordionItem value="specifications">
-              <AccordionTrigger>Specifications</AccordionTrigger>
-              <AccordionContent>
-                <SpecificationsTable customFields={product.customFields} />
-              </AccordionContent>
-            </AccordionItem>
-          )}
-
-          <AccordionItem value="shipping">
-            <AccordionTrigger>Shipping & Returns</AccordionTrigger>
-            <AccordionContent>
-              <ShippingInfo />
             </AccordionContent>
           </AccordionItem>
-        </Accordion>
-      </div>
-    </>
+        )}
+
+        {hasSpecifications && (
+          <AccordionItem value="specifications">
+            <AccordionTrigger>Specifications</AccordionTrigger>
+            <AccordionContent>
+              <SpecificationsTable customFields={product.customFields} />
+            </AccordionContent>
+          </AccordionItem>
+        )}
+
+        <AccordionItem value="shipping">
+          <AccordionTrigger>Shipping & Returns</AccordionTrigger>
+          <AccordionContent>
+            <ShippingInfo />
+          </AccordionContent>
+        </AccordionItem>
+      </Accordion>
+    </div>
   );
 }
 

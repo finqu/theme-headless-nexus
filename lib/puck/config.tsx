@@ -1,7 +1,7 @@
 import type { Config, DefaultRootRenderProps, PuckContext } from '@puckeditor/core';
 import type { Menu } from '@finqu/storefront-types';
 import type { StoreData, StoreBasicInfo } from '@/lib/context-providers/store-context';
-import { config as baseConfig } from '@/.storefront/puck.render.config';
+import { config as baseConfig } from '@/.storefront/puck.edit.config';
 import { NavbarClient } from '@/components/layout/navbar-client';
 import { Footer } from '@/components/layout/footer';
 import type { LayoutSettings } from '@/lib/layout-settings';

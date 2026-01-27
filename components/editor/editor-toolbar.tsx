@@ -205,7 +205,7 @@ export function EditorToolbar({
               selectViewport(viewport);
             }
           }}
-          className="rounded bg-zinc-800"
+          className="rounded-sm bg-zinc-800"
         >
           {defaultViewports.map((viewport, index) => {
             const icon = viewportIcons[viewport.icon] || <Monitor className="h-3.5 w-3.5" />;

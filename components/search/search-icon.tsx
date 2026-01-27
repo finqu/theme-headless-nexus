@@ -22,11 +22,11 @@ export function SearchIcon({ className, showLabel }: SearchIconProps) {
       <Button
         variant="ghost"
         size={showLabel ? 'default' : 'icon'}
-        className={cn(className)}
+        className={cn('h-full cursor-pointer', className)}
         onClick={openSearch}
         aria-label="Search"
       >
-        <Search className="h-5 w-5" />
+        <Search className="h-5 w-5" strokeWidth={1.5} />
         {showLabel && <span className="ml-2">Search</span>}
       </Button>
       <SearchModal open={isOpen} onOpenChange={setIsOpen} />

@@ -12,9 +12,19 @@ import { ProductGridSkeleton } from './product-grid-skeleton';
  * Props for the ProductGrid Puck component.
  * Stores product IDs for persistence; products are fetched at render time via Suspense.
  */
-interface ProductGridProps extends Omit<ProductGridViewProps, 'products'> {
+interface ProductGridProps extends Omit<ProductGridViewProps, 'products' | 'headerLink'> {
   /** Product IDs stored in Puck data (lightweight) */
   selectedProductIds?: number[];
+  /** Header link href (for editor) */
+  headerLinkHref?: string;
+  /** Header link label (for editor) */
+  headerLinkLabel?: string;
+  /** Show gradient border at the top */
+  gradientBorderTop?: boolean;
+  /** Show gradient border after the header */
+  gradientBorderAfterHeader?: boolean;
+  /** Show gradient border at the bottom */
+  gradientBorderBottom?: boolean;
 }
 
 /**
@@ -31,25 +41,66 @@ export const config: ComponentConfig<ProductGridProps> = {
   defaultProps: {
     ...productGridDefaultProps,
     selectedProductIds: [],
+    gradientBorderTop: false,
+    gradientBorderAfterHeader: false,
+    gradientBorderBottom: false,
   },
-  render: ({ title, selectedProductIds, columns, showPrice, showDescription }) => {
+  render: ({
+    title,
+    headerLinkHref,
+    headerLinkLabel,
+    selectedProductIds,
+    columns,
+    showPrice,
+    showDescription,
+    gradientBorderTop,
+    gradientBorderAfterHeader,
+    gradientBorderBottom,
+  }) => {
+    const headerLink =
+      headerLinkHref && headerLinkLabel
+        ? { href: headerLinkHref, label: headerLinkLabel }
+        : undefined;
+
     // No products selected - render empty state immediately
     if (!selectedProductIds || selectedProductIds.length === 0) {
-      return <ProductGridSkeleton title={title} columns={columns} isEmpty />;
+      return (
+        <ProductGridSkeleton
+          title={title}
+          headerLink={headerLink}
+          columns={columns}
+          isEmpty
+          gradientBorderTop={gradientBorderTop}
+          gradientBorderAfterHeader={gradientBorderAfterHeader}
+          gradientBorderBottom={gradientBorderBottom}
+        />
+      );
     }
 
     return (
       <Suspense
         fallback={
-          <ProductGridSkeleton title={title} columns={columns} count={selectedProductIds.length} />
+          <ProductGridSkeleton
+            title={title}
+            headerLink={headerLink}
+            columns={columns}
+            count={selectedProductIds.length}
+            gradientBorderTop={gradientBorderTop}
+            gradientBorderAfterHeader={gradientBorderAfterHeader}
+            gradientBorderBottom={gradientBorderBottom}
+          />
         }
       >
         <ProductGridAsync
           title={title}
+          headerLink={headerLink}
           productIds={selectedProductIds}
           columns={columns}
           showPrice={showPrice}
           showDescription={showDescription}
+          gradientBorderTop={gradientBorderTop}
+          gradientBorderAfterHeader={gradientBorderAfterHeader}
+          gradientBorderBottom={gradientBorderBottom}
         />
       </Suspense>
     );

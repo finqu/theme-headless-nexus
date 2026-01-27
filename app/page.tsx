@@ -51,7 +51,7 @@ export default async function HomePage() {
             </p>
             <a
               href={`/editor?mode=page&slug=home&locale=${locale}`}
-              className="bg-primary text-primary-foreground inline-block rounded-md px-6 py-3 hover:opacity-90"
+              className="bg-primary text-primary-foreground inline-block rounded-sm px-6 py-3 hover:opacity-90"
             >
               Open Editor
             </a>

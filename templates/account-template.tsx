@@ -15,26 +15,10 @@ export function AccountTemplate({ locale, section }: AccountTemplateProps) {
           {/* Sidebar */}
           <aside className="lg:col-span-3">
             <nav className="space-y-1">
-              <AccountNavItem
-                href="#"
-                active={section === 'dashboard'}
-                label="Dashboard"
-              />
-              <AccountNavItem
-                href="#"
-                active={section === 'orders'}
-                label="Orders"
-              />
-              <AccountNavItem
-                href="#"
-                active={section === 'wishlist'}
-                label="Wishlist"
-              />
-              <AccountNavItem
-                href="#"
-                active={section === 'edit'}
-                label="Account Settings"
-              />
+              <AccountNavItem href="#" active={section === 'dashboard'} label="Dashboard" />
+              <AccountNavItem href="#" active={section === 'orders'} label="Orders" />
+              <AccountNavItem href="#" active={section === 'wishlist'} label="Wishlist" />
+              <AccountNavItem href="#" active={section === 'edit'} label="Account Settings" />
             </nav>
           </aside>
 
@@ -51,22 +35,12 @@ export function AccountTemplate({ locale, section }: AccountTemplateProps) {
   );
 }
 
-function AccountNavItem({
-  href,
-  active,
-  label,
-}: {
-  href: string;
-  active: boolean;
-  label: string;
-}) {
+function AccountNavItem({ href, active, label }: { href: string; active: boolean; label: string }) {
   return (
     <a
       href={href}
-      className={`block rounded-md px-3 py-2 text-sm font-medium ${
-        active
-          ? 'bg-gray-100 text-gray-900'
-          : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+      className={`block rounded-sm px-3 py-2 text-sm font-medium ${
+        active ? 'bg-gray-100 text-gray-900' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
       }`}
     >
       {label}
@@ -80,8 +54,8 @@ function AccountDashboard() {
       <h1 className="text-2xl font-bold text-gray-900">My Account</h1>
       <div className="rounded-lg border border-gray-200 bg-white p-6">
         <p className="text-gray-600">
-          Welcome to your account dashboard. Here you can manage your orders,
-          wishlist, and account settings.
+          Welcome to your account dashboard. Here you can manage your orders, wishlist, and account
+          settings.
         </p>
       </div>
     </div>
@@ -93,9 +67,7 @@ function AccountEdit() {
     <div className="space-y-6">
       <h1 className="text-2xl font-bold text-gray-900">Account Settings</h1>
       <div className="rounded-lg border border-gray-200 bg-white p-6">
-        <p className="text-gray-600">
-          Account settings form will be displayed here.
-        </p>
+        <p className="text-gray-600">Account settings form will be displayed here.</p>
       </div>
     </div>
   );
@@ -106,9 +78,7 @@ function AccountOrders() {
     <div className="space-y-6">
       <h1 className="text-2xl font-bold text-gray-900">My Orders</h1>
       <div className="rounded-lg border border-gray-200 bg-white p-6">
-        <p className="text-gray-600">
-          Your order history will be displayed here.
-        </p>
+        <p className="text-gray-600">Your order history will be displayed here.</p>
       </div>
     </div>
   );
@@ -119,9 +89,7 @@ function AccountWishlist() {
     <div className="space-y-6">
       <h1 className="text-2xl font-bold text-gray-900">My Wishlist</h1>
       <div className="rounded-lg border border-gray-200 bg-white p-6">
-        <p className="text-gray-600">
-          Your wishlist items will be displayed here.
-        </p>
+        <p className="text-gray-600">Your wishlist items will be displayed here.</p>
       </div>
     </div>
   );

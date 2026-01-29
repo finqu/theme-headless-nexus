@@ -121,4 +121,4 @@ pnpm format           # Prettier format all files
 
 - `FINQU_STOREFRONT_URL` / `NEXT_PUBLIC_FINQU_STOREFRONT_URL` - API endpoint
 - `FINQU_STOREFRONT_TOKEN` / `NEXT_PUBLIC_FINQU_STOREFRONT_TOKEN` - Auth token
-- `UPSTASH_REDIS_REST_URL` - Enables Redis storage (production)
+- `KV_REST_API_URL` - Enables Redis storage (production)

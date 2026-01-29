@@ -518,13 +518,13 @@ NEXT_PUBLIC_FINQU_STOREFRONT_URL=https://your-storefront.finqu.dev
 NEXT_PUBLIC_FINQU_STOREFRONT_TOKEN=pk_...
 
 # Redis (optional - enables production storage)
-UPSTASH_REDIS_REST_URL=https://...
+KV_REST_API_URL=https://...
 ```
 
 ### Storage Modes
 
 - **Development** - File-based storage in `data/` directory
-- **Production** - Redis storage (when `UPSTASH_REDIS_REST_URL` is set)
+- **Production** - Redis storage (when `KV_REST_API_URL` is set)
 
 ## Building Custom Blocks
 

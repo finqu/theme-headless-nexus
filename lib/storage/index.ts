@@ -9,11 +9,11 @@ export { RedisStorage } from './redis';
 /**
  * Determine which storage backend to use based on environment
  *
- * - If UPSTASH_REDIS_REST_URL is set, use Redis (production)
+ * - If KV_REST_API_URL is set, use Redis (production)
  * - Otherwise, use file-based storage (local development)
  */
 function createStorage(): StorageBackend {
-  const useRedis = Boolean(process.env.UPSTASH_REDIS_REST_URL);
+  const useRedis = Boolean(process.env.KV_REST_API_URL);
 
   if (useRedis) {
     return new RedisStorage();

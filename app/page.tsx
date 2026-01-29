@@ -38,7 +38,7 @@ export default async function HomePage() {
     }
   }
 
-  const data = await getPageConfig('home', 'published');
+  const data = await getPageConfig(resource?.id ?? 'home', 'published');
 
   if (!data) {
     return (

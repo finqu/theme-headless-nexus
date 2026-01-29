@@ -8,7 +8,7 @@ A **Finqu headless e-commerce storefront** built with Next.js 16 and Puck visual
 
 ### Core Data Flow
 
-1. **Middleware** ([middleware.ts](middleware.ts)) detects locale from URL prefix, strips it, and passes `x-locale` header
+1. **Middleware** ([proxy.ts](proxy.ts)) detects locale from URL prefix, strips it, and passes `x-locale` header
 2. **Dynamic routing** ([app/[...slug]/page.tsx](app/[...slug]/page.tsx)) uses `resourceByPath` API to resolve any URL to a resource type (product, category, page, etc.)
 3. **Template system** matches resource types to Puck templates via [lib/template-types.ts](lib/template-types.ts)
 4. **Storage** auto-selects Redis (production) or file-based (local) backend via [lib/storage/index.ts](lib/storage/index.ts)
@@ -85,7 +85,12 @@ const data = await storefrontClient.query<StoreQueryResponse>(
 );
 
 // Client Components - use hooks from @finqu/storefront-sdk/react
-import { useProduct, useCatalogProducts, useCart, useCreateCart } from '@finqu/storefront-sdk/react';
+import {
+  useProduct,
+  useCatalogProducts,
+  useCart,
+  useCreateCart,
+} from '@finqu/storefront-sdk/react';
 ```
 
 ## Locale Handling

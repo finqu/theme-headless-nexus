@@ -10,23 +10,6 @@ export interface EditorTokenPayload extends JWTPayload {
 }
 
 /**
- * Check if the request is from localhost
- * Localhost requests bypass JWT authentication for development convenience
- */
-export function isLocalhost(request: NextRequest): boolean {
-  const host = request.headers.get('host') || '';
-  const forwardedHost = request.headers.get('x-forwarded-host') || '';
-
-  const hostToCheck = forwardedHost || host;
-
-  return (
-    hostToCheck.startsWith('localhost') ||
-    hostToCheck.startsWith('127.0.0.1') ||
-    hostToCheck.startsWith('[::1]')
-  );
-}
-
-/**
  * Extract Bearer token from Authorization header
  */
 export function extractBearerToken(request: NextRequest): string | null {
@@ -35,6 +18,13 @@ export function extractBearerToken(request: NextRequest): string | null {
     return null;
   }
   return authHeader.slice(7);
+}
+
+/**
+ * Extract token from finqu_editor_token query parameter
+ */
+export function extractQueryToken(request: NextRequest): string | null {
+  return request.nextUrl.searchParams.get('finqu_editor_token');
 }
 
 /**
@@ -63,22 +53,17 @@ export async function verifyEditorToken(token: string): Promise<EditorTokenPaylo
  * Authentication result type
  */
 export type AuthResult =
-  | { authenticated: true; payload: EditorTokenPayload | null; isLocal: boolean }
+  | { authenticated: true; payload: EditorTokenPayload }
   | { authenticated: false; error: string };
 
 /**
  * Authenticate an editor API request
- * - Localhost requests are always allowed (returns payload: null, isLocal: true)
- * - Production requests require a valid JWT token
+ * Requires a valid JWT token (from Authorization header or finqu_editor_token query param)
  */
 export async function authenticateEditorRequest(request: NextRequest): Promise<AuthResult> {
-  // Allow localhost without authentication
-  if (isLocalhost(request)) {
-    return { authenticated: true, payload: null, isLocal: true };
-  }
-
-  // Extract and verify JWT token for non-localhost requests
-  const token = extractBearerToken(request);
+  // Extract JWT token
+  // Check Authorization header first, then fall back to finqu_editor_token query param
+  const token = extractBearerToken(request) || extractQueryToken(request);
 
   if (!token) {
     return { authenticated: false, error: 'Missing authorization token' };
@@ -90,5 +75,5 @@ export async function authenticateEditorRequest(request: NextRequest): Promise<A
     return { authenticated: false, error: 'Invalid or expired token' };
   }
 
-  return { authenticated: true, payload, isLocal: false };
+  return { authenticated: true, payload };
 }

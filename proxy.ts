@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
+import { jwtVerify } from 'jose';
 import { getStoreInfo } from '@/lib/store-cache';
 
 /**
@@ -9,12 +10,34 @@ import { getStoreInfo } from '@/lib/store-cache';
 const SKIP_PATHS = ['/api/', '/editor', '/_next/', '/favicon.ico', '/robots.txt', '/sitemap.xml'];
 
 /**
+ * Verify a Finqu editor JWT token
+ * @returns true if valid, false otherwise
+ */
+async function verifyEditorToken(token: string): Promise<boolean> {
+  const secretKey = process.env.FINQU_HEADLESS_SECRET_KEY;
+
+  if (!secretKey) {
+    console.error('FINQU_HEADLESS_SECRET_KEY is not configured');
+    return false;
+  }
+
+  try {
+    const secret = new TextEncoder().encode(secretKey);
+    await jwtVerify(token, secret);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+/**
  * Proxy for locale detection from URL path.
  *
  * This proxy:
  * 1. Detects the locale from the first path segment (e.g., /en/products -> 'en')
  * 2. Strips the locale prefix from the URL (rewrites /en/products -> /products)
  * 3. Sets x-locale and x-pathname headers on the REQUEST for downstream server components
+ * 4. Validates finqu_editor_token for editor routes and returns 403 if invalid
  *
  * IMPORTANT: Headers must be set on the REQUEST (not response) for server components
  * to access them via the headers() function.
@@ -22,9 +45,27 @@ const SKIP_PATHS = ['/api/', '/editor', '/_next/', '/favicon.ico', '/robots.txt'
  * URL is the single source of truth. No redirects.
  */
 export async function proxy(request: NextRequest) {
-  const { pathname } = request.nextUrl;
+  const { pathname, searchParams } = request.nextUrl;
 
-  // Skip locale handling for certain paths
+  // Handle editor routes - validate finqu_editor_token
+  if (pathname.startsWith('/editor')) {
+    const finquToken = searchParams.get('finqu_editor_token');
+
+    // Token is required for all editor access
+    if (!finquToken) {
+      return new NextResponse(null, { status: 403 });
+    }
+
+    // Verify the token
+    const isValid = await verifyEditorToken(finquToken);
+    if (!isValid) {
+      return new NextResponse(null, { status: 403 });
+    }
+
+    return NextResponse.next();
+  }
+
+  // Skip locale handling for other special paths
   if (SKIP_PATHS.some((p) => pathname.startsWith(p))) {
     return NextResponse.next();
   }

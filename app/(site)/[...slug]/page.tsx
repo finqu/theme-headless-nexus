@@ -43,8 +43,8 @@ export default async function DynamicPage({ params, searchParams }: PageProps) {
     variantParam && typeof variantParam === 'string'
       ? `${slug}?v=${variantParam}`
       : variantParam && Array.isArray(variantParam) && variantParam[0]
-      ? `${slug}?v=${variantParam[0]}`
-      : slug;
+        ? `${slug}?v=${variantParam[0]}`
+        : slug;
 
   // Resolve path to resource type, ID, and alternates
   const resource = await getResourceByPath(pathWithVariant, locale);

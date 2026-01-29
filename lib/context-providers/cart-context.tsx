@@ -155,7 +155,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
         // Add to existing cart
         await addLinesMutation({
           variables: {
-            cartId,
+            id: cartId,
             lines: [{ merchandiseId, quantity }],
           },
         });
@@ -176,14 +176,14 @@ export function CartProvider({ children }: { children: ReactNode }) {
         // Remove item if quantity is 0 or less
         await removeLinesMutation({
           variables: {
-            cartId,
+            id: cartId,
             lineIds: [lineId],
           },
         });
       } else {
         await updateLinesMutation({
           variables: {
-            cartId,
+            id: cartId,
             lines: [{ id: lineId, quantity }],
           },
         });
@@ -199,7 +199,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
       if (!cartId) return;
       await removeLinesMutation({
         variables: {
-          cartId,
+          id: cartId,
           lineIds: [lineId],
         },
       });

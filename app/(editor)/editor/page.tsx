@@ -311,7 +311,7 @@ function EditorContent() {
 
       try {
         // Fetch page/template data
-        const pageRes = await fetch(`${url}?draft=true`);
+        const pageRes = await fetch(`${url}?draft=true}`);
 
         if (pageRes.status === 404) {
           // No existing data - start with empty

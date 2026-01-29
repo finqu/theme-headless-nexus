@@ -91,7 +91,7 @@ export function ProductCard({ product, currency = 'EUR' }: ProductCardProps) {
           {/* Add to Cart */}
           <AddToCart
             className="border-t p-4 sm:p-6"
-            productId={product.defaultOrSelectedVariant!.productId}
+            productId={product.defaultOrSelectedVariant!.productId!}
             isAvailable={isAvailable}
           />
 

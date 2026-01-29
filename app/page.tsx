@@ -45,7 +45,7 @@ export default async function HomePage() {
       <SiteLayout locale={locale} alternates={resource?.alternates}>
         <div className="flex min-h-[60vh] items-center justify-center bg-gray-50">
           <div className="max-w-md text-center">
-            <h1 className="mb-4 text-4xl font-bold">Welcome to Horizon</h1>
+            <h1 className="mb-4 text-4xl font-bold">Welcome to Nexus</h1>
             <p className="mb-8 text-gray-600">
               Your headless storefront is ready. Start by creating your home page in the editor.
             </p>

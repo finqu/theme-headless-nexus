@@ -98,7 +98,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
     loading: isCartLoading,
     refetch: refetchCart,
   } = useCartQuery<Cart>(
-    { cartId: cartId ?? '' },
+    { id: cartId ?? '' },
     {
       skip: !cartId || !isInitialized,
       fetchPolicy: 'network-only',

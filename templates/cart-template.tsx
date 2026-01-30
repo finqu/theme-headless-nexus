@@ -1,3 +1,5 @@
+import Link from 'next/link';
+
 interface CartTemplateProps {
   locale: string;
 }
@@ -18,10 +20,10 @@ export function CartTemplate({ locale }: CartTemplateProps) {
             <div className="rounded-lg border border-gray-200 bg-white p-6">
               <p className="text-center text-gray-500">Your cart is empty.</p>
               <div className="mt-6 text-center">
-                <a href="/" className="text-primary hover:text-primary/80 text-sm font-medium">
+                <Link href="/" className="text-primary hover:text-primary/80 text-sm font-medium">
                   Continue Shopping
                   <span aria-hidden="true"> &rarr;</span>
-                </a>
+                </Link>
               </div>
             </div>
           </section>

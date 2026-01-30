@@ -99,7 +99,9 @@ export default async function DynamicPage({ params, searchParams }: PageProps) {
 /**
  * Generate metadata for the page based on resource type
  */
-export async function generateMetadata() {
+export async function generateMetadata({ params }: PageProps) {
+  // Await params for Next.js 15+ compatibility
+  const { slug } = await params;
   // Get locale and original path from middleware headers
   const [locale, path] = await Promise.all([getLocale(), getPathname()]);
 

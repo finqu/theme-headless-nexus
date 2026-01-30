@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import type { ProductListItem } from '@/lib/types';
 import { ProductListCard } from '@/components/product/product-list-card';
 import { EmptyState, GradientBorder } from '@/components/shared';
@@ -54,9 +55,9 @@ export function ProductGrid({
     <div className="relative grid grid-cols-[1fr_auto] items-center gap-4 px-4 py-4 @sm:px-6">
       {title && <h2 className="text-2xl font-bold tracking-tight">{title}</h2>}
       {headerLink && (
-        <a href={headerLink.href} className="font-mono text-sm hover:underline">
+        <Link href={headerLink.href} className="font-mono text-sm hover:underline">
           {headerLink.label}
-        </a>
+        </Link>
       )}
       {gradientBorderAfterHeader && <GradientBorder position="bottom" />}
     </div>

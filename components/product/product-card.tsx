@@ -67,9 +67,9 @@ export function ProductCard({ product, currency = 'EUR' }: ProductCardProps) {
       </div>
 
       {/* Main Product Section */}
-      <div className="h-full lg:grid lg:grid-cols-2 lg:items-start">
+      <div className="lg:grid lg:grid-cols-2 lg:items-start">
         {/* Gallery */}
-        <div className="max-h-[70vh] w-full lg:sticky lg:top-4 lg:h-full lg:max-h-none">
+        <div className="w-full lg:sticky lg:top-4">
           <ProductGallery images={images} productTitle={product.title ?? undefined} />
         </div>
 

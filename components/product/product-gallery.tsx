@@ -43,7 +43,7 @@ export function ProductGallery({ images, productTitle }: ProductGalleryProps) {
       {/* Gallery content with padding */}
       <div className="relative z-10 space-y-4 px-4 py-8 sm:px-6">
         {/* Main Image */}
-        <div className="border bg-gray-100 lg:aspect-3/4">
+        <div className="aspect-square border bg-gray-100 lg:aspect-3/4">
           <Image
             src={selectedImage.url}
             alt={selectedImage.alt || productTitle || 'Product image'}

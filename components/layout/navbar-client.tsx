@@ -2,6 +2,7 @@
 
 import * as React from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { Menu as MenuIcon, ChevronRight, ChevronLeft, User, LogIn } from 'lucide-react';
 import type { Menu, Currency, Link as MenuLink } from '@finqu/storefront-types';
 import type { StoreData } from '@/lib/context-providers/store-context';
@@ -213,7 +214,7 @@ export function NavbarClient({ menu, storeData, isEditing = false }: NavbarClien
                 <Link href={routes?.rootUrl || '/'}>
                   <span className="sr-only">{storeName}</span>
                   {logoUrl ? (
-                    <img src={logoUrl} alt={storeName} className="h-8 w-auto" />
+                    <Image src={logoUrl} alt={storeName} width={120} height={32} className="h-8 w-auto" />
                   ) : (
                     <span className="text-xl font-bold text-gray-900">{storeName}</span>
                   )}

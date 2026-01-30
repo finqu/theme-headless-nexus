@@ -55,12 +55,12 @@ export function AddToCart({ productId, isAvailable = true, className }: AddToCar
           size="icon"
           onClick={decreaseQuantity}
           disabled={quantity <= 1 || isLoading}
-          className="h-10 w-10 rounded-l rounded-r-none"
+          className="h-12 w-12 rounded-l rounded-r-none sm:h-10 sm:w-10"
           aria-label="Decrease quantity"
         >
           <Minus className="h-4 w-4" />
         </Button>
-        <div className="flex h-10 w-16 items-center justify-center border-y border-gray-200 bg-white text-center">
+        <div className="flex h-12 w-16 items-center justify-center border-y border-gray-200 bg-white text-center sm:h-10">
           <span className="text-sm font-medium">{quantity}</span>
         </div>
         <Button
@@ -69,7 +69,7 @@ export function AddToCart({ productId, isAvailable = true, className }: AddToCar
           size="icon"
           onClick={increaseQuantity}
           disabled={isLoading}
-          className="h-10 w-10 rounded-l-none rounded-r"
+          className="h-12 w-12 rounded-l-none rounded-r sm:h-10 sm:w-10"
           aria-label="Increase quantity"
         >
           <Plus className="h-4 w-4" />
@@ -77,7 +77,11 @@ export function AddToCart({ productId, isAvailable = true, className }: AddToCar
       </div>
 
       {/* Add to Cart Button */}
-      <Button onClick={handleAddToCart} disabled={isDisabled} size="lg" className="flex-1">
+      <Button
+        onClick={handleAddToCart}
+        disabled={isDisabled}
+        className="h-12 flex-1 px-6"
+      >
         {isLoading ? (
           <>
             <Loader2 className="mr-2 h-4 w-4 animate-spin" />

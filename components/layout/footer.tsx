@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import Image from 'next/image';
 import type { Menu, Link as MenuLink } from '@finqu/storefront-types';
 import type { StoreData } from '@/lib/context-providers/store-context';
 import { NewsletterForm } from './newsletter-form';
@@ -54,7 +55,7 @@ export function Footer({
             {/* Logo */}
             <Link href="/" className="inline-block">
               {logoUrl ? (
-                <img src={logoUrl} alt={storeName} className="h-8 w-auto" />
+                <Image src={logoUrl} alt={storeName} width={120} height={32} className="h-8 w-auto" />
               ) : (
                 <LogoPlaceholder />
               )}

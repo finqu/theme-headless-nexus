@@ -1,3 +1,5 @@
+import Image from 'next/image';
+import Link from 'next/link';
 import type { ProductListItem } from '@/lib/types';
 import { formatPrice, getProductImage, PriceDisplay, ImagePlaceholder } from '@/components/shared';
 
@@ -21,10 +23,12 @@ export function ProductListCard({
       {/* Product Image */}
       <div className="relative aspect-square overflow-hidden bg-gray-50 @xl:aspect-3/4">
         {image?.url ? (
-          <img
+          <Image
             src={image.url}
             alt={image.alt || product.title || ''}
-            className="transition-duration-300 h-full w-full object-cover"
+            fill
+            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+            className="transition-duration-300 object-cover"
           />
         ) : (
           <ImagePlaceholder text="No image" />
@@ -67,9 +71,9 @@ export function ProductListCard({
   return (
     <article className="group h-full">
       {href ? (
-        <a href={href} className="grid h-full grid-rows-[auto_1fr]">
+        <Link href={href} className="grid h-full grid-rows-[auto_1fr]">
           {content}
-        </a>
+        </Link>
       ) : (
         <div className="grid h-full grid-rows-[auto_1fr]">{content}</div>
       )}

@@ -1,3 +1,4 @@
+import type { Metadata } from 'next';
 import { Render } from '@puckeditor/core';
 import { config } from '@/.storefront/puck.render.config';
 import { getPageConfig } from '@/lib/puck/storage';
@@ -5,6 +6,12 @@ import { getResourceByPath } from '@/lib/resource-resolver';
 import { getLocale, getPathname } from '@/lib/locale';
 import { SiteLayout } from '@/components/layout';
 import { redirect } from 'next/navigation';
+import Link from 'next/link';
+
+export const metadata: Metadata = {
+  title: 'Home',
+  description: 'Welcome to your headless storefront',
+};
 
 /**
  * Home page - renders the published "home" page config
@@ -49,12 +56,12 @@ export default async function HomePage() {
             <p className="mb-8 text-gray-600">
               Your headless storefront is ready. Start by creating your home page in the editor.
             </p>
-            <a
+            <Link
               href={`/editor?mode=page&slug=home&locale=${locale}`}
               className="bg-primary text-primary-foreground inline-block rounded-sm px-6 py-3 hover:opacity-90"
             >
               Open Editor
-            </a>
+            </Link>
           </div>
         </div>
       </SiteLayout>

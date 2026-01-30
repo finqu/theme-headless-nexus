@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import { Skeleton } from '@/components/ui/skeleton';
 import { EmptyState, GradientBorder } from '@/components/shared';
 import type { ProductGridColumns } from '@/components/product/product-grid';
@@ -40,9 +41,9 @@ export function ProductGridSkeleton({
     <div className="relative grid grid-cols-[1fr_auto] items-center gap-4 border-b px-4 py-4 @sm:px-6">
       {title && <h2 className="text-2xl font-bold tracking-tight">{title}</h2>}
       {headerLink && (
-        <a href={headerLink.href} className="font-mono text-sm hover:underline">
+        <Link href={headerLink.href} className="font-mono text-sm hover:underline">
           {headerLink.label}
-        </a>
+        </Link>
       )}
       {gradientBorderAfterHeader && <GradientBorder position="bottom" />}
     </div>

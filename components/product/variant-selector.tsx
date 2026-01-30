@@ -1,5 +1,3 @@
-'use client';
-
 import Link from 'next/link';
 import type { ProductOption, ProductOptionValue } from '@finqu/storefront-types';
 import { cn } from '@/lib/utils';

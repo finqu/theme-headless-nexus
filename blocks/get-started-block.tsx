@@ -73,7 +73,7 @@ export function GetStartedBlock({
       {/* Center fade overlay */}
       <div className="gradient-center-fade" />
 
-      <div className="relative z-10 container mx-auto max-w-xl text-center">
+      <div className="relative container mx-auto max-w-xl text-center">
         {badgeText &&
           (badgeLink ? (
             <Badge

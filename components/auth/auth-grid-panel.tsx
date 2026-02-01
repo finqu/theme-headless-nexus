@@ -63,7 +63,7 @@ export function AuthGridPanel({
       <div className="gradient-center-fade" />
 
       {/* Marketing content */}
-      <div className="relative z-10 max-w-md">
+      <div className="relative max-w-md">
         <h2 className="mb-4 text-3xl font-bold tracking-tight lg:text-4xl">{title}</h2>
         <p className="text-muted-foreground mb-8 text-base lg:text-lg">{description}</p>
 

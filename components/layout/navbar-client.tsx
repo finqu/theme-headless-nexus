@@ -73,7 +73,7 @@ export function NavbarClient({ menu, storeData, isEditing = false }: NavbarClien
         Get free delivery on orders over $100
       </div>
 
-      <header className="sticky top-0 z-10 bg-white/80 backdrop-blur-md">
+      <header className="sticky top-0 z-20 bg-white/80 backdrop-blur-md">
         <nav aria-label="Top" className="x-4 border-b sm:pl-4 lg:pl-6">
           <div className="">
             <div className="flex h-16 items-center">
@@ -214,7 +214,13 @@ export function NavbarClient({ menu, storeData, isEditing = false }: NavbarClien
                 <Link href={routes?.rootUrl || '/'}>
                   <span className="sr-only">{storeName}</span>
                   {logoUrl ? (
-                    <Image src={logoUrl} alt={storeName} width={120} height={32} className="h-8 w-auto" />
+                    <Image
+                      src={logoUrl}
+                      alt={storeName}
+                      width={120}
+                      height={32}
+                      className="h-8 w-auto"
+                    />
                   ) : (
                     <span className="text-xl font-bold text-gray-900">{storeName}</span>
                   )}

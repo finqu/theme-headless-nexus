@@ -24,7 +24,7 @@ export function ProductGallery({ images, productTitle }: ProductGalleryProps) {
       <div className="relative h-full">
         {/* Sketchy lines background pattern - extends full width/height */}
         <SketchyLines angle={45} spacing={10} thickness={1} color="rgba(0, 0, 0, 0.06)" />
-        <div className="relative z-10 px-4 py-8 sm:px-6">
+        <div className="relative px-4 py-8 sm:px-6">
           <div className="aspect-square w-full overflow-hidden border bg-gray-100">
             <ImagePlaceholder text="No image available" />
           </div>
@@ -41,7 +41,7 @@ export function ProductGallery({ images, productTitle }: ProductGalleryProps) {
       <SketchyLines angle={45} spacing={10} thickness={1} color="rgba(0, 0, 0, 0.06)" />
 
       {/* Gallery content with padding */}
-      <div className="relative z-10 space-y-4 px-4 py-8 sm:px-6">
+      <div className="relative space-y-4 px-4 py-8 sm:px-6">
         {/* Main Image */}
         <div className="aspect-square border bg-gray-100 lg:aspect-3/4">
           <Image

@@ -1,0 +1,29 @@
+{
+  "version": 1,
+  "skills": {
+    "finqu-cli": {
+      "source": "Finqu/skills",
+      "sourceType": "github",
+      "skillPath": "skills/finqu-cli/SKILL.md",
+      "computedHash": "fd977e32ad1fee9b3dcb1c12a53d1a6b16e93985a9139dadbe8d5ff05305f72a"
+    },
+    "finqu-headless": {
+      "source": "Finqu/skills",
+      "sourceType": "github",
+      "skillPath": "skills/finqu-headless/SKILL.md",
+      "computedHash": "aa78702c1f9c20bccab9d0fb650c56e41358c44bc6a3ab3a60bb3928147ad40b"
+    },
+    "finqu-router": {
+      "source": "Finqu/skills",
+      "sourceType": "github",
+      "skillPath": "skills/finqu-router/SKILL.md",
+      "computedHash": "50cc1685c5e0569282b2146e0f1df994b9452595558d8959e281f0f506e8edbe"
+    },
+    "finqu-storefront-api": {
+      "source": "Finqu/skills",
+      "sourceType": "github",
+      "skillPath": "skills/finqu-storefront-api/SKILL.md",
+      "computedHash": "f3fdf8023bae09821e6f229433cb4aefd66c3ee23e6055caad6b55c61a74a228"
+    }
+  }
+}

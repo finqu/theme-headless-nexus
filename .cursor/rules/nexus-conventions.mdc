@@ -1,0 +1,13 @@
+---
+description: Nexus storefront conventions that always apply
+alwaysApply: true
+---
+
+# Nexus conventions
+
+- Follow `AGENTS.md`. This repo’s SDK usage overrides generic Finqu skill snippets.
+- Package manager is pnpm. Locale proxy is `proxy.ts`, not `middleware.ts`.
+- Fetch via `@finqu/storefront-sdk/server` or `/react`. Custom GraphQL only in `lib/queries/` for gaps.
+- Do not edit `.storefront/`. Do not wrap GraphQL in REST routes. Checkout uses `cart.checkoutUrl`.
+- RSC-first. Parse `resourceByPath` IDs with `parseInt` before SDK calls.
+- New storefront pages: implement the next item in the `ecommerce-pages` backlog, one slice per change.

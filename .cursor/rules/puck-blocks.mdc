@@ -1,0 +1,14 @@
+---
+description: Puck visual editor blocks
+globs: blocks/**/*.{ts,tsx},lib/puck/**/*.{ts,tsx}
+alwaysApply: false
+---
+
+# Puck blocks
+
+- Files must match `*.puck.tsx` and export `category` plus `config: ComponentConfig<Props>`.
+- Simple block: one file. Interactive picker: `*.edit.puck.tsx` (client) + `*.render.puck.tsx` (server) + `shared.ts`.
+- Store IDs in props, not full API objects. Fetch fresh data in render mode.
+- Wrap async render trees in `<Suspense>`.
+- Never edit `.storefront/puck.*.config.tsx` — `pnpm dev` regenerates them.
+- Keep editor fields labeled and give usable `defaultProps`.

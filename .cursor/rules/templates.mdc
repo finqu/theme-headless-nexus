@@ -1,0 +1,15 @@
+---
+description: Resource templates and catch-all routing
+globs: templates/**/*.{ts,tsx},app/(site)/**/*.tsx,app/page.tsx
+alwaysApply: false
+---
+
+# Templates
+
+- Register every `ResourceKind` renderer in `templates/index.tsx`.
+- Prefer a real template over `PlaceholderTemplate`. Keep placeholders only for not-yet-built kinds.
+- Server templates fetch with SDK helpers (`getProduct`, `getCatalogProducts`, `getProductGroupWithProducts`, `getCart`).
+- Pass `locale` and numeric `id`. Use `searchParams` for catalog sort/pagination.
+- Puck published config wins when present (`getTemplateConfig` / `getPageConfig`). Templates are the fallback.
+- Checkout: link to `checkoutUrl`. Do not implement payment UI.
+- Reuse `components/product/*` and `components/cart/*` instead of new one-off markup.

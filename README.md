@@ -4,6 +4,8 @@ A modern Next.js 16 storefront theme for Finqu headless commerce, featuring an i
 
 📚 **For detailed Finqu documentation**, visit [developers.finqu.com](https://developers.finqu.com)
 
+🤖 **For AI coding agents**, start with [AGENTS.md](./AGENTS.md).
+
 ## Quick Start
 
 ```bash
@@ -515,7 +517,7 @@ FINQU_SECRET_KEY=sk_...
 
 # Public API access (for client-side queries)
 NEXT_PUBLIC_FINQU_STOREFRONT_URL=https://your-storefront.finqu.dev
-NEXT_PUBLIC_FINQU_STOREFRONT_TOKEN=pk_...
+NEXT_PUBLIC_FINQU_PUBLIC_KEY=pk_...
 
 # Redis (optional - enables production storage)
 KV_REST_API_URL=https://...

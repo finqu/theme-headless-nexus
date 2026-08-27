@@ -1,0 +1,21 @@
+---
+description: Finqu Storefront GraphQL and SDK usage
+globs: lib/**/*.{ts,tsx},blocks/**/*.{ts,tsx}
+alwaysApply: false
+---
+
+# GraphQL / SDK
+
+```ts
+import { storefrontClient, cachePresets, withLocale } from '@/lib/storefront';
+import { getProduct, getCatalogProducts } from '@finqu/storefront-sdk/server';
+
+const { product } = await getProduct(storefrontClient, { id });
+```
+
+- Server: `storefrontClient` + `FINQU_SECRET_KEY`. Client: hooks + `NEXT_PUBLIC_FINQU_PUBLIC_KEY`.
+- Cache: `cachePresets.static` (routes/menus), `.products` (catalog), `.dynamic` (cart/auth). Always `withLocale`.
+- Deduplicate per request with `React.cache()` (see `getResourceByPath`).
+- Custom operations: add typed documents in `lib/queries/`, re-export from `lib/queries/index.ts`.
+- Mutations must surface `userErrors`. Do not swallow them.
+- Types come from `@finqu/storefront-types`, not hand-rolled duplicates.

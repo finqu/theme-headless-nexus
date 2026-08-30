@@ -7,6 +7,7 @@ import { getTemplateTypeForResource } from '@/lib/template-types';
 import { getLocale, getPathname } from '@/lib/locale';
 import { SiteLayout } from '@/components/layout';
 import { renderTemplate } from '@/templates';
+import { getProductGroupById } from '@/lib/product-group';
 
 interface PageProps {
   params: Promise<{ slug: string[] }>;
@@ -99,9 +100,7 @@ export default async function DynamicPage({ params, searchParams }: PageProps) {
 /**
  * Generate metadata for the page based on resource type
  */
-export async function generateMetadata({ params }: PageProps) {
-  // Await params for Next.js 15+ compatibility
-  const { slug } = await params;
+export async function generateMetadata(_props: PageProps) {
   // Get locale and original path from middleware headers
   const [locale, path] = await Promise.all([getLocale(), getPathname()]);
 
@@ -112,7 +111,6 @@ export async function generateMetadata({ params }: PageProps) {
     return {};
   }
 
-  // Generate title based on resource type
   const title = getPageTitle(resource.type, path);
 
   // Build hreflang alternate links from resource alternates
@@ -124,20 +122,37 @@ export async function generateMetadata({ params }: PageProps) {
     }
   }
 
-  // Check for Puck template with custom metadata
   const templateType = getTemplateTypeForResource(resource.type);
+  const groupId =
+    resource.type === 'PRODUCT_GROUP' && resource.id ? parseInt(resource.id, 10) : Number.NaN;
+  const groupPromise = !Number.isNaN(groupId)
+    ? getProductGroupById(groupId, locale).catch(() => null)
+    : null;
+  const puckConfigPromise =
+    templateType && resource.id
+      ? getTemplateConfig(templateType, resource.id, 'published')
+      : Promise.resolve(null);
 
-  if (templateType && resource.id) {
-    const data = await getTemplateConfig(templateType, resource.id, 'published');
+  const data = await puckConfigPromise;
+  if (data) {
+    const puckTitle = (data.root?.props as Record<string, unknown>)?.title as string;
+    if (puckTitle) {
+      return {
+        title: puckTitle,
+        alternates: { languages: alternates },
+      };
+    }
+  }
 
-    if (data) {
-      const puckTitle = (data.root?.props as Record<string, unknown>)?.title as string;
-      if (puckTitle) {
-        return {
-          title: puckTitle,
-          alternates: { languages: alternates },
-        };
-      }
+  if (groupPromise) {
+    const group = await groupPromise;
+    if (group) {
+      return {
+        title: group.seoTitle || group.title || title,
+        description: group.seoDescription || undefined,
+        keywords: group.seoKeywords || undefined,
+        alternates: { languages: alternates },
+      };
     }
   }
 
@@ -167,6 +182,7 @@ function getPageTitle(type: ResourceKind, path: string): string {
     SEARCH: 'Search',
     BLOG: 'Blog',
     PRODUCTS: 'Products',
+    PRODUCT_GROUP: 'Category',
     PRIVACY_POLICY: 'Privacy Policy',
     SHIPPING_POLICY: 'Shipping Policy',
     REFUND_POLICY: 'Refund Policy',

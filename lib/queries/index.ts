@@ -5,8 +5,8 @@
  * @finqu/storefront-sdk's built-in helper functions.
  *
  * For products, cart, and product groups, use the SDK helpers:
- * - getProduct, getCatalogProducts from '@finqu/storefront-sdk/server'
- * - useProduct, useCatalogProducts, useCart from '@finqu/storefront-sdk/react'
+ * - getProduct, getCatalogProducts, getProductGroup, getProductGroupWithProducts from '@finqu/storefront-sdk/server'
+ * - useProduct, useCatalogProducts, useCart, useProductGroup from '@finqu/storefront-sdk/react'
  *
  * Types are imported from @finqu/storefront-types where possible.
  */

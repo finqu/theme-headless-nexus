@@ -32,6 +32,8 @@ export function CartDrawer({ cartUrl = '/cart' }: CartDrawerProps) {
     closeCart,
     updateItem,
     removeItem,
+    error,
+    clearError,
     checkoutUrl,
   } = useCart();
 
@@ -51,6 +53,25 @@ export function CartDrawer({ cartUrl = '/cart' }: CartDrawerProps) {
         </SheetHeader>
 
         <Separator />
+
+        {error ? (
+          <div
+            role="alert"
+            className="mt-4 flex items-start gap-2 rounded-sm border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700"
+          >
+            <span className="flex-1">{error}</span>
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon-sm"
+              className="-mt-1 -mr-1 text-red-700 hover:bg-red-100 hover:text-red-800"
+              onClick={clearError}
+              aria-label="Dismiss cart error"
+            >
+              <X className="h-4 w-4" />
+            </Button>
+          </div>
+        ) : null}
 
         {/* Cart Contents */}
         <div className="flex-1 overflow-y-auto py-4">

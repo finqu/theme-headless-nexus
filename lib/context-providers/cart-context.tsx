@@ -13,10 +13,11 @@ import {
   useCart as useCartQuery,
   useCreateCart,
   useAddToCart,
+  useApplyDiscountCode,
   useRemoveFromCart,
   useUpdateCartLines,
 } from '@finqu/storefront-sdk/react';
-import type { Cart, CartLineItem } from '@finqu/storefront-types';
+import { getFirstUserError, type Cart, type CartLineItem } from '@finqu/storefront-types';
 
 const CART_ID_COOKIE = 'finqu_cart_id';
 
@@ -47,6 +48,10 @@ function clearCartIdCookie() {
   document.cookie = `${CART_ID_COOKIE}=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/`;
 }
 
+function getOperationError(error: unknown, fallback: string): string {
+  return error instanceof Error && error.message ? error.message : fallback;
+}
+
 export interface CartContextValue {
   /** Current cart data */
   cart: Cart | null;
@@ -72,6 +77,12 @@ export interface CartContextValue {
   updateItem: (lineId: number, quantity: number) => Promise<void>;
   /** Remove item from cart */
   removeItem: (lineId: number) => Promise<void>;
+  /** Apply a discount code to the cart */
+  applyDiscountCode: (code: string) => Promise<boolean>;
+  /** Latest cart query or mutation error */
+  error: string | null;
+  /** Clear the latest cart error */
+  clearError: () => void;
   /** Checkout URL */
   checkoutUrl: string | null;
 }
@@ -82,6 +93,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
   const [cartId, setCartId] = useState<string | null>(null);
   const [isOpen, setIsOpen] = useState(false);
   const [isInitialized, setIsInitialized] = useState(false);
+  const [operationError, setOperationError] = useState<string | null>(null);
 
   // Load cart ID from cookie on mount
   useEffect(() => {
@@ -95,6 +107,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
   // Fetch cart data when we have a cart ID
   const {
     data: cartData,
+    error: cartQueryError,
     loading: isCartLoading,
     refetch: refetchCart,
   } = useCartQuery<Cart>(
@@ -112,8 +125,9 @@ export function CartProvider({ children }: { children: ReactNode }) {
   const [addLinesMutation, { loading: isAdding }] = useAddToCart<Cart>();
   const [updateLinesMutation, { loading: isUpdatingLines }] = useUpdateCartLines<Cart>();
   const [removeLinesMutation, { loading: isRemoving }] = useRemoveFromCart<Cart>();
+  const [applyDiscountMutation, { loading: isApplyingDiscount }] = useApplyDiscountCode<Cart>();
 
-  const isUpdating = isCreating || isAdding || isUpdatingLines || isRemoving;
+  const isUpdating = isCreating || isAdding || isUpdatingLines || isRemoving || isApplyingDiscount;
 
   // Derived state
   const items = useMemo(() => cart?.lines ?? [], [cart?.lines]);
@@ -126,6 +140,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
   const openCart = useCallback(() => setIsOpen(true), []);
   const closeCart = useCallback(() => setIsOpen(false), []);
   const toggleCart = useCallback(() => setIsOpen((prev) => !prev), []);
+  const clearError = useCallback(() => setOperationError(null), []);
 
   // Add item to cart
   const addItem = useCallback(
@@ -136,33 +151,53 @@ export function CartProvider({ children }: { children: ReactNode }) {
         return;
       }
 
-      if (cartId == null) {
-        // Create a new cart with the item
-        const { data } = await createCartMutation({
-          variables: {
-            input: {
-              lines: [{ merchandiseId, quantity }],
-            },
-          },
-        });
+      setOperationError(null);
 
-        const newCartId = data?.cartCreate.cart?.id;
-        if (newCartId) {
+      try {
+        if (cartId == null) {
+          // Create a new cart with the item
+          const { data } = await createCartMutation({
+            variables: {
+              input: {
+                lines: [{ merchandiseId, quantity }],
+              },
+            },
+          });
+
+          const mutationError = getFirstUserError(data?.cartCreate);
+          if (mutationError) {
+            throw new Error(mutationError);
+          }
+
+          const newCartId = data?.cartCreate.cart?.id;
+          if (!newCartId) {
+            throw new Error('The cart could not be created.');
+          }
           setCartId(newCartId);
           setCartIdCookie(newCartId);
+        } else {
+          // Add to existing cart
+          const { data } = await addLinesMutation({
+            variables: {
+              id: cartId,
+              lines: [{ merchandiseId, quantity }],
+            },
+          });
+
+          const mutationError = getFirstUserError(data?.cartLinesAdd);
+          if (mutationError) {
+            throw new Error(mutationError);
+          }
+          await refetchCart();
         }
-      } else {
-        // Add to existing cart
-        await addLinesMutation({
-          variables: {
-            id: cartId,
-            lines: [{ merchandiseId, quantity }],
-          },
-        });
-        refetchCart();
+
+        // Open cart drawer after adding
+        openCart();
+      } catch (error) {
+        setOperationError(getOperationError(error, 'The item could not be added to the cart.'));
+        openCart();
+        throw error;
       }
-      // Open cart drawer after adding
-      openCart();
     },
     [cartId, createCartMutation, addLinesMutation, openCart, refetchCart]
   );
@@ -172,23 +207,39 @@ export function CartProvider({ children }: { children: ReactNode }) {
     async (lineId: number, quantity: number) => {
       if (!cartId) return;
 
-      if (quantity <= 0) {
-        // Remove item if quantity is 0 or less
-        await removeLinesMutation({
-          variables: {
-            id: cartId,
-            lineIds: [lineId],
-          },
-        });
-      } else {
-        await updateLinesMutation({
-          variables: {
-            id: cartId,
-            lines: [{ id: lineId, quantity }],
-          },
-        });
+      setOperationError(null);
+
+      try {
+        if (quantity <= 0) {
+          // Remove item if quantity is 0 or less
+          const { data } = await removeLinesMutation({
+            variables: {
+              id: cartId,
+              lineIds: [lineId],
+            },
+          });
+          const mutationError = getFirstUserError(data?.cartLinesRemove);
+          if (mutationError) {
+            setOperationError(mutationError);
+            return;
+          }
+        } else {
+          const { data } = await updateLinesMutation({
+            variables: {
+              id: cartId,
+              lines: [{ id: lineId, quantity }],
+            },
+          });
+          const mutationError = getFirstUserError(data?.cartLinesUpdate);
+          if (mutationError) {
+            setOperationError(mutationError);
+            return;
+          }
+        }
+        await refetchCart();
+      } catch (error) {
+        setOperationError(getOperationError(error, 'The cart quantity could not be updated.'));
       }
-      refetchCart();
     },
     [cartId, updateLinesMutation, removeLinesMutation, refetchCart]
   );
@@ -197,15 +248,71 @@ export function CartProvider({ children }: { children: ReactNode }) {
   const removeItem = useCallback(
     async (lineId: number) => {
       if (!cartId) return;
-      await removeLinesMutation({
-        variables: {
-          id: cartId,
-          lineIds: [lineId],
-        },
-      });
-      refetchCart();
+
+      setOperationError(null);
+
+      try {
+        const { data } = await removeLinesMutation({
+          variables: {
+            id: cartId,
+            lineIds: [lineId],
+          },
+        });
+        const mutationError = getFirstUserError(data?.cartLinesRemove);
+        if (mutationError) {
+          setOperationError(mutationError);
+          return;
+        }
+        await refetchCart();
+      } catch (error) {
+        setOperationError(getOperationError(error, 'The item could not be removed.'));
+      }
     },
     [cartId, removeLinesMutation, refetchCart]
+  );
+
+  // Apply a discount code while retaining any codes already on the cart
+  const applyDiscountCode = useCallback(
+    async (code: string) => {
+      const normalizedCode = code.trim();
+      if (!cartId || !normalizedCode) {
+        setOperationError('Enter a discount code to apply.');
+        return false;
+      }
+
+      setOperationError(null);
+
+      const appliedCodes = (cart?.discounts ?? []).flatMap((discount) =>
+        discount.code ? [discount.code] : []
+      );
+      const hasCode = appliedCodes.some(
+        (discountCode) => discountCode.toLowerCase() === normalizedCode.toLowerCase()
+      );
+
+      if (hasCode) {
+        return true;
+      }
+
+      try {
+        const { data } = await applyDiscountMutation({
+          variables: {
+            id: cartId,
+            discountCodes: [...appliedCodes, normalizedCode],
+          },
+        });
+        const mutationError = getFirstUserError(data?.cartDiscountCodesUpdate);
+        if (mutationError) {
+          setOperationError(mutationError);
+          return false;
+        }
+        await refetchCart();
+        return true;
+      } catch (error) {
+        setOperationError(getOperationError(error, 'The discount code could not be applied.'));
+        return false;
+      }
+    },
+    [applyDiscountMutation, cart?.discounts, cartId, refetchCart]
   );
 
   const value: CartContextValue = {
@@ -221,6 +328,9 @@ export function CartProvider({ children }: { children: ReactNode }) {
     addItem,
     updateItem,
     removeItem,
+    applyDiscountCode,
+    error: operationError ?? cartQueryError?.message ?? null,
+    clearError,
     checkoutUrl: cart?.checkoutUrl ?? null,
   };
 

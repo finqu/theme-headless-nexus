@@ -21,10 +21,7 @@ export function formatPrice(value: number, currency = 'EUR'): string {
  * @param price - The current/sale price
  * @returns Discount percentage (0-100)
  */
-export function calculateDiscountPercent(
-  originalPrice: number,
-  price: number
-): number {
+export function calculateDiscountPercent(originalPrice: number, price: number): number {
   if (originalPrice <= 0 || price <= 0) return 0;
   return Math.round(((originalPrice - price) / originalPrice) * 100);
 }

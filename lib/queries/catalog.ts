@@ -4,7 +4,13 @@
  * Shared between edit and render Puck components.
  */
 export const CATALOG_PRODUCTS_QUERY = /* GraphQL */ `
-  query GetCatalogProducts($first: Int = 20, $after: String, $query: String, $sortKey: ProductSortKey, $reverse: Boolean = false) {
+  query GetCatalogProducts(
+    $first: Int = 20
+    $after: String
+    $query: String
+    $sortKey: ProductSortKey
+    $reverse: Boolean = false
+  ) {
     catalog {
       productsCount
       products(first: $first, after: $after, query: $query, sortKey: $sortKey, reverse: $reverse) {

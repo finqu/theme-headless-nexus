@@ -26,10 +26,13 @@ export const STORE_QUERY = /* GraphQL */ `
 /**
  * Subset of StoreInfo containing only the fields we query
  */
-export type StoreBasicInfo = Pick<StoreInfo, 'name' | 'logo' | 'favicon' | 'customerAccountsEnabled'>;
+export type StoreBasicInfo = Pick<
+  StoreInfo,
+  'name' | 'logo' | 'favicon' | 'customerAccountsEnabled'
+>;
 
 export interface StoreQueryResponse {
-    store: StoreBasicInfo | null;
+  store: StoreBasicInfo | null;
 }
 
 /**
@@ -48,7 +51,7 @@ export const LOCALES_QUERY = /* GraphQL */ `
 `;
 
 export interface LocalesQueryResponse {
-    locales: Locale[];
+  locales: Locale[];
 }
 
 /**
@@ -65,7 +68,7 @@ export const CURRENCIES_QUERY = /* GraphQL */ `
 `;
 
 export interface CurrenciesQueryResponse {
-    currencies: Currency[];
+  currencies: Currency[];
 }
 
 /**
@@ -89,6 +92,6 @@ export const STORE_SETUP_QUERY = /* GraphQL */ `
 `;
 
 export interface StoreSetupQueryResponse {
-    store: Pick<StoreInfo, 'name' | 'logo'> | null;
-    locales: Locale[];
+  store: Pick<StoreInfo, 'name' | 'logo'> | null;
+  locales: Locale[];
 }

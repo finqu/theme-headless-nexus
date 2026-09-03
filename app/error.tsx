@@ -19,9 +19,7 @@ export default function Error({
     <div className="flex min-h-[60vh] flex-col items-center justify-center px-4">
       <div className="text-center">
         <h1 className="text-4xl font-bold tracking-tight text-gray-900">Something went wrong</h1>
-        <p className="mt-4 text-gray-600">
-          We apologize for the inconvenience. Please try again.
-        </p>
+        <p className="mt-4 text-gray-600">We apologize for the inconvenience. Please try again.</p>
         <div className="mt-8 flex items-center justify-center gap-4">
           <button
             onClick={reset}

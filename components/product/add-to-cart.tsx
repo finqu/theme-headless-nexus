@@ -77,11 +77,7 @@ export function AddToCart({ productId, isAvailable = true, className }: AddToCar
       </div>
 
       {/* Add to Cart Button */}
-      <Button
-        onClick={handleAddToCart}
-        disabled={isDisabled}
-        className="h-12 flex-1 px-6"
-      >
+      <Button onClick={handleAddToCart} disabled={isDisabled} className="h-12 flex-1 px-6">
         {isLoading ? (
           <>
             <Loader2 className="mr-2 h-4 w-4 animate-spin" />

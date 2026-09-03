@@ -32,17 +32,17 @@ export async function GET(request: Request) {
     const locale = searchParams.get('locale') || '';
 
     // Create cache options
-    const cacheOptions = locale
-      ? withLocale(locale, cachePresets.static)
-      : cachePresets.static;
+    const cacheOptions = locale ? withLocale(locale, cachePresets.static) : cachePresets.static;
 
     // Fetch local page IDs and storefront pages in parallel
     const [localPageIds, storefrontPagesResult] = await Promise.all([
       listPageIds(),
-      storefrontClient.query<PagesQueryResponse>(PAGES_QUERY, { first: 50 }, cacheOptions).catch((err) => {
-        console.error('Failed to fetch storefront pages:', err);
-        return null;
-      }),
+      storefrontClient
+        .query<PagesQueryResponse>(PAGES_QUERY, { first: 50 }, cacheOptions)
+        .catch((err) => {
+          console.error('Failed to fetch storefront pages:', err);
+          return null;
+        }),
     ]);
 
     // Create a set of local page IDs for quick lookup

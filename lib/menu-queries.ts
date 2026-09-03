@@ -12,10 +12,7 @@ interface MenuQueryResponse {
  * @param handle - Menu handle to fetch
  * @param locale - Locale for localized menu content
  */
-export async function fetchMenuWithLinks(
-  handle: string,
-  locale: string
-): Promise<Menu | null> {
+export async function fetchMenuWithLinks(handle: string, locale: string): Promise<Menu | null> {
   try {
     const result = await storefrontClient.query<MenuQueryResponse>(
       GET_NAVIGATION_MENU,

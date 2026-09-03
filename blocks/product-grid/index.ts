@@ -8,9 +8,4 @@ export { ProductGridAsync } from './product-grid-async';
 export { ProductGridSkeleton } from './product-grid-skeleton';
 
 // Shared utilities for product fetching
-export {
-  fetchProducts,
-  fetchProductsByIds,
-  extractProductIds,
-  getProductImageUrl,
-} from './shared';
+export { fetchProducts, fetchProductsByIds, extractProductIds, getProductImageUrl } from './shared';

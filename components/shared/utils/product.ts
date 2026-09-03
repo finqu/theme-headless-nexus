@@ -10,9 +10,7 @@ import type { ProductListItem } from '@/lib/types';
  * @param product - Product or ProductListItem
  * @returns Image URL string or undefined
  */
-export function getProductImageUrl(
-  product: Product | ProductListItem
-): string | undefined {
+export function getProductImageUrl(product: Product | ProductListItem): string | undefined {
   const variant = product.defaultOrSelectedVariant;
   const url = variant?.featuredImage?.url || variant?.image?.url;
   return url || undefined;

@@ -47,7 +47,7 @@ export function AuthLayout({
       </div>
 
       {/* Form Panel - Right side on desktop, top on mobile */}
-      <div className="bg-white flex w-full flex-1 flex-col items-center justify-center border-border px-4 py-12 lg:w-1/2 lg:border-l lg:px-8">
+      <div className="border-border flex w-full flex-1 flex-col items-center justify-center bg-white px-4 py-12 lg:w-1/2 lg:border-l lg:px-8">
         <div className="w-full max-w-md">{children}</div>
       </div>
 

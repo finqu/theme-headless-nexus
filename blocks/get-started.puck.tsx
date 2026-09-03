@@ -56,7 +56,8 @@ export const config: ComponentConfig<GetStartedProps> = {
   defaultProps: {
     badgeText: 'Shipped new features!',
     title: 'Get Started with Headless Commerce',
-    description: 'Start building your storefront in minutes with our powerful headless commerce solution.',
+    description:
+      'Start building your storefront in minutes with our powerful headless commerce solution.',
     commandName: 'my-storefront',
     gradientBorderTop: false,
     gradientBorderBottom: false,

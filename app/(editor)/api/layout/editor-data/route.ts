@@ -12,32 +12,29 @@ import { getStoreData } from '@/lib/store-cache';
  * - locale: Optional locale code (e.g., 'fi', 'en') to fetch localized data
  */
 export async function GET(request: Request) {
-    try {
-        // Parse locale from query params
-        const { searchParams } = new URL(request.url);
-        const locale = searchParams.get('locale') || 'en';
+  try {
+    // Parse locale from query params
+    const { searchParams } = new URL(request.url);
+    const locale = searchParams.get('locale') || 'en';
 
-        // Fetch layout settings first to get menu handles
-        const layoutSettings = await getLayoutSettings();
+    // Fetch layout settings first to get menu handles
+    const layoutSettings = await getLayoutSettings();
 
-        // Fetch menus and store data in parallel
-        const [navbarMenu, footerMenu, storeData] = await Promise.all([
-            fetchMenuWithLinks(layoutSettings.navbar.menuHandle, locale),
-            fetchMenuWithLinks(layoutSettings.footer.menuHandle, locale),
-            getStoreData(locale),
-        ]);
+    // Fetch menus and store data in parallel
+    const [navbarMenu, footerMenu, storeData] = await Promise.all([
+      fetchMenuWithLinks(layoutSettings.navbar.menuHandle, locale),
+      fetchMenuWithLinks(layoutSettings.footer.menuHandle, locale),
+      getStoreData(locale),
+    ]);
 
-        return NextResponse.json({
-            layoutSettings,
-            navbarMenu,
-            footerMenu,
-            storeData,
-        });
-    } catch (error) {
-        console.error('Failed to fetch editor layout data:', error);
-        return NextResponse.json(
-            { error: 'Failed to fetch editor layout data' },
-            { status: 500 }
-        );
-    }
+    return NextResponse.json({
+      layoutSettings,
+      navbarMenu,
+      footerMenu,
+      storeData,
+    });
+  } catch (error) {
+    console.error('Failed to fetch editor layout data:', error);
+    return NextResponse.json({ error: 'Failed to fetch editor layout data' }, { status: 500 });
+  }
 }

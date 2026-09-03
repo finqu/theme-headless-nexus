@@ -55,7 +55,13 @@ export function Footer({
             {/* Logo */}
             <Link href="/" className="inline-block">
               {logoUrl ? (
-                <Image src={logoUrl} alt={storeName} width={120} height={32} className="h-8 w-auto" />
+                <Image
+                  src={logoUrl}
+                  alt={storeName}
+                  width={120}
+                  height={32}
+                  className="h-8 w-auto"
+                />
               ) : (
                 <LogoPlaceholder />
               )}

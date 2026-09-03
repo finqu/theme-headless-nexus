@@ -92,9 +92,7 @@ export async function proxy(request: NextRequest) {
   const firstSegment = segments[0]?.toLowerCase();
 
   // Check if URL has a locale prefix (any supported locale)
-  const matchedLocale = storeInfo.locales.find(
-    (l) => l.isoCode?.toLowerCase() === firstSegment
-  );
+  const matchedLocale = storeInfo.locales.find((l) => l.isoCode?.toLowerCase() === firstSegment);
 
   // Clone request headers to add our custom headers
   const requestHeaders = new Headers(request.headers);

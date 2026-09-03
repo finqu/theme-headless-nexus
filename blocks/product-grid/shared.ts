@@ -78,10 +78,7 @@ export async function fetchProducts(options: FetchProductsOptions = {}): Promise
  * Fetches a single product by ID.
  * Used internally by fetchProductsByIds for efficient individual fetching.
  */
-async function fetchProductById(
-  client: FinquClient,
-  productId: number
-): Promise<Product | null> {
+async function fetchProductById(client: FinquClient, productId: number): Promise<Product | null> {
   try {
     const result = await client.query<{
       product: Product | null;
@@ -127,9 +124,7 @@ export async function fetchProductsByIds(
 
   // Maintain the order of requested IDs
   const productMap = new Map(validProducts.map((p) => [p.id, p]));
-  return validIds
-    .map((id) => productMap.get(id))
-    .filter((p): p is Product => p != null);
+  return validIds.map((id) => productMap.get(id)).filter((p): p is Product => p != null);
 }
 
 /**

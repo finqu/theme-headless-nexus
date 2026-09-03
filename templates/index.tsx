@@ -9,6 +9,7 @@ import { ProductsTemplate } from './products-template';
 import { PolicyTemplate } from './policy-template';
 import { ProductTemplate } from './product-template';
 import { ProductGroupTemplate } from './product-group-template';
+import { PageTemplate } from './page-template';
 
 // Re-export individual templates
 export { PlaceholderTemplate } from './placeholder-template';
@@ -21,6 +22,7 @@ export { ProductsTemplate } from './products-template';
 export { PolicyTemplate } from './policy-template';
 export { ProductTemplate } from './product-template';
 export { ProductGroupTemplate } from './product-group-template';
+export { PageTemplate } from './page-template';
 
 /**
  * Props passed to template renderers.
@@ -91,14 +93,12 @@ const templateRegistry: Partial<Record<ResourceKind, TemplateRenderer>> = {
     ) : (
       <PlaceholderTemplate type="PRODUCT_GROUP" message="Product group ID is missing." />
     ),
-  PAGE: ({ id }) => (
-    <PlaceholderTemplate
-      type="PAGE"
-      id={id}
-      message="No template configured for this page."
-      showEditorLink
-    />
-  ),
+  PAGE: ({ id, locale }) =>
+    id != null ? (
+      <PageTemplate id={id} locale={locale} />
+    ) : (
+      <PlaceholderTemplate type="PAGE" message="Page ID is missing." />
+    ),
   ARTICLE: ({ id }) => (
     <PlaceholderTemplate
       type="ARTICLE"

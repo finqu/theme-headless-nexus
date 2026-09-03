@@ -11,7 +11,7 @@ Ship the next `todo`/`partial` in **priority order**. One slice per PR.
 | partial | Product PDP       | `PRODUCT`       | `ProductTemplate` fetches via `getProduct`. Gallery, variants, add-to-cart exist. Fill SEO metadata from product fields; wire breadcrumbs to real category URLs. |
 | done    | Category          | `PRODUCT_GROUP` | `ProductGroupTemplate` fetches via `GET_PRODUCT_GROUP` / `GET_PRODUCT_GROUP_WITH_PRODUCTS`. Grid, sort, pagination, SEO. Next slice is the live cart page.       |
 | done    | Cart page         | `CART`          | Live lines, quantity/remove mutations, totals, discount codes, and hosted checkout via `cart.checkoutUrl`. Next slice is the CMS page fallback.                  |
-| todo    | CMS page fallback | `PAGE`          | Queries exist (`PAGE_BY_ID_QUERY`). Render title + HTML content when no Puck config is published.                                                                |
+| done    | CMS page fallback | `PAGE`          | `PageTemplate` fetches `PAGE_BY_ID_QUERY` with locale-aware caching and renders title + rich HTML when no Puck page is published. Next slice is search as RSC.   |
 | partial | Catalog           | `PRODUCTS`      | `ProductsTemplate` works. Keep improving sort/filter/pagination against `getCatalogProducts`.                                                                    |
 
 ## P1 — find and account

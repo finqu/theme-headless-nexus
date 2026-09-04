@@ -68,7 +68,9 @@ const templateRegistry: Partial<Record<ResourceKind, TemplateRenderer>> = {
   ),
 
   // Discovery templates
-  SEARCH: ({ locale }) => <SearchTemplate locale={locale} />,
+  SEARCH: ({ locale, searchParams }) => (
+    <SearchTemplate locale={locale} searchParams={searchParams} />
+  ),
   BLOG: () => <PlaceholderTemplate type="BLOG" title="Blog" templateType="blog" />,
   PRODUCTS: ({ locale, searchParams }) => (
     <ProductsTemplate locale={locale} searchParams={searchParams} />

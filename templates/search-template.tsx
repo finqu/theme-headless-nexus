@@ -1,11 +1,13 @@
-'use client';
-
-import { useState, useEffect, useCallback } from 'react';
-import { useSearchParams, useRouter } from 'next/navigation';
+import { Suspense } from 'react';
 import Link from 'next/link';
-import { Search, ChevronRight, Home } from 'lucide-react';
-import type { ProductListItem } from '@/lib/types';
-import { useLocale } from '@/lib/context-providers/locale-context';
+import { ChevronRight, Home, Search } from 'lucide-react';
+import {
+  getCatalogProducts,
+  type FinquServerClient,
+  type GraphQLVariables,
+  type ServerFetchOptions,
+} from '@finqu/storefront-sdk/server';
+import type { Product } from '@finqu/storefront-types';
 import { ProductGrid } from '@/components/product/product-grid';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -18,91 +20,68 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from '@/components/ui/breadcrumb';
-import { fetchProducts } from '@/blocks/product-grid/shared';
+import { getDefaultLocale } from '@/lib/locale';
+import { cachePresets, storefrontClient, withLocale } from '@/lib/storefront';
 
 interface SearchTemplateProps {
   locale: string;
+  searchParams?: Record<string, string | string[] | undefined>;
+}
+
+const SEARCH_RESULTS_LIMIT = 24;
+const SEARCH_SKELETON_ITEMS = Array.from({ length: 8 }, (_, index) => index);
+
+function getSearchQuery(searchParams: SearchTemplateProps['searchParams']): string {
+  const value = searchParams?.q;
+  const query = Array.isArray(value) ? value[0] : value;
+  return query?.trim() ?? '';
 }
 
 /**
- * Search template component.
- * Fetches and displays search results based on URL query parameter.
+ * The SDK helper does not expose server fetch options, so provide a thin
+ * locale-aware client that applies the catalog cache preset to its query.
  */
-export function SearchTemplate({ locale: serverLocale }: SearchTemplateProps) {
-  const searchParams = useSearchParams();
-  const router = useRouter();
-  const { locale } = useLocale();
-  const activeLocale = locale || serverLocale;
+function createSearchClient(locale: string): FinquServerClient {
+  const defaultOptions = withLocale(locale, cachePresets.products);
 
-  const queryParam = searchParams.get('q') || '';
-  const [searchQuery, setSearchQuery] = useState(queryParam);
-  const [results, setResults] = useState<ProductListItem[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
-  const [hasSearched, setHasSearched] = useState(false);
-  const [totalCount, setTotalCount] = useState(0);
-
-  // Fetch results when query param changes
-  useEffect(() => {
-    if (!queryParam.trim()) {
-      setResults([]);
-      setHasSearched(false);
-      setTotalCount(0);
-      return;
-    }
-
-    const fetchResults = async () => {
-      setIsLoading(true);
-      setHasSearched(true);
-      try {
-        const products = await fetchProducts({
-          query: queryParam.trim(),
-          first: 24,
-        });
-        setResults(products);
-        setTotalCount(products.length);
-      } catch (error) {
-        console.error('Search error:', error);
-        setResults([]);
-        setTotalCount(0);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchResults();
-  }, [queryParam, activeLocale]);
-
-  // Sync input with URL param
-  useEffect(() => {
-    setSearchQuery(queryParam);
-  }, [queryParam]);
-
-  const handleSubmit = useCallback(
-    (e: React.FormEvent) => {
-      e.preventDefault();
-      if (searchQuery.trim()) {
-        router.push(`/search?q=${encodeURIComponent(searchQuery.trim())}`);
-      }
+  return {
+    query<T = unknown>(
+      document: string,
+      variables?: GraphQLVariables,
+      options?: ServerFetchOptions
+    ) {
+      return storefrontClient.query<T>(document, variables, options ?? defaultOptions);
     },
-    [searchQuery, router]
-  );
+    mutate<T = unknown>(document: string, variables?: GraphQLVariables) {
+      return storefrontClient.mutate<T>(document, variables);
+    },
+  };
+}
+
+/**
+ * Server-rendered product search fallback.
+ * The GET form keeps the current localized route while the result list streams in.
+ */
+export async function SearchTemplate({ locale, searchParams }: SearchTemplateProps) {
+  const query = getSearchQuery(searchParams);
+  const defaultLocale = await getDefaultLocale();
+  const homeHref = locale.toLowerCase() === defaultLocale.toLowerCase() ? '/' : `/${locale}`;
 
   return (
     <div className="min-h-[60vh] py-8">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        {/* Breadcrumb */}
         <Breadcrumb className="mb-6">
           <BreadcrumbList>
             <BreadcrumbItem>
               <BreadcrumbLink asChild>
-                <Link href="/" className="flex items-center">
-                  <Home className="h-4 w-4" />
+                <Link href={homeHref} className="flex items-center">
+                  <Home aria-hidden="true" className="h-4 w-4" />
                   <span className="sr-only">Home</span>
                 </Link>
               </BreadcrumbLink>
             </BreadcrumbItem>
             <BreadcrumbSeparator>
-              <ChevronRight className="h-4 w-4" />
+              <ChevronRight aria-hidden="true" className="h-4 w-4" />
             </BreadcrumbSeparator>
             <BreadcrumbItem>
               <BreadcrumbPage>Search</BreadcrumbPage>
@@ -110,28 +89,27 @@ export function SearchTemplate({ locale: serverLocale }: SearchTemplateProps) {
           </BreadcrumbList>
         </Breadcrumb>
 
-        {/* Header */}
         <div className="mb-8">
           <h1 className="text-2xl font-bold tracking-tight text-gray-900 sm:text-3xl">
-            {queryParam ? `Search results for "${queryParam}"` : 'Search'}
+            {query ? `Search results for "${query}"` : 'Search'}
           </h1>
-          {hasSearched && !isLoading && (
-            <p className="mt-2 text-sm text-gray-500">
-              {totalCount} {totalCount === 1 ? 'result' : 'results'} found
-            </p>
-          )}
         </div>
 
-        {/* Search form */}
-        <form onSubmit={handleSubmit} className="mb-10">
+        <form method="get" role="search" className="mb-10">
           <div className="relative mx-auto max-w-xl">
-            <Search className="absolute top-1/2 left-4 h-5 w-5 -translate-y-1/2 text-gray-400" />
+            <label htmlFor="product-search" className="sr-only">
+              Search products
+            </label>
+            <Search
+              aria-hidden="true"
+              className="absolute top-1/2 left-4 h-5 w-5 -translate-y-1/2 text-gray-400"
+            />
             <Input
+              id="product-search"
               type="search"
               name="q"
               placeholder="Search products..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
+              defaultValue={query}
               className="py-6 pr-24 pl-12 text-base"
             />
             <Button type="submit" className="absolute top-1/2 right-2 -translate-y-1/2" size="sm">
@@ -140,38 +118,93 @@ export function SearchTemplate({ locale: serverLocale }: SearchTemplateProps) {
           </div>
         </form>
 
-        {/* Results */}
-        {isLoading ? (
-          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
-            {Array.from({ length: 8 }).map((_, i) => (
-              <div key={i} className="overflow-hidden rounded-lg border border-gray-200 bg-white">
-                <Skeleton className="aspect-3/4 w-full" />
-                <div className="space-y-3 p-6">
-                  <Skeleton className="h-4 w-3/4" />
-                  <Skeleton className="h-4 w-1/2" />
-                </div>
-              </div>
-            ))}
-          </div>
-        ) : hasSearched && results.length === 0 ? (
-          <div className="rounded-lg border-2 border-dashed border-gray-300 p-12 text-center">
-            <Search className="mx-auto h-12 w-12 text-gray-300" />
-            <h3 className="mt-4 text-lg font-medium text-gray-900">No results found</h3>
-            <p className="mt-2 text-sm text-gray-500">
-              Try searching for something else or check your spelling.
-            </p>
-          </div>
-        ) : results.length > 0 ? (
-          <ProductGrid products={results} columns={4} showPrice showDescription={false} />
+        {query ? (
+          <Suspense fallback={<SearchResultsSkeleton />}>
+            <SearchResults locale={locale} query={query} />
+          </Suspense>
         ) : (
-          <div className="rounded-lg border-2 border-dashed border-gray-300 p-12 text-center">
-            <Search className="mx-auto h-12 w-12 text-gray-300" />
-            <h3 className="mt-4 text-lg font-medium text-gray-900">What are you looking for?</h3>
-            <p className="mt-2 text-sm text-gray-500">
-              Enter a search term above to find products.
-            </p>
-          </div>
+          <SearchState
+            title="What are you looking for?"
+            description="Enter a search term above to find products."
+          />
         )}
+      </div>
+    </div>
+  );
+}
+
+async function SearchResults({ locale, query }: { locale: string; query: string }) {
+  let products: Product[];
+  let totalCount: number;
+
+  try {
+    const result = await getCatalogProducts<Product>(createSearchClient(locale), {
+      query,
+      first: SEARCH_RESULTS_LIMIT,
+    });
+    products = result.catalog.products.nodes ?? [];
+    totalCount = result.catalog.products.totalCount ?? products.length;
+  } catch (error) {
+    console.error('Failed to load search results:', error);
+    return (
+      <SearchState
+        role="alert"
+        title="Search is temporarily unavailable"
+        description="There was a problem loading results. Please try again later."
+      />
+    );
+  }
+
+  if (products.length === 0) {
+    return (
+      <SearchState
+        title="No results found"
+        description="Try searching for something else or check your spelling."
+      />
+    );
+  }
+
+  return (
+    <>
+      <p className="mb-6 text-sm text-gray-500">
+        {totalCount} {totalCount === 1 ? 'result' : 'results'} found
+      </p>
+      <ProductGrid products={products} columns={4} showPrice showDescription={false} />
+    </>
+  );
+}
+
+function SearchState({
+  title,
+  description,
+  role = 'status',
+}: {
+  title: string;
+  description: string;
+  role?: 'alert' | 'status';
+}) {
+  return (
+    <div role={role} className="rounded-lg border-2 border-dashed border-gray-300 p-12 text-center">
+      <Search aria-hidden="true" className="mx-auto h-12 w-12 text-gray-300" />
+      <h2 className="mt-4 text-lg font-medium text-gray-900">{title}</h2>
+      <p className="mt-2 text-sm text-gray-500">{description}</p>
+    </div>
+  );
+}
+
+function SearchResultsSkeleton() {
+  return (
+    <div aria-busy="true" aria-label="Loading search results">
+      <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+        {SEARCH_SKELETON_ITEMS.map((item) => (
+          <div key={item} className="overflow-hidden rounded-lg border border-gray-200 bg-white">
+            <Skeleton className="aspect-3/4 w-full" />
+            <div className="space-y-3 p-6">
+              <Skeleton className="h-4 w-3/4" />
+              <Skeleton className="h-4 w-1/2" />
+            </div>
+          </div>
+        ))}
       </div>
     </div>
   );

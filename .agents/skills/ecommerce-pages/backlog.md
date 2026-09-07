@@ -18,7 +18,7 @@ Ship the next `todo`/`partial` in **priority order**. One slice per PR.
 
 | Status  | Slice                         | ResourceKind                                                    | Notes                                                                         |
 | ------- | ----------------------------- | --------------------------------------------------------------- | ----------------------------------------------------------------------------- |
-| partial | Search                        | `SEARCH`                                                        | Client fetch today. Move listing to RSC + `getCatalogProducts({ query })`.    |
+| done    | Search                        | `SEARCH`                                                        | Server-rendered listing via `getCatalogProducts({ query })`, with streamed loading, empty, and error states. Next slice is login/register. |
 | partial | Login / register              | `LOGIN`, `REGISTER`                                             | Forms are static. Use `customerAccessTokenCreate` / customer create mutation. |
 | todo    | Password recover/reset/change | `RECOVER_PASSWORD`, `RESET_PASSWORD`, `CHANGE_PASSWORD`         | Placeholders.                                                                 |
 | partial | Account                       | `ACCOUNT`, `ACCOUNT_EDIT`, `ACCOUNT_ORDERS`, `ACCOUNT_WISHLIST` | Shell only. Server helpers: `getCustomerByToken`, `getCustomerOrders`.        |

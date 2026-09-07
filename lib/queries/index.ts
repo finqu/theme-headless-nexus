@@ -14,3 +14,4 @@
 export * from './store';
 export * from './routing';
 export * from './content';
+export * from './customer';

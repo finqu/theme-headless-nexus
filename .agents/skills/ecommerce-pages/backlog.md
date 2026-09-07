@@ -19,9 +19,9 @@ Ship the next `todo`/`partial` in **priority order**. One slice per PR.
 | Status  | Slice                         | ResourceKind                                                    | Notes                                                                         |
 | ------- | ----------------------------- | --------------------------------------------------------------- | ----------------------------------------------------------------------------- |
 | done    | Search                        | `SEARCH`                                                        | Server-rendered listing via `getCatalogProducts({ query })`, with streamed loading, empty, and error states. Next slice is login/register. |
-| partial | Login / register              | `LOGIN`, `REGISTER`                                             | Forms are static. Use `customerAccessTokenCreate` / customer create mutation. |
-| todo    | Password recover/reset/change | `RECOVER_PASSWORD`, `RESET_PASSWORD`, `CHANGE_PASSWORD`         | Placeholders.                                                                 |
+| done    | Login / register              | `LOGIN`, `REGISTER`                                             | Live validated forms use the SDK login helper and customer create mutation, store the access token in an HTTP-only cookie, and surface API errors. Next slice is account/orders. |
 | partial | Account                       | `ACCOUNT`, `ACCOUNT_EDIT`, `ACCOUNT_ORDERS`, `ACCOUNT_WISHLIST` | Shell only. Server helpers: `getCustomerByToken`, `getCustomerOrders`.        |
+| todo    | Password recover/reset/change | `RECOVER_PASSWORD`, `RESET_PASSWORD`, `CHANGE_PASSWORD`         | Placeholders.                                                                 |
 | todo    | Logout                        | `LOGOUT`                                                        | `customerAccessTokenDelete` + cookie clear.                                   |
 
 ## P2 — content

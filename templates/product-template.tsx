@@ -1,4 +1,5 @@
 import { getProduct } from '@finqu/storefront-sdk/server';
+import type { Product } from '@finqu/storefront-types';
 import { storefrontClient } from '@/lib/storefront';
 import { ProductCard } from '@/components/product';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -15,7 +16,7 @@ interface ProductTemplateProps {
  */
 export async function ProductTemplate({ id, locale }: ProductTemplateProps) {
   try {
-    const { product } = await getProduct(storefrontClient, { id });
+    const { product } = await getProduct<Product>(storefrontClient, { id });
 
     if (!product) {
       return (
